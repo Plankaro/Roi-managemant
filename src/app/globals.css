@@ -19,3 +19,20 @@ body {
     --radius:0.5rem;
   }
 }
+
+
+/* Swiper custom styles */
+.swiper-pagination-bullet {
+  @apply opacity-100 !important;
+  transition: width 0.3s ease-in-out; /* Smooth width transition */
+}
+
+.swiper-pagination {
+  @apply !bottom-0 !-left-[38%] !important;
+}
+
+.bullet-active {
+  @apply bg-white !important;
+  width: 3rem !important; /* Increase the width of the active bullet */
+  transition: width 0.3s ease-out; /* Smooth width transition */
+}

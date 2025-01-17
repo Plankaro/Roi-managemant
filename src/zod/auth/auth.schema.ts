@@ -10,6 +10,12 @@ export const signInSchema = z.object({
     rememberMe: z.boolean().default(false),
 });
 
+export const forgotPasswordSchema = z.object({
+    email: z.string().email({
+        message: "Please enter a valid email address.",
+    }),
+});
+
 export const signUpSchema = z.object({
     firstName: z.string().min(2, {
         message: "First name must be at least 2 characters.",
@@ -33,3 +39,4 @@ export const signUpSchema = z.object({
 
 export type SignInFormValues = z.infer<typeof signInSchema>;
 export type SignUpFormValues = z.infer<typeof signUpSchema>;
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
