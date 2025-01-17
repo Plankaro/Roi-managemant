@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 
 
-const DashboardLayout = ({ children, allchats, chatlist }: { children: ReactNode, allchats: ReactNode, chatlist: ReactNode }) => {
+const DashboardLayout = ({ children }: { children: ReactNode }) => {
     return (
         <div className='flex h-screen'>
             {/* Sidebar */}
@@ -45,8 +45,6 @@ const DashboardLayout = ({ children, allchats, chatlist }: { children: ReactNode
                 </div>
             </div>
             {children}
-            {chatlist}
-            {allchats}
         </div>
     )
 }
