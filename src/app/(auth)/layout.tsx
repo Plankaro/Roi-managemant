@@ -8,7 +8,7 @@ const AuthLauout = ({ children }: { children: React.ReactNode }) => {
             <div className="w-full container grid lg:grid-cols-2 gap-4 items-center  ">
 
                 {/* Left side - Branding */}
-                <div className='flex items-center justify-center order-1'>
+                <div className='flex items-center justify-center order-1 max-lg:hidden'>
                     <AuthSlider />
                 </div>
 

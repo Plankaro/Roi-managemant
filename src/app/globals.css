@@ -23,7 +23,7 @@ body {
 
 /* Swiper custom styles */
 .swiper-pagination-bullet {
-  @apply opacity-100 !important;
+  @apply opacity-100 !h-[2.5px]  !important;
   transition: width 0.3s ease-in-out; /* Smooth width transition */
 }
 
@@ -32,7 +32,7 @@ body {
 }
 
 .bullet-active {
-  @apply bg-white !important;
+  @apply bg-white  h-1 !important;
   width: 3rem !important; /* Increase the width of the active bullet */
   transition: width 0.3s ease-out; /* Smooth width transition */
 }

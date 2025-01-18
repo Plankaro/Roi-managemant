@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Checkbox } from '../ui/checkbox';
+import { cn } from '@/lib/utils';
 
 interface AuthFormProps<T extends FieldValues> {
     type: 'SIGN_IN' | 'SIGN_UP' | 'FORGOT_PASSWORD'
@@ -76,7 +77,10 @@ const AuthForm = <T extends FieldValues>({ type, defaultValues, onSubmit, schema
                                             <FormControl>
                                                 <Input
                                                     placeholder={["password", "confirmPassword"].includes(field.name) ? "********" : field.name === "email" ? "user@example.com" : field.name}
-                                                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                                                    className={cn("bg-white/10 border-white/20 text-white placeholder:text-gray-400 text-justify  leading-none", {
+                                                        "text-justify": true,
+                                                        "pt-2": ["password", "confirmPassword"].includes(field.name)
+                                                    })}
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -106,7 +110,7 @@ const AuthForm = <T extends FieldValues>({ type, defaultValues, onSubmit, schema
                                                     id="rememberMe"
                                                     checked={field.value}
                                                     onCheckedChange={field.onChange}
-                                                    className="border-white/20 data-[state=checked]:bg-blue-600"
+                                                    className="border-white/20 data-[state=checked]:bg-transparent data-[state=checked]:border-white !rounded-none"
                                                 />
                                                 <label
                                                     htmlFor="rememberMe"

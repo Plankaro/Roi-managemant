@@ -30,7 +30,7 @@ const slides = [
 
 export function AuthSlider() {
     return (
-        <div className="text-white space-y-6 max-w-lg">
+        <div className="text-white space-y-12 max-w-lg w-full">
             <div className="flex items-center gap-2 text-2xl font-bold">
                 <Logo width={192} height={93} />
             </div>
