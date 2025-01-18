@@ -1,5 +1,6 @@
-import { AuthSlider } from '@/components/auth/auth-slider'
 
+
+import { AuthSlider } from '@/components/page/auth/auth-slider'
 import React from 'react'
 
 const AuthLauout = ({ children }: { children: React.ReactNode }) => {

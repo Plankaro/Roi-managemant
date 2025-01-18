@@ -61,7 +61,7 @@ export default function Home() {
   const [selectedContact, setSelectedContact] = useState(contacts[0]);
 
   return (
-    <div className="flex h-screen bg-navy-900">
+    <div className="flex  bg-navy-900">
 
     </div>
   );

@@ -121,6 +121,9 @@ export default {
 					},
 				],
 			},
+			backgroundImage: {
+				"gradient-border": "linear-gradient(180deg, #1B2A48, #4166AE)",
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
