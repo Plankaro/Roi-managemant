@@ -66,7 +66,7 @@ const DashboardLayout = ({
       <div className="">
         <div className="flex items-center justify-between">
           <div className="text-lg ml-3 font-semibold text-white">Filters</div>
-          <div className="flex gap-8 items-center">
+          <div className="flex gap-6 items-center">
             <p className="text-base ml-3  text-white cursor-pointer">
               Sort By: All{" "}
             </p>
