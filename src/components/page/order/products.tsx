@@ -52,8 +52,8 @@ export default function ProductInventory() {
         />
       </div>
 
-      <div className="rounded-lg bg-transparent p-4">
-        <div className="grid grid-cols-4 gap-4 p-3 bg-[#19191980] pb-4 text-sm font-medium text-white">
+      <div className="rounded-lg bg-transparent ">
+        <div className="grid grid-cols-4 gap-4 p-3 bg-[#19191980]/50 pb-4 text-sm font-medium text-white">
           <div className="col-span-2">Product</div>
           <div>Inventory</div>
           <div>Amount</div>
