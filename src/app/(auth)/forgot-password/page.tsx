@@ -1,5 +1,5 @@
 "use client";
-import AuthForm from '@/components/auth/auth-form'
+import AuthForm from '@/components/page/auth/auth-form';
 import { forgotPasswordSchema } from '@/zod/auth/auth.schema'
 import React from 'react'
 

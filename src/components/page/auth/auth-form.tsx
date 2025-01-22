@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 
 interface AuthFormProps<T extends FieldValues> {
     type: 'SIGN_IN' | 'SIGN_UP' | 'FORGOT_PASSWORD'
-    onSubmit: (data: T) => Promise<{ error?: string, success?: boolean }>
+    onSubmit: (data: T) => void,
     schema: ZodType<T>,
     defaultValues: T,
     authTitle?: string

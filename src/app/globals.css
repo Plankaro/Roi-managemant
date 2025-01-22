@@ -12,6 +12,15 @@ body {
   background-position: center center;
 }
 
+.glass{
+  /* From https://css.glass */
+
+
+backdrop-filter: blur(8.6px);
+-webkit-backdrop-filter: blur(8.6px);
+
+}
+
 *{
   margin: 0;
   padding: 0;

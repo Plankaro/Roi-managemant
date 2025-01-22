@@ -1,7 +1,7 @@
 "use client";
 
 import { SignUpFormValues, signUpSchema } from "@/zod/auth/auth.schema";
-import AuthForm from "@/components/auth/auth-form";
+import AuthForm from "@/components/page/auth/auth-form";
 
 export default function SignUp() {
 
