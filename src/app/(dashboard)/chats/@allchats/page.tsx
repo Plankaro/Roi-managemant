@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
+import { UserRound } from 'lucide-react';
 
 export const contacts = [
   {
@@ -101,7 +102,7 @@ const AllChats = () => {
                   <EllipsisVertical className="h-10 w-10" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-blue-500">
+              <DropdownMenuContent align="end" className="bg-blue-500 border-0 py-2 text-white">
                 <DropdownMenuItem>
                   <div className="flex  pr-14 gap-5">
                     <Image
@@ -113,11 +114,20 @@ const AllChats = () => {
                     <span>Create Order</span>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem>Block Contact</DropdownMenuItem>
-                <DropdownMenuItem className="text-red-500">
-                  Delete Chat
+                {/* <DropdownMenuItem className="mt-6 "> */}
+                    <div className="flex mt-6 pr-14 gap-5">
+                        <UserRound className="pl-2"/>
+                        <span>Assign To</span>
+                    </div>
+                {/* </DropdownMenuItem> */}
+                <DropdownMenuItem className="ml-3 mt-3">
+                 Agent 1
                 </DropdownMenuItem>
+                {/* <div className="bg-primary w-full flex items-center gap-4 p-2">
+                <UserRound/>Unassigned
+              </div> */}
               </DropdownMenuContent>
+             
             </DropdownMenu>
           </div>
         </div>

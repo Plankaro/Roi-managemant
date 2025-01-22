@@ -1,6 +1,8 @@
 "use client";
-import React, { ReactNode, } from "react";
+import React, { ReactNode } from "react";
 import { FilterMenu } from "@/components/page/chats/filter-menu";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 // const filters = [
 //   { label: "Conversation Status", icon: ChevronDown },
@@ -61,13 +63,22 @@ const DashboardLayout = ({
 
   return (
     <div className="flex flex-col w-full">
-      <div className="text-lg ml-3 font-semibold text-white">Filters</div>
-      <FilterMenu />
+      <div>
+        <div className="flex items-center justify-between">
+          <div className="text-lg ml-3 font-semibold text-white">Filters</div>
+          <div className="flex gap-4 items-center">
+          <p className="text-base ml-3  text-white cursor-pointer">Sort By:All </p>
+          <p className="text-lg ml-3  text-red-500 underline cursor-pointer">View Report </p>
+          <Button className="bg-blue-500 hover:bg-blue-400">
+            <Plus className="h-4 w-4" />
+            <span className="ml-2 text-b">Broadcast Campaign</span>
+          </Button>
+          </div>
+        </div>
+        <FilterMenu />
+      </div>
       <div className="flex h-full flex-col w-full">
-        <div
-          
-          className="flex  gap-4 overflow-hidden h-[calc(100vh-190px)]"
-        >
+        <div className="flex  gap-4 overflow-hidden h-[calc(100vh-190px)]">
           {/* {children} */}
           {chatlist}
           {allchats}
