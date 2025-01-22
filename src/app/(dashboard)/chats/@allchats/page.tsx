@@ -294,7 +294,7 @@ const AllChats = () => {
       {!takeOver ? (
         <div className="p-4 border-t border-primary bg-[#4064AC80] rounded-b-[20px]">
           <div className="flex items-center gap-2 text-white justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-sm">
               <BotIcon /> <p>This conversation is assigned to a Bot</p>
             </div>
 
