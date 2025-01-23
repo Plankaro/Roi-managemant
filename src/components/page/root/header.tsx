@@ -12,11 +12,11 @@ const Header = () => {
         <Bell className="text-white" />
         <div className="flex items-center gap-2">
           <div className="flex flex-col  text-white">
-            <span>Skin Bae Support</span>
+            <span className="text-sm ">Skin Bae Support</span>
             <span className="text-xs">skin@gmail.com</span>
           </div>
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" height={28} width={28} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>

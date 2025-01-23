@@ -17,6 +17,7 @@ import {
   Database,
   EllipsisVertical,
   BotIcon,
+  User,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,8 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import { UserRound } from 'lucide-react';
-
+import { UserRound } from "lucide-react";
+import Link from "next/link";
 export const contacts = [
   {
     id: 1,
@@ -102,9 +103,12 @@ const AllChats = () => {
                   <EllipsisVertical className="h-10 w-10" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-blue-500 border-0 py-2 text-white">
+              <DropdownMenuContent
+                align="end"
+                className="bg-blue-500 border-0 py-2 text-white ove"
+              >
                 <DropdownMenuItem>
-                  <div className="flex  pr-14 gap-5">
+                  <Link href={"/orders/12"} className="flex  pr-14 gap-5">
                     <Image
                       src="/icons/shopify.png"
                       alt="shopify"
@@ -112,29 +116,29 @@ const AllChats = () => {
                       height={21}
                     />
                     <span>Create Order</span>
-                  </div>
+                  </Link>
                 </DropdownMenuItem>
                 {/* <DropdownMenuItem className="mt-6 "> */}
-                    <div className="flex mt-6 pr-14 gap-5">
-                        <UserRound className="pl-2"/>
-                        <span>Assign To</span>
-                    </div>
+                <div className="flex mt-6 pr-14 gap-5">
+                  <UserRound className="pl-2" />
+                  <span>Assign To</span>
+                </div>
                 {/* </DropdownMenuItem> */}
-                <DropdownMenuItem className="ml-3 mt-3">
-                 Agent 1
+                <DropdownMenuItem className="ml-3 my-3">
+                  Agent 1
                 </DropdownMenuItem>
-                {/* <div className="bg-primary w-full flex items-center gap-4 p-2">
-                <UserRound/>Unassigned
-              </div> */}
+                <div className="flex absolute bottom-0 right-0  left-0 items-center  gap-2 px-4 py-3 text-white bg-[#1E2A47] cursor-pointer">
+                  <User className="h-4 w-4" />
+                  <span>Assigned</span>
+                </div>
               </DropdownMenuContent>
-             
             </DropdownMenu>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4 ">
+      <ScrollArea className="flex-1 p-4 pt-20">
         <div className="space-y-4">
           {/* Sample messages */}
           <div className="flex items-start gap-3 max-w-xl ml-auto">
@@ -167,10 +171,11 @@ const AllChats = () => {
             <div className="flex-1">
               <div className="bg-white/10 text-white p-3 rounded-lg">
                 <Image
-                  fill
-                  src="https://images.unsplash.com/photo-1638716000957-e0e0e32d2d02"
+                  height={500}
+                  width={500}
+                  src="https://images.unsplash.com/photo-1564584217132-2271feaeb3c5"
                   alt="Product"
-                  className="w-full h-auto rounded-lg mb-2"
+                  className="w-full h-auto object-cover object-center rounded-lg mb-2"
                 />
                 <h4 className="font-semibold mb-1">
                   Exclusive Offer on [Product Name]!
@@ -200,10 +205,11 @@ const AllChats = () => {
             <div className="flex-1">
               <div className="bg-white/10 text-white p-3 rounded-lg">
                 <Image
-                  fill
-                  src="https://images.unsplash.com/photo-1638716000957-e0e0e32d2d02"
+                  height={500}
+                  width={500}
+                  src="https://images.unsplash.com/photo-1564584217132-2271feaeb3c5"
                   alt="Product"
-                  className="w-full h-auto rounded-lg mb-2"
+                  className="w-full h-auto object-cover object-center rounded-lg mb-2"
                 />
                 <h4 className="font-semibold mb-1">
                   Exclusive Offer on [Product Name]!
@@ -233,10 +239,11 @@ const AllChats = () => {
             <div className="flex-1">
               <div className="bg-white/10 text-white p-3 rounded-lg">
                 <Image
-                  fill
-                  src="https://images.unsplash.com/photo-1638716000957-e0e0e32d2d02"
+                  height={500}
+                  width={500}
+                  src="https://images.unsplash.com/photo-1564584217132-2271feaeb3c5"
                   alt="Product"
-                  className="w-full h-auto rounded-lg mb-2"
+                  className="w-full h-auto object-cover object-center rounded-lg mb-2"
                 />
                 <h4 className="font-semibold mb-1">
                   Exclusive Offer on [Product Name]!
@@ -266,10 +273,11 @@ const AllChats = () => {
             <div className="flex-1">
               <div className="bg-white/10 text-white p-3 rounded-lg">
                 <Image
-                  fill
-                  src="https://images.unsplash.com/photo-1638716000957-e0e0e32d2d02"
+                  height={500}
+                  width={500}
+                  src="https://images.unsplash.com/photo-1564584217132-2271feaeb3c5"
                   alt="Product"
-                  className="w-full h-auto rounded-lg mb-2"
+                  className="w-full h-auto object-cover object-center rounded-lg mb-2"
                 />
                 <h4 className="font-semibold mb-1">
                   Exclusive Offer on [Product Name]!

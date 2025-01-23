@@ -1,8 +1,8 @@
 import React from 'react'
 
-function PersonAlert() {
+function PersonAlert({height=28, width=29}: {height?:number, width?:number}) {
   return (
-    <svg width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={width} height={height} viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <mask id="mask0_255_362" style={{ maskType: 'alpha' }} maskUnits="userSpaceOnUse" x="0" y="0" width="29" height="28">
     <rect x="0.5" width="28" height="28" fill="#D9D9D9"/>
     </mask>

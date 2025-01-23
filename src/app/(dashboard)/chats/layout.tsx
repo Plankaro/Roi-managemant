@@ -81,7 +81,7 @@ const DashboardLayout = ({
         </div>
         <FilterMenu />
       </div>
-      <div className="flex h-full flex-col w-full">
+      <div className="flex h-full flex-col ">
         <div className="flex  gap-4 overflow-hidden h-[calc(100vh-190px)]">
           {/* {children} */}
           {chatlist}

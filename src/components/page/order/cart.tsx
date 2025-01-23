@@ -141,8 +141,8 @@ function Cart() {
 
   return (
     
-    <div className="border-primary flex-1 border rounded-lg  flex items-center justify-center px-4">
-        <ScrollArea className="h-[420px] pr-4">
+    <div className="border-primary flex-1 border rounded-lg  flex items-center w-full  justify-center ">
+        <ScrollArea className="h-[420px] w-full px-10">
       <div className="w-full   rounded-3xl text-white">
         <h1 className="text-2xl font-semibold mb-6">Cart</h1>
         
@@ -154,7 +154,7 @@ function Cart() {
               
               return (
                 <div key={item.id} className="flex gap-4">
-                  <div className="w-20 h-20 bg-gray-300 rounded-lg overflow-hidden">
+                  <div className="w-20 h-20  rounded-lg overflow-hidden">
                     <img 
                       src={`https://picsum.photos/200/200?random=${item.id}`}
                       alt={item.name}
@@ -228,7 +228,7 @@ function Cart() {
           </div>
      
 
-        <div className="mt-6 pt-6 border-t border-gray-400">
+        <div className="mt-6 pt-6 border-t-4 border-blue-700 ">
           <h2 className="text-xl font-semibold mb-4">Price Details</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
@@ -243,14 +243,14 @@ function Cart() {
               <span>Shipping fee</span>
               <span>₹ {shippingFee}</span>
             </div>
-            <div className="pt-4 mt-4 border-t border-gray-400 flex justify-between font-semibold">
+            <div className="pt-4 mt-4  flex justify-between font-semibold">
               <span>Total Amount</span>
               <span>₹ {Math.round(finalAmount)}</span>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-gray-400">
+        <div className="mt-6 pt-6 border-t-4 border-blue-700">
           <h2 className="text-xl font-semibold mb-4">Customer Info</h2>
           <div className="flex justify-between items-center">
             <span>Shipping Address:</span>
