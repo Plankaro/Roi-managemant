@@ -67,7 +67,7 @@ const AllChats = () => {
   return (
     <div className="flex-1 flex flex-col border border-primary rounded-[20px] glass backdrop-blur-3xl backdrop-brightness-75  relative ">
       {/* Header */}
-      <div className="p-4 bg-primary/90 w-full  rounded-t-[20px] absolute top-0 z-10 glass">
+      <div className="p-4 w-full  rounded-t-[20px] absolute top-0 z-10 glass ">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -138,7 +138,10 @@ const AllChats = () => {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4 pt-20">
+      <ScrollArea
+        className="flex-1 overflow-hidden "
+        style={{ height: "calc(100% - 140px)", marginTop: "80px" }}
+      >
         <div className="space-y-4">
           {/* Sample messages */}
           <div className="flex items-start gap-3 max-w-xl ml-auto">

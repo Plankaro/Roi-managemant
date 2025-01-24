@@ -142,7 +142,7 @@ function Cart() {
   return (
     
     <div className="border-primary flex-1 border rounded-lg  flex items-center w-full  justify-center ">
-        <ScrollArea className="h-[420px] w-full px-10">
+        <ScrollArea className="h-[420px] w-full px-10 no-scrollbar overflow-scroll">
       <div className="w-full   rounded-3xl text-white">
         <h1 className="text-2xl font-semibold mb-6">Cart</h1>
         

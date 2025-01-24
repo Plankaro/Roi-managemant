@@ -47,7 +47,7 @@ export default function HistoryView() {
 
           <div className="h-0.5 w-full bg-blue-600/30 my-4" />
 
-          <div className="divide-y divide-[#2D477A]">
+          <div className="divide-y divide-[#2D477A] no-scrollbar overflow-scroll">
             {orders.map((order, index) => (
               <button
                 key={index}

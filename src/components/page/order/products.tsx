@@ -59,7 +59,7 @@ export default function ProductInventory() {
           <div>Amount</div>
         </div>
 
-        <ScrollArea className="h-[300px]">
+        <ScrollArea className="h-[300px] no-scrollbar overflow-scroll">
           <div className="divide-y divide-[#2D477A] p-3">
             {products.map((product) => (
               <div key={product.id} className="grid grid-cols-4 gap-4 py-4 text-sm text-gray-300">

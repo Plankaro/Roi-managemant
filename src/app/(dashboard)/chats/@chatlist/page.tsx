@@ -116,7 +116,8 @@ const ChatLists = () => {
           />
         </div>
       </div>
-      <ScrollArea className="w-full">
+      
+      <ScrollArea className="w-full no-scrollbar">
         <div className="space-y-2 p-2 w-full">
           {contacts.map((contact) => (
             <button

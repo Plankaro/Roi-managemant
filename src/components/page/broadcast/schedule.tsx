@@ -6,16 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 function Schedule() {
   return (
-    <ScrollArea className="h-full">
+    <ScrollArea className="flex-1 h-fit no-scrollbar overflow-scroll bg-primary-200 rounded-3xl">
     <div className="p-8 space-y-8">
       <div className="space-y-6">
-        <h2 className="text-lg font-medium text-white">Schedule</h2>
+        <h2 className="text-lg font-medium ">Schedule</h2>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Frequency</label>
+            <label className="text-sm ">Frequency</label>
             <Select defaultValue="once">
-              <SelectTrigger className="bg-white/5 border-gray-800 text-white">
+              <SelectTrigger className="bg-white/5 border-gray-800 ">
                 <SelectValue placeholder="Once" />
               </SelectTrigger>
               <SelectContent>
@@ -28,23 +28,23 @@ function Schedule() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Date & Time (IST)</label>
+            <label className="text-sm ">Date & Time (IST)</label>
             <Input
               type="text"
               defaultValue="20/01/ 2015   10: 00 AM"
-              className="bg-white/5 border-gray-800 text-white"
+              className="bg-white/5 border-gray-800 "
             />
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-medium text-white">Run test message</h2>
+        <h2 className="text-lg font-medium ">Run test message</h2>
         <div className="space-y-2">
-          <label className="text-sm text-gray-400">Enter the mobile number</label>
-          <Input type="tel" defaultValue="+91 9876543212" className="bg-white/5 border-gray-800 text-white" />
+          <label className="text-sm ">Enter the mobile number</label>
+          <Input type="tel" defaultValue="+91 9876543212" className="bg-white/5 border-gray-800 " />
         </div>
-        <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90 text-white">Send Message</Button>
+        <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90 ">Send Message</Button>
       </div>
     </div>
   </ScrollArea>

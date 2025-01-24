@@ -47,14 +47,14 @@ export default function SelectTemplate() {
 
   return (
 
-        <ScrollArea className="h-[550px] w-full">
+        <ScrollArea className="h-[550px] w-full no-scrollbar overflow-scroll bg-primary-200 rounded-3xl">
           <div className="p-8 space-y-8">
             <div className="space-y-2">
               <div className="flex items-center gap-1">
-                <h2 className="text-lg font-medium text-white">Recipients</h2>
+                <h2 className="text-lg font-medium ">Recipients</h2>
                 <span className="text-red-500">*</span>
               </div>
-              <p className="text-sm text-gray-400">You can upload an Excel sheet or select a Shopify segment.</p>
+              <p className="text-sm ">You can upload an Excel sheet or select a Shopify segment.</p>
               <div className="flex items-center gap-4">
                 <input
                   type="file"
@@ -66,7 +66,7 @@ export default function SelectTemplate() {
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={() => recipientInputRef.current?.click()}
-                    className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90 text-white whitespace-nowrap"
+                    className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90  whitespace-nowrap"
                   >
                     + Upload Recipients
                   </Button>
@@ -76,7 +76,7 @@ export default function SelectTemplate() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 text-gray-400"
+                        className="h-5 w-5 "
                         onClick={clearRecipientFile}
                       >
                         <X className="h-3 w-3" />
@@ -89,13 +89,13 @@ export default function SelectTemplate() {
 
             <div className="space-y-6">
               <div className="flex items-center gap-1">
-                <h2 className="text-lg font-medium text-white">Add Content</h2>
+                <h2 className="text-lg font-medium ">Add Content</h2>
                 <span className="text-red-500">*</span>
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-base font-medium text-white">Image</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="text-base font-medium ">Image</h3>
+                <p className="text-sm ">
                   Upload an image under 5 MB with a recommended aspect ratio of 1.91:1.
                 </p>
                 <div className="flex items-center gap-4">
@@ -109,14 +109,14 @@ export default function SelectTemplate() {
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={() => imageInputRef.current?.click()}
-                      className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90 text-white whitespace-nowrap"
+                      className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90  whitespace-nowrap"
                     >
                       + Upload Image
                     </Button>
                     {imageFile && (
                       <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-md">
                         <span className="text-sm text-gray-300 truncate max-w-[200px]">{imageFile.name}</span>
-                        <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-400" onClick={clearImageFile}>
+                        <Button variant="ghost" size="icon" className="h-5 w-5 " onClick={clearImageFile}>
                           <X className="h-3 w-3" />
                         </Button>
                       </div>
@@ -126,29 +126,29 @@ export default function SelectTemplate() {
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-base font-medium text-white">Body</h3>
-                <p className="text-sm text-gray-400">Enter the {"{{1}}"} parameter for your message.</p>
+                <h3 className="text-base font-medium ">Body</h3>
+                <p className="text-sm">Enter the {"{{1}}"} parameter for your message.</p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-300">{"{{1}}"}</span>
+                    <span className="">{"{{1}}"}</span>
                     <Checkbox id="shopify-segment" className="border-gray-600" />
-                    <label htmlFor="shopify-segment" className="text-sm text-gray-400">
+                    <label htmlFor="shopify-segment" className="text-sm ">
                       From Shopify Segment
                     </label>
                   </div>
                   <Input
                     placeholder="Enter the parameter for {{1}}"
-                    className="bg-white/5 border-gray-800 text-white placeholder:text-gray-500"
+                    className="bg-white/5 border-gray-800  placeholder:text-gray-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-base font-medium text-white">CTA Button</h3>
-                <p className="text-sm text-gray-400">Enter the URL for the CTA Button</p>
+                <h3 className="text-base font-medium ">CTA Button</h3>
+                <p className="text-sm ">Enter the URL for the CTA Button</p>
                 <Input
                   placeholder="Enter the URL"
-                  className="bg-white/5 border-gray-800 text-white placeholder:text-gray-500"
+                  className="bg-white/5 border-gray-800  placeholder:text-gray-500"
                 />
               </div>
             </div>

@@ -15,9 +15,9 @@ body {
 .glass{
   /* From https://css.glass */
 
-
-backdrop-filter: blur(8.6px);
--webkit-backdrop-filter: blur(8.6px);
+background-color: rgb(35 55 95 / 0.5);;
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
 
 }
 
@@ -77,10 +77,13 @@ backdrop-filter: blur(8.6px);
   .no-scrollbar::-webkit-scrollbar {
       display: none !important;
       width: 0 !important;
+      
   }
  /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
       -ms-overflow-style: none;  /* IE and Edge */
       scrollbar-width: none;  /* Firefox */
 }
+
 }
+
