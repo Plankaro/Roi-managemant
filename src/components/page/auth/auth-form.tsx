@@ -23,6 +23,7 @@ interface AuthFormProps<T extends FieldValues> {
     defaultValues: T,
     authTitle?: string
     authDescription?: string
+    loading?: boolean
 
 }
 

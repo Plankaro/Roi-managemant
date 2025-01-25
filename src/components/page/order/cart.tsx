@@ -147,14 +147,14 @@ function Cart() {
         <h1 className="text-2xl font-semibold mb-6">Cart</h1>
         
       
-          <div className="space-y-4">
+          <div className="space-y-6 ">
             {cartItems.map((item) => {
               const currentVariant = item.variants.find(v => v.size === item.selectedSize);
               const availableQuantity = currentVariant?.availableQuantity || 0;
               
               return (
-                <div key={item.id} className="flex gap-4">
-                  <div className="w-20 h-20  rounded-lg overflow-hidden">
+                <div key={item.id} className="flex gap-16">
+                  <div className="w-28 h-28 overflow-hidden">
                     <img 
                       src={`https://picsum.photos/200/200?random=${item.id}`}
                       alt={item.name}
