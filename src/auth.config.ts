@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
@@ -13,7 +15,7 @@ async function refreshAccessToken(token:any) {
 
         console.log("Beaarer token", `Bearer ${token.refresh_token}`);
 
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth//refresh-token`, {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`, {
             headers: {
                 "Authorization": `Bearer ${token.refresh_token}`
             }
@@ -61,7 +63,7 @@ export default {
       
             },
 
-            async authorize(credentials) {
+            async authorize(credentials): Promise<any> {
                 const { email, password } = credentials;
          
 
@@ -114,7 +116,7 @@ export default {
             // Allow access if the user is authenticated
             return isLoggedIn;
         },
-        jwt: async({ token, user, trigger, session,account })=> {
+        jwt: async({ token, user, trigger, session, }:any)=> {
           
 
 
@@ -130,11 +132,11 @@ export default {
             }
             return token;
         },
-        session: async({ session, token }) =>{
-            console.log(token);
+        session: async({ session, token }:any) =>{
+          ;
           
-            session.user = token.user;
-            session.access_token = token.access_token;
+            session.user = token.user as any;
+            session.access_token = token.access_token as any;
             
             return session;
         }

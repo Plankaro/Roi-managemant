@@ -2,42 +2,81 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import baseQuery from "./basequery";
 
-
 export const apiSlice = createApi({
- 
   baseQuery,
+  tagTypes: ["Prospect"], // Define tags for invalidation
   endpoints: (builder) => ({
-   getToken: builder.mutation({
-    query:(body)=>({
-      url:"/auth/token-link",
-      method:'POST',
-      body
-
-   })
-   }),
+    getToken: builder.mutation({
+      query: (body) => ({
+        url: "/auth/token-link",
+        method: "POST",
+        body,
+      }),
+    }),
 
     signup: builder.mutation({
       query: (body) => ({
-        url: "/auth/register", // Adjust the endpoint based on your API
+        url: "/auth/register",
         method: "POST",
-        body, // Pass the signup payload (e.g., email, password, etc.)
+        body,
       }),
     }),
 
     verifyToken: builder.query({
       query: (token) => ({
-        url: `/auth/verify-token/${token}`, // Match the backend route
+        url: `/auth/verify-token/${token}`,
         method: "GET",
       }),
     }),
+
     resetPassword: builder.mutation({
       query: ({ token, body }) => ({
         url: `/auth/reset-password/${token}`,
         method: "POST",
-        body, // Pass the resetPasswordDto (e.g., password and confirmPassword)
+        body,
       }),
+    }),
+
+    getAllShopifyContacts: builder.query({
+      query: () => ({
+        url: "/customers",
+        method: "GET",
+      }),
+    }),
+
+    getSpecificShopifyContacts: builder.query({
+      query: (id) => ({
+        url: `/customers/${id}`,
+        method: "GET",
+      }),
+    }),
+
+    createProspect: builder.mutation({
+      query: (body) => ({
+        url: "/prospects",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Prospect"], // Invalidate the 'Prospect' tag after creating
+    }),
+
+    getProspect: builder.query({
+      query: () => ({
+        url: "/prospects",
+        method: "GET",
+      }),
+      providesTags: ["Prospect"], // Provide the 'Prospect' tag
     }),
   }),
 });
 
-export const { useGetTokenMutation,  useSignupMutation,useVerifyTokenQuery,useResetPasswordMutation  } = apiSlice;
+export const {
+  useGetTokenMutation,
+  useSignupMutation,
+  useVerifyTokenQuery,
+  useResetPasswordMutation,
+  useGetAllShopifyContactsQuery,
+  useGetSpecificShopifyContactsQuery,
+  useCreateProspectMutation,
+  useGetProspectQuery,
+} = apiSlice;

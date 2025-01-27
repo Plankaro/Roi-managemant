@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <div className="w-full flex items-center justify-between  py-2 h-[72px]">
       <Logo width={120} height={58} />
-      <div className="flex items-center gap-4 basis-3/12 justify-between">
+      <div className="flex items-center  gap-10">
         <Search className="text-white" />
         <Bell className="text-white" />
         <div className="flex items-center gap-2">

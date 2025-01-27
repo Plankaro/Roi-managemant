@@ -22,7 +22,7 @@ export default function Home() {
             defaultValues={{
                 email: "",
                 password: "",
-                rememberMe: false,
+               
             }}
             authDescription="Start your 30 day free trial. Cancel any time"
             authTitle="Account Sign In"

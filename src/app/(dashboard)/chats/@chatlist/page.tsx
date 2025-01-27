@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,6 +10,12 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Person from "@/components/icons/person";
 import PersonAlert from "@/components/icons/person-alert";
+import ScrollableContactDialog from "@/components/page/chats/contacts";
+import { useGetProspectQuery } from "@/store/features/apislice";
+import { AvatarFallback } from "@radix-ui/react-avatar";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState,AppDispatch } from "@/store/store";
+import { selectProspect } from "@/store/features/prospectslice";
 
 const contacts = [
   {
@@ -95,18 +103,28 @@ const contacts = [
 ];
 
 const ChatLists = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const {data,isLoading} = useGetProspectQuery({})
+  const selectedProspect = useSelector((state: RootState) => state.selectedProspect?.selectedProspect);
+
+  console.log(selectedProspect)
   return (
     <div className="max-w-md  border rounded-[20px] border-primary backdrop-blur-xl flex flex-col h-full overflow-hidden  ">
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white">All Chats</h2>
+          <ScrollableContactDialog>
           <Button
             variant="outline"
             size="sm"
             className="gap-2 bg-blue-900 border-none rounded-[10px] text-white"
+           
           >
+       
+
             <BookOpen className="h-4 w-4" /> contacts
           </Button>
+          </ScrollableContactDialog>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -119,24 +137,43 @@ const ChatLists = () => {
       
       <ScrollArea className="w-full no-scrollbar">
         <div className="space-y-2 p-2 w-full">
-          {contacts.map((contact) => (
-            <button
+          {data && data.map((contact: any) => {
+         
+            return(
+              <button
               key={contact.id}
               className={cn(
-                " p-3 rounded-lg text-left transition-colors"
+                " p-3 rounded-lg text-left transition-colors w-full ",
+                selectedProspect?.id==contact.id ? "bg-primary text-white":"hover:bg-primary hover:text-white"
               )}
+              onClick={() => {
+                dispatch(selectProspect(contact));
+              }}
+
             >
               <div className="flex items-start gap-3">
                 <div className="relative">
                   <Avatar className="w-14 h-14">
-                    <Image
+                    <AvatarImage
                       src={contact.avatar}
                       alt="@shadcn"
                       className="object-contain"
                       width={56}
                       height={56}
                     />
+                    <AvatarFallback >
+                    <AvatarImage
+                      src="https://www.gravatar.com/avatar?d=mp
+"
+                      alt="@shadcn"
+                      className="object-contain"
+                      width={56}
+                      height={56}
+                    />
+                    </AvatarFallback>
+                    
                   </Avatar>
+
                 </div>
                 <div className="flex-1 w-full h-14 py-[2px] flex flex-col justify-between">
                   <div className="flex items-center justify-between">
@@ -144,20 +181,22 @@ const ChatLists = () => {
                       {contact.name}
                     </p>
                     <span className="text-xs text-gray-400">
-                      {contact.time}
+                      {contact.message?.[0].created_at??""}
                     </span>
                   </div>
-                  <div className="flex gap-2 items-center w-full">
+                  <div className="flex gap-2 items-center justify-between w-full">
                     <p className="text-sm text-gray-400 line-clamp-1 mt-auto ">
-                      {contact.message}
+                      {contact.message?.[0].body_text??"Send your first message"}
                     </p>
 
-                  {contact.assigned ? <Person /> : <PersonAlert />}
+                  {contact.assignedTo ? <Person /> : <PersonAlert />}
                   </div>
                 </div>
               </div>
             </button>
-          ))}
+            )
+         
+          })}
         </div>
       </ScrollArea>
     </div>
