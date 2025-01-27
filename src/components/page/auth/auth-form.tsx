@@ -17,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from '@/lib/utils';
 
 interface AuthFormProps<T extends FieldValues> {
-    type: 'SIGN_IN' | 'SIGN_UP' | 'FORGOT_PASSWORD'
+    type: 'SIGN_IN' | 'SIGN_UP' | 'FORGOT_PASSWORD' | 'RESET_PASSWORD',
     onSubmit: (data: T) => void,
     schema: ZodType<T>,
     defaultValues: T,
@@ -27,11 +27,13 @@ interface AuthFormProps<T extends FieldValues> {
 
 }
 
-const AuthForm = <T extends FieldValues>({ type, defaultValues, onSubmit, schema, authTitle, authDescription }: AuthFormProps<T>) => {
+const AuthForm = <T extends FieldValues>({ type, defaultValues, onSubmit, schema, authTitle, authDescription,loading }: AuthFormProps<T>) => {
 
     const isSignIn = type === 'SIGN_IN'
     const isForgotPassword = type === 'FORGOT_PASSWORD'
     const isSignUp = type === 'SIGN_UP'
+    const isResetPassword = type === 'RESET_PASSWORD'
+
 
     const form: UseFormReturn<T> = useForm({
         resolver: zodResolver(schema),
@@ -94,12 +96,13 @@ const AuthForm = <T extends FieldValues>({ type, defaultValues, onSubmit, schema
                     }
 
                     <div>
-                        <Button type="submit" className="w-full rounded-full bg-primary-500 hover:bg-primary-600 capitalize ">
-                            {isSignIn ? "Sign In" : isForgotPassword ? "send" : "Sign Up"}
+                        <Button type="submit" disabled={loading} className="w-full rounded-full  bg-primary-500 hover:bg-primary-600 capitalize ">
+                        {isSignIn ? "Sign In" : isForgotPassword ? "Send" : isResetPassword ? "Reset Password" : "Sign Up"}
+
                         </Button>
 
 
-                        {
+                        {/* {
                             isSignIn && (
                                 <div className="flex items-center justify-between pt-2">
                                     <FormField
@@ -122,12 +125,12 @@ const AuthForm = <T extends FieldValues>({ type, defaultValues, onSubmit, schema
                                             </div>
                                         )}
                                     />
-                                    <Link href={"/forgot-password"} className="text-white p-0 hover:underline  ">
+                                    <Link href={"/get-token"} className="text-white p-0 hover:underline  ">
                                         {" "} Forgot Password?
                                     </Link>
                                 </div>
                             )
-                        }
+                        } */}
                     </div>
                     {
                         isSignUp && (

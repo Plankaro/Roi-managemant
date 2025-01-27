@@ -7,6 +7,10 @@ export const store = configureStore({
     // Add the RTK Query API slice reducer
     [apiSlice.reducerPath]: apiSlice.reducer,
   },
+
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(apiSlice.middleware), // Add the RTK Query middleware
+
 });
 
 export type RootState = ReturnType<typeof store.getState>;

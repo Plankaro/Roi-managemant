@@ -1,18 +1,18 @@
 // src/api/baseQuery.ts
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getSession } from "next-auth/react";
+// import { auth } from "@/auth";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL, // Replace with your API base URL
-  prepareHeaders: async (headers) => {
-    const session = await getSession();
+  baseUrl: `${process.env.NEXT_PUBLIC_API_URL}`, // Replace with your API base URL
+  // prepareHeaders: async (headers) => {
+  //   const session = await  auth();;
 
-    if ( session?.accessToken) {
-      headers.set("authorization", `Bearer ${session.accessToken}`);
-    }
+  //   if ( session?.accessToken ) {
+  //     headers.set("authorization", `Bearer ${session.accessToken}`);
+  //   }
 
-    return headers;
-  },
+  //   return headers;
+  // },
 });
 
 export default baseQuery;

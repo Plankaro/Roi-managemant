@@ -1,34 +1,48 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { SignUpFormValues, signUpSchema } from "@/zod/auth/auth.schema";
 import AuthForm from "@/components/page/auth/auth-form";
 import toast from "react-hot-toast";
-import { useState } from "react";
-import axios from "axios";
+import { useSignupMutation,useGetTokenMutation } from "@/store/features/apislice";
+
+
+
 export default function SignUpPage() {
 
-    const [loading,setLoading] = useState(false)
-    const onSubmit = (values: SignUpFormValues) => {
-        if(values.password !== values.confirmPassword){
-            toast.error("Passwords do not match")
-            return
-
+    const [signup, { isLoading }] = useSignupMutation();
+    const [getTokens,{isLoading:getTokensLoading}]=useGetTokenMutation()
+    const onSubmit = async (values: SignUpFormValues) => {
+        if (values.password !== values.confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
         }
-        setLoading(true)
-        const promise = axios.post("/api/auth/sign-up",values)
-        toast.promise(promise, {
-            loading: "Signing up...",
-            success: "Signed up successfully",
-            error: promise.catch((error) => error.response.data.message),
-        })
-        promise.finally(() => {
-            setLoading(false)
-        })
-
-
-
-
-    }
+    
+        try {
+            const promise =await signup(values).unwrap();
+    
+       
+    
+            const data = await promise;
+    
+            if (data.email) {
+                await getTokens(data.email);
+            }
+    
+            toast.success("Sign-up successful!");
+        } catch (error: any) {
+            // Check if the error contains a specific message from the server
+      
+            if (error?.data?.message) {
+                toast.error(error.data.message); // Show server-side error message
+            } else {
+                toast.error("An unexpected error occurred. Please try again.");
+            }
+    
+            console.error("Sign-up error:", error); // Log for debugging
+        }
+    };
+    
 
     return (
         <AuthForm
@@ -42,6 +56,7 @@ export default function SignUpPage() {
                 password: "",
                 confirmPassword: ""
             }}
+            loading={isLoading || getTokensLoading}
             authDescription="Start your 30 day free trial. Cancel any time"
             authTitle="Account Sign In"
 
