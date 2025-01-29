@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
           hostname: "picsum.photos",
           pathname: "/**", // Allow all paths under picsum.photos
         },
+        {
+          protocol: "https",
+          hostname: "cdn.shopify.com",
+          pathname: "/**", // Allow all paths under example.com/images/
+        }
     ]
   }
 };

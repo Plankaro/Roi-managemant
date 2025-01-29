@@ -53,12 +53,14 @@ interface Product {
         
       },
       updateVariant: (state, action: PayloadAction<{ productId: string, variantId: string }>) => {
+        console.log("Updating variant for item with ID:", action.payload.productId);
         const { productId, variantId } = action.payload;
         const cartItem = state.cartItems.find((item) => item.id === productId);
         if (cartItem) {
           cartItem.selectedVariant = variantId;
          
         }
+        
       },
       updateQuantity: (state, action: PayloadAction<{ productId: string, quantity: number }>) => {
         const { productId, quantity } = action.payload;

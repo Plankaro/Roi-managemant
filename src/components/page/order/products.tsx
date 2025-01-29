@@ -30,15 +30,15 @@ interface ProductProps {
 export default function ProductInventory({products}: {products: ProductProps[],loading: boolean}) {
   const dispatch = useDispatch()
   const cartItems = useSelector((state: any) => state.cart.cartItems)
-  console.log(cartItems)
+
   const [searchQuery, setSearchQuery] = React.useState("")
 
   const handleCheckboxChange = (product: any) => {
     if (cartItems.some((item: any) => item.id === product.id)) {
-      console.log("Removing product:", product);
+
       dispatch(removeItem(product.id));
     } else {
-      console.log("Adding product:", product);
+     
       dispatch(addToCart(product));
     }
   };

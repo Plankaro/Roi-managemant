@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -14,6 +13,12 @@ import {
 } from "@/components/ui/select"
 import {  useDispatch, useSelector } from 'react-redux';
 import { removeItem, updateQuantity, updateVariant } from '@/store/features/cartSlice';
+
+import { toast } from 'react-hot-toast';
+import { ShippingAddressForm } from './shipping_form';
+import { ShippingAddressFormValues } from '@/zod/shipping';
+import { useGetSpecificShopifyContactsQuery } from '@/store/features/apislice';
+import { useCreateOrderMutation } from '@/store/features/apislice';
 
 
 type Product = {
@@ -38,111 +43,131 @@ type Product = {
 };
 
 
-function Cart() {
+function Cart({id}:{id:string}) {
+
   const dispatch = useDispatch()
   const cartItems = useSelector((state: any) => state.cart.cartItems)
+  const [openShippingAddress,setOpenShippingAddress] = useState(false)
+  const {data:ShopifyCustomer} = useGetSpecificShopifyContactsQuery(id)
+  const [createOrder] = useCreateOrderMutation()
+  const [shippingAddress, setShippingAddress] = useState({
+    firstName: "",
+    lastName:"",
+    address1: "",
+ 
+    city: "",
+    state: "",
+    country: "",
+    zip: "",
+  });
+  
+  useEffect(()=>{
+    setShippingAddress({
+      firstName: ShopifyCustomer?.firstName??"",
+      lastName: ShopifyCustomer?.lastName??"",
+      address1: ShopifyCustomer?.addresses[0]?.address1??"",
+      city:  ShopifyCustomer?.addresses[0]?.city??"",
+      state:ShopifyCustomer?.addresses[0]?.state??"",
+      country: ShopifyCustomer?.addresses[0]?.country??"",
+      zip: ShopifyCustomer?.addresses[0]?.zip??"",
+
+    })
+  },[ShopifyCustomer])
 
 
-  console.log(cartItems);
-  // const [cartItems, setCartItems] = useState<CartItem[]>([
-  //   {
-  //     id: 1,
-  //     name: "XYZ Brand Product",
-  //     description: "Small description of the product",
-  //     selectedSize: 40,
-  //     selectedQuantity: 1,
-  //     originalPrice: 2199,
-  //     discountedPrice: 1869,
-  //     discount: 15,
-  //     variants: [
-  //       { size: 38, availableQuantity: 5 },
-  //       { size: 39, availableQuantity: 3 },
-  //       { size: 40, availableQuantity: 8 },
-  //       { size: 41, availableQuantity: 2 },
-  //       { size: 42, availableQuantity: 4 }
-  //     ]
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "XYZ Brand Product",
-  //     description: "Small description of the product",
-  //     selectedSize: 41,
-  //     selectedQuantity: 1,
-  //     originalPrice: 2199,
-  //     discountedPrice: 1869,
-  //     discount: 15,
-  //     variants: [
-  //       { size: 39, availableQuantity: 2 },
-  //       { size: 40, availableQuantity: 0 },
-  //       { size: 41, availableQuantity: 6 },
-  //       { size: 42, availableQuantity: 3 }
-  //     ]
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "XYZ Brand Product",
-  //     description: "Small description of the product",
-  //     selectedSize: 42,
-  //     selectedQuantity: 1,
-  //     originalPrice: 2199,
-  //     discountedPrice: 1869,
-  //     discount: 15,
-  //     variants: [
-  //       { size: 40, availableQuantity: 4 },
-  //       { size: 41, availableQuantity: 2 },
-  //       { size: 42, availableQuantity: 7 },
-  //       { size: 43, availableQuantity: 1 }
-  //     ]
-  //   },
-  //   {
-  //       id: 4,
-  //       name: "XYZ Brand Product",
-  //       description: "Small description of the product",
-  //       selectedSize: 42,
-  //       selectedQuantity: 1,
-  //       originalPrice: 2199,
-  //       discountedPrice: 1869,
-  //       discount: 15,
-  //       variants: [
-  //         { size: 40, availableQuantity: 4 },
-  //         { size: 41, availableQuantity: 2 },
-  //         { size: 42, availableQuantity: 7 },
-  //         { size: 43, availableQuantity: 1 }
-  //       ]
-  //     }
-  // ]);
 
 
-  const handleSizeChange = (productId: string, newSize: string) => {
-   
+  const findVariant = (productId: string, variantId: string) => {
+    const product = cartItems.find((item:Product) => item.id === productId);
+    return product?.variants.find((variant:any) => variant.id === variantId);
   };
 
-  const handleQuantityChange = (itemId: string, newQuantity: string) => {
-    
-  };
-
-  const findVariant = (productId:any,variantId:any)=>{
-    console.log(productId,variantId)
-  }
-
+ 
   const calculateTotals = () => {
-    return cartItems.reduce((acc:any, item:any) => {
-      console.log(acc, item);
-      const itemTotal = item.originalPrice * item.selectedQuantity;
-      const itemDiscount = (itemTotal * item.discount) / 100;
-      return {
-        mrp: acc.mrp + itemTotal,
-        discount: acc.discount + itemDiscount
-      };
-    }, { mrp: 0, discount: 0 });
+  let mrp = 0
+ 
+    cartItems.forEach((item:Product) => {
+      const variant = findVariant(item.id, item.selectedVariant);
+      if (variant) {
+        mrp += Number(variant.price) * item.quantity;
+        // discount += Number(variant.price) * item.quantity;
+      }
+    });
+    return { mrp };
   };
 
   const totals = calculateTotals();
   const shippingFee = 123;
-  const finalAmount = totals.mrp - totals.discount + shippingFee;
+  const finalAmount = totals.mrp+ shippingFee;
   if(cartItems.length === 0){
     return null
   }
+
+  const handleShippingaddressDialog = ()=>{
+    if(openShippingAddress){
+      setOpenShippingAddress(false)
+    }
+    else{
+      setOpenShippingAddress(true)
+      setShippingAddress({
+        firstName: ShopifyCustomer?.firstName??"",
+        lastName: ShopifyCustomer?.lastName??"",
+        address1: ShopifyCustomer?.addresses[0]?.address1??"",
+        city:  ShopifyCustomer?.addresses[0]?.city??"",
+        state:"",
+        country: ShopifyCustomer?.addresses[0]?.country??"",
+        zip: ShopifyCustomer?.addresses[0]?.zip??"",
+      })
+    }
+  }
+  const handleCheckout = async()=>{
+    try {
+      if (Object.values(shippingAddress).some(value => value === "")) {
+        toast.error("Please fill in all shipping address fields");
+        return;
+      }
+      else{
+        const itemsTobeCheckout = cartItems.map((item:Product)=>{
+          const variant = item.variants.find(variant => variant.id === item.selectedVariant);
+          return {
+            variantId: item.selectedVariant,
+            quantity: item.quantity,
+            price: variant?.price || 0
+          }
+        })
+        const promise = createOrder({customerId:ShopifyCustomer.id,Items:itemsTobeCheckout,totalPrice:finalAmount,shippingAddress:shippingAddress})
+        toast.promise(promise,{
+          loading: "Checkout...",
+          success: "Order placed successfully!",
+          error: (error: any) =>
+            error?.data?.message || "An error occurred while placing the order.",
+        })
+        console.log(await promise)
+       
+      }
+    } catch (error: any) {
+      toast.error(error.message||"An error occurred while")
+    }
+  }
+
+
+
+  const handleDataSubmit = (data:ShippingAddressFormValues)=>{
+    setShippingAddress({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      address1: data.address1,
+      city: data.city,
+      state: data.state,
+      country: data.country,
+      zip: data.zip,
+    })
+    toast.success("Successfully saved ")
+
+  }
+
+
+
 
   return (
     
@@ -160,7 +185,7 @@ function Cart() {
                 <div key={item.id} className="flex gap-16">
                   <div className="w-28 h-28 overflow-hidden">
                     <img 
-                    src={item.images[0]}
+                    src={findVariant(item?.id, item.selectedVariant)?.image || item.images[0]}
                       alt={item.title}
                       className="w-full h-full object-cover"
                     />
@@ -178,7 +203,7 @@ function Cart() {
                     
                     <div className="mt-2 flex gap-4">
                       <Select
-
+                       onValueChange={(value) => dispatch(updateVariant({ productId: item.id, variantId: value }))}
                       value={item.selectedVariant}
                       >
                         <SelectTrigger className="w-[150px]">
@@ -189,7 +214,8 @@ function Cart() {
                             <SelectItem
                               key={variant.id}
                               value={variant.id}
-                              // disabled={variant. === 0}
+                              disabled={variant.quantity === 0}
+                             
                             >
                               {item.options[0].name}: {variant.title}
                             </SelectItem>
@@ -199,13 +225,13 @@ function Cart() {
 
                       <Select
                         value={item.quantity.toString()}
-                        onValueChange={(value) => handleQuantityChange(item.id, value)}
+                       onValueChange={(quantity) => dispatch(updateQuantity({ productId: item.id, quantity: Number(quantity) }))}
                       >
                         <SelectTrigger className="w-[100px]">
                           <SelectValue  />
                         </SelectTrigger>
                         <SelectContent>
-                          {[...Array(Math.min(item.totalInventory, 5))].map((_, i) => (
+                          {[...Array(Math.min(5, 5))].map((_, i) => (
                             <SelectItem
                               key={i + 1}
                               value={(i + 1).toString()}
@@ -218,7 +244,7 @@ function Cart() {
                     </div>
                     
                     <div className="mt-2 flex items-center gap-5">
-                      <span className="l text-gray-300">₹{item.variants[0].price}</span>
+                      <span className="l text-gray-300">₹{findVariant(item?.id, item.selectedVariant)?.price*item.quantity}</span>
                       {/* <span className="text-blue-400 text-base">₹{item.discountedPrice}</span>
                       <span className="text-red-500 text-sm">{item.discount}% Off</span>
                       <p className="ml-auto text-xs  rounded text-red-500  ">
@@ -239,10 +265,10 @@ function Cart() {
               <span>Total MRP</span>
               <span>₹ {totals.mrp}</span>
             </div>
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
               <span>Discount on MRP</span>
               <span>₹ {Math.round(totals.discount)}</span>
-            </div>
+            </div> */}
             <div className="flex justify-between">
               <span>Shipping fee</span>
               <span>₹ {shippingFee}</span>
@@ -258,16 +284,19 @@ function Cart() {
           <h2 className="text-xl font-semibold mb-4">Customer Info</h2>
           <div className="flex justify-between items-center">
             <span>Shipping Address:</span>
-            <button className="text-blue-400 hover:text-blue-300">+Add</button>
+            <button className="text-blue-400  hover:text-blue-300" onClick={handleShippingaddressDialog}>{openShippingAddress?"- remove":" + add"}</button>
+        
           </div>
+   {openShippingAddress &&  <ShippingAddressForm value={shippingAddress} onSubmit={handleDataSubmit}/>}
         </div>
 
-        <button className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+        <button className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors" onClick={handleCheckout}>
           Proceed
         </button>
       </div>
       </ScrollArea>
     </div>
+  
 
  
   );

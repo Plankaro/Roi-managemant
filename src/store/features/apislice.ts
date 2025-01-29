@@ -4,7 +4,7 @@ import baseQuery from "./basequery";
 
 export const apiSlice = createApi({
   baseQuery,
-  tagTypes: ["Prospect"], // Define tags for invalidation
+  tagTypes: ["Prospect","shopifyCustomer"], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
       query: (body) => ({
@@ -49,7 +49,9 @@ export const apiSlice = createApi({
         url: `/customers/${id}`,
         method: "GET",
       }),
+      providesTags: ["shopifyCustomer"], // Provide the 'Prospect' tag
     }),
+
 
     createProspect: builder.mutation({
       query: (body) => ({
@@ -72,6 +74,14 @@ export const apiSlice = createApi({
         url: "/products",
         method: "GET",
       }),
+    }),
+    createOrder:builder.mutation({
+      query: (body) => ({
+        url: "/orders",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["shopifyCustomer"], // Invalidate the 'Prospect' tag after creating
     })
   }),
 });
@@ -85,5 +95,6 @@ export const {
   useGetSpecificShopifyContactsQuery,
   useCreateProspectMutation,
   useGetProspectQuery,
-  useGetProductsQuery
+  useGetProductsQuery,
+  useCreateOrderMutation
 } = apiSlice;
