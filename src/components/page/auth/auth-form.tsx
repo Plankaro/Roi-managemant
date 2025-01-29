@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { Checkbox } from "@/components/ui/checkbox";
+// import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from '@/lib/utils';
 
 interface AuthFormProps<T extends FieldValues> {

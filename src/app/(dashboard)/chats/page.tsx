@@ -1,8 +1,10 @@
 "use client";
-import React, { ReactNode } from "react";
+import React from "react";
 import { FilterMenu } from "@/components/page/chats/filter-menu";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import ChatLists from "./@chatlist/page";
+import AllChats from "./@allchats/page";
 
 // const filters = [
 //   { label: "Conversation Status", icon: ChevronDown },
@@ -19,15 +21,7 @@ import { Plus } from "lucide-react";
 //   { label: "Tags", icon: ChevronDown },
 // ];
 
-const DashboardLayout = ({
-  // children,
-  allchats,
-  chatlist,
-}: {
-  children: ReactNode;
-  allchats: ReactNode;
-  chatlist: ReactNode;
-}) => {
+const DashboardLayout = () => {
   // const filterRef = useRef<HTMLDivElement>(null);
   // const [ setAvailableHeight] = useState(0);
 
@@ -64,13 +58,13 @@ const DashboardLayout = ({
   return (
     <div className="flex flex-col w-full">
       <div className="">
-        <div className="flex items-center justify-between">
+        <div className="md:flex items-center justify-between hidden">
           <div className="text-lg ml-3 font-semibold text-white">Filters</div>
           <div className="flex gap-6 items-center">
-            <p className="text-base ml-3  text-white cursor-pointer">
+            <p className="lg:text-base text-sm ml-3  text-white cursor-pointer">
               Sort By: All{" "}
             </p>
-            <p className="text-lg ml-3  text-red-500 underline cursor-pointer">
+            <p className="text-base lg:text-lg ml-3  text-red-500 underline cursor-pointer">
               View Report{" "}
             </p>
             <Button className="bg-blue-500 hover:bg-blue-400">
@@ -79,13 +73,14 @@ const DashboardLayout = ({
             </Button>
           </div>
         </div>
-        <FilterMenu />
+       
       </div>
       <div className="flex h-full flex-col ">
-        <div className="flex  gap-4 overflow-hidden h-[calc(100vh-190px)]">
+      <FilterMenu />
+        <div className="flex  gap-4 overflow-hidden md:h-[calc(100vh-190px)] h-[85vh]">
           {/* {children} */}
-          {chatlist}
-          {allchats}
+        <ChatLists/>
+          <AllChats/>
         </div>
       </div>
     </div>

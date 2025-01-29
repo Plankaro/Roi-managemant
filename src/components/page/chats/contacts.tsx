@@ -43,10 +43,11 @@ export default function ScrollableContactDialog({
         console.log(selectedContact);
 
         await createProspect({
-          shopify_id: selectedContact.id,
+          shopify_id:selectedContact.id.match(/\d+$/)[0],
           name: selectedContact.name,
           email: selectedContact.email,
           phone: selectedContact.phone,
+          image: selectedContact.image,
         });
         refetch();
         

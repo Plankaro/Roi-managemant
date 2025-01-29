@@ -67,6 +67,12 @@ export const apiSlice = createApi({
       }),
       providesTags: ["Prospect"], // Provide the 'Prospect' tag
     }),
+    getProducts: builder.query({
+      query: () => ({
+        url: "/products",
+        method: "GET",
+      }),
+    })
   }),
 });
 
@@ -79,4 +85,5 @@ export const {
   useGetSpecificShopifyContactsQuery,
   useCreateProspectMutation,
   useGetProspectQuery,
+  useGetProductsQuery
 } = apiSlice;

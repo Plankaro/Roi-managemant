@@ -16,6 +16,7 @@ import { AvatarFallback } from "@radix-ui/react-avatar";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState,AppDispatch } from "@/store/store";
 import { selectProspect } from "@/store/features/prospectslice";
+import FilterDropdown from "@/components/page/chats/filter-dropdown";
 
 const contacts = [
   {
@@ -105,11 +106,12 @@ const contacts = [
 const ChatLists = () => {
   const dispatch = useDispatch<AppDispatch>();
   const {data,isLoading} = useGetProspectQuery({})
+  console.log(data)
   const selectedProspect = useSelector((state: RootState) => state.selectedProspect?.selectedProspect);
 
   console.log(selectedProspect)
   return (
-    <div className="max-w-md  border rounded-[20px] border-primary backdrop-blur-xl flex flex-col h-full overflow-hidden  ">
+    <div className={`md:max-w-md md:flex   ${selectedProspect ? "hidden" : "flex"} w-full border rounded-[20px] xl:basis-2/5 md:basis-4/12 border-primary backdrop-blur-xl flex-col h-full overflow-hidden  `}>
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white">All Chats</h2>
@@ -126,11 +128,17 @@ const ChatLists = () => {
           </Button>
           </ScrollableContactDialog>
         </div>
+        <div className="w-full flex my-5 md:hidden justify-between">
+        <FilterDropdown>
+         <span className="text-lg">Filters</span> 
+          </FilterDropdown>
+          <span className="text-red-500">clear all</span>
+        </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search here..."
-            className="pl-9 bg-white/5 border-gray-700 text-white placeholder:text-gray-400 w-full max-w-[18.75rem]"
+            className="pl-9 bg-white/5 border-gray-700 text-white placeholder:text-gray-400 w-full md:max-w-[18.75rem]"
           />
         </div>
       </div>
@@ -151,26 +159,19 @@ const ChatLists = () => {
               }}
 
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-center gap-5">
                 <div className="relative">
-                  <Avatar className="w-14 h-14">
+                  <Avatar className="lg:h-14 lg:w-14">
                     <AvatarImage
-                      src={contact.avatar}
+                      src={contact.image}
                       alt="@shadcn"
-                      className="object-contain"
-                      width={56}
-                      height={56}
+                      className="object-contain lg:h-14 lg:w-14 h-10 w-10"
+                     
                     />
-                    <AvatarFallback >
-                    <AvatarImage
-                      src="https://www.gravatar.com/avatar?d=mp
-"
-                      alt="@shadcn"
-                      className="object-contain"
-                      width={56}
-                      height={56}
-                    />
-                    </AvatarFallback>
+                   <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
+                     >
+                        {contact.name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     
                   </Avatar>
 
@@ -184,7 +185,7 @@ const ChatLists = () => {
                       {contact.message?.[0].created_at??""}
                     </span>
                   </div>
-                  <div className="flex gap-2 items-center justify-between w-full">
+                  <div className="flex lg:gap-10 gap-2 items-center justify-between w-full">
                     <p className="text-sm text-gray-400 line-clamp-1 mt-auto ">
                       {contact.message?.[0].body_text??"Send your first message"}
                     </p>

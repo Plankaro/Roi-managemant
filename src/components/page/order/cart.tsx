@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 "use client"
 import React, { useState } from 'react';
@@ -10,122 +12,122 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {  useDispatch, useSelector } from 'react-redux';
+import { removeItem, updateQuantity, updateVariant } from '@/store/features/cartSlice';
 
-interface ProductVariant {
-  size: number;
-  availableQuantity: number;
-}
 
-interface CartItem {
-  id: number;
-  name: string;
+type Product = {
+  id: string;
+  title: string;
   description: string;
-  selectedSize: number;
-  selectedQuantity: number;
-  originalPrice: number;
-  discountedPrice: number;
-  discount: number;
-  variants: ProductVariant[];
-}
+  images: string[];
+  options: {
+    name: string;
+    values: string[];
+  }[];
+  quantity: number;
+  selectedVariant: string;
+  totalInventory: number;
+  variants: {
+    id: string;
+    availableForSale: boolean;
+    price: string;
+    title: string;
+    quantity: number;
+  }[];
+};
+
 
 function Cart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: "XYZ Brand Product",
-      description: "Small description of the product",
-      selectedSize: 40,
-      selectedQuantity: 1,
-      originalPrice: 2199,
-      discountedPrice: 1869,
-      discount: 15,
-      variants: [
-        { size: 38, availableQuantity: 5 },
-        { size: 39, availableQuantity: 3 },
-        { size: 40, availableQuantity: 8 },
-        { size: 41, availableQuantity: 2 },
-        { size: 42, availableQuantity: 4 }
-      ]
-    },
-    {
-      id: 2,
-      name: "XYZ Brand Product",
-      description: "Small description of the product",
-      selectedSize: 41,
-      selectedQuantity: 1,
-      originalPrice: 2199,
-      discountedPrice: 1869,
-      discount: 15,
-      variants: [
-        { size: 39, availableQuantity: 2 },
-        { size: 40, availableQuantity: 0 },
-        { size: 41, availableQuantity: 6 },
-        { size: 42, availableQuantity: 3 }
-      ]
-    },
-    {
-      id: 3,
-      name: "XYZ Brand Product",
-      description: "Small description of the product",
-      selectedSize: 42,
-      selectedQuantity: 1,
-      originalPrice: 2199,
-      discountedPrice: 1869,
-      discount: 15,
-      variants: [
-        { size: 40, availableQuantity: 4 },
-        { size: 41, availableQuantity: 2 },
-        { size: 42, availableQuantity: 7 },
-        { size: 43, availableQuantity: 1 }
-      ]
-    },
-    {
-        id: 4,
-        name: "XYZ Brand Product",
-        description: "Small description of the product",
-        selectedSize: 42,
-        selectedQuantity: 1,
-        originalPrice: 2199,
-        discountedPrice: 1869,
-        discount: 15,
-        variants: [
-          { size: 40, availableQuantity: 4 },
-          { size: 41, availableQuantity: 2 },
-          { size: 42, availableQuantity: 7 },
-          { size: 43, availableQuantity: 1 }
-        ]
-      }
-  ]);
+  const dispatch = useDispatch()
+  const cartItems = useSelector((state: any) => state.cart.cartItems)
 
-  const handleSizeChange = (itemId: number, newSize: string) => {
-    setCartItems(items => items.map(item => {
-      if (item.id === itemId) {
-        const size = parseInt(newSize);
-        const variant = item.variants.find(v => v.size === size);
-        return {
-          ...item,
-          selectedSize: size,
-          selectedQuantity: variant && variant.availableQuantity < item.selectedQuantity ? 1 : item.selectedQuantity
-        };
-      }
-      return item;
-    }));
+
+  console.log(cartItems);
+  // const [cartItems, setCartItems] = useState<CartItem[]>([
+  //   {
+  //     id: 1,
+  //     name: "XYZ Brand Product",
+  //     description: "Small description of the product",
+  //     selectedSize: 40,
+  //     selectedQuantity: 1,
+  //     originalPrice: 2199,
+  //     discountedPrice: 1869,
+  //     discount: 15,
+  //     variants: [
+  //       { size: 38, availableQuantity: 5 },
+  //       { size: 39, availableQuantity: 3 },
+  //       { size: 40, availableQuantity: 8 },
+  //       { size: 41, availableQuantity: 2 },
+  //       { size: 42, availableQuantity: 4 }
+  //     ]
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "XYZ Brand Product",
+  //     description: "Small description of the product",
+  //     selectedSize: 41,
+  //     selectedQuantity: 1,
+  //     originalPrice: 2199,
+  //     discountedPrice: 1869,
+  //     discount: 15,
+  //     variants: [
+  //       { size: 39, availableQuantity: 2 },
+  //       { size: 40, availableQuantity: 0 },
+  //       { size: 41, availableQuantity: 6 },
+  //       { size: 42, availableQuantity: 3 }
+  //     ]
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "XYZ Brand Product",
+  //     description: "Small description of the product",
+  //     selectedSize: 42,
+  //     selectedQuantity: 1,
+  //     originalPrice: 2199,
+  //     discountedPrice: 1869,
+  //     discount: 15,
+  //     variants: [
+  //       { size: 40, availableQuantity: 4 },
+  //       { size: 41, availableQuantity: 2 },
+  //       { size: 42, availableQuantity: 7 },
+  //       { size: 43, availableQuantity: 1 }
+  //     ]
+  //   },
+  //   {
+  //       id: 4,
+  //       name: "XYZ Brand Product",
+  //       description: "Small description of the product",
+  //       selectedSize: 42,
+  //       selectedQuantity: 1,
+  //       originalPrice: 2199,
+  //       discountedPrice: 1869,
+  //       discount: 15,
+  //       variants: [
+  //         { size: 40, availableQuantity: 4 },
+  //         { size: 41, availableQuantity: 2 },
+  //         { size: 42, availableQuantity: 7 },
+  //         { size: 43, availableQuantity: 1 }
+  //       ]
+  //     }
+  // ]);
+
+
+  const handleSizeChange = (productId: string, newSize: string) => {
+   
   };
 
-  const handleQuantityChange = (itemId: number, newQuantity: string) => {
-    setCartItems(items => items.map(item => {
-      if (item.id === itemId) {
-        return {
-          ...item,
-          selectedQuantity: parseInt(newQuantity)
-        };
-      }
-      return item;
-    }));
+  const handleQuantityChange = (itemId: string, newQuantity: string) => {
+    
   };
+
+  const findVariant = (productId:any,variantId:any)=>{
+    console.log(productId,variantId)
+  }
 
   const calculateTotals = () => {
-    return cartItems.reduce((acc, item) => {
+    return cartItems.reduce((acc:any, item:any) => {
+      console.log(acc, item);
       const itemTotal = item.originalPrice * item.selectedQuantity;
       const itemDiscount = (itemTotal * item.discount) / 100;
       return {
@@ -138,6 +140,9 @@ function Cart() {
   const totals = calculateTotals();
   const shippingFee = 123;
   const finalAmount = totals.mrp - totals.discount + shippingFee;
+  if(cartItems.length === 0){
+    return null
+  }
 
   return (
     
@@ -148,60 +153,59 @@ function Cart() {
         
       
           <div className="space-y-6 ">
-            {cartItems.map((item) => {
-              const currentVariant = item.variants.find(v => v.size === item.selectedSize);
-              const availableQuantity = currentVariant?.availableQuantity || 0;
+            {cartItems.map((item:Product) => {
+             
               
               return (
                 <div key={item.id} className="flex gap-16">
                   <div className="w-28 h-28 overflow-hidden">
                     <img 
-                      src={`https://picsum.photos/200/200?random=${item.id}`}
-                      alt={item.name}
+                    src={item.images[0]}
+                      alt={item.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium">{item.name}</h3>
-                        <p className="text-sm text-gray-200">{item.description}</p>
+                        <h3 className="font-medium">{item.title}</h3>
+                        <p className="text-xs text-gray-200">{item.description}</p>
                       </div>
-                      <button className="text-gray-300 hover:text-white">
+                      <button className="text-gray-300 hover:text-white" onClick={() => dispatch(removeItem(item.id))}>
                         <X size={20} />
                       </button>
                     </div>
                     
                     <div className="mt-2 flex gap-4">
                       <Select
-                        value={item.selectedSize.toString()}
-                        onValueChange={(value) => handleSizeChange(item.id, value)}
+
+                      value={item.selectedVariant}
                       >
-                        <SelectTrigger className="w-[100px]">
-                          <SelectValue placeholder="Size" />
+                        <SelectTrigger className="w-[150px]">
+                        <SelectValue placeholder="" />
                         </SelectTrigger>
                         <SelectContent>
                           {item.variants.map((variant) => (
                             <SelectItem
-                              key={variant.size}
-                              value={variant.size.toString()}
-                              disabled={variant.availableQuantity === 0}
+                              key={variant.id}
+                              value={variant.id}
+                              // disabled={variant. === 0}
                             >
-                              Size: {variant.size}
+                              {item.options[0].name}: {variant.title}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
 
                       <Select
-                        value={item.selectedQuantity.toString()}
+                        value={item.quantity.toString()}
                         onValueChange={(value) => handleQuantityChange(item.id, value)}
                       >
                         <SelectTrigger className="w-[100px]">
-                          <SelectValue placeholder="Quantity" />
+                          <SelectValue  />
                         </SelectTrigger>
                         <SelectContent>
-                          {[...Array(Math.min(availableQuantity, 5))].map((_, i) => (
+                          {[...Array(Math.min(item.totalInventory, 5))].map((_, i) => (
                             <SelectItem
                               key={i + 1}
                               value={(i + 1).toString()}
@@ -214,12 +218,12 @@ function Cart() {
                     </div>
                     
                     <div className="mt-2 flex items-center gap-5">
-                      <span className="line-through text-gray-300">₹{item.originalPrice}</span>
-                      <span className="text-blue-400 text-base">₹{item.discountedPrice}</span>
+                      <span className="l text-gray-300">₹{item.variants[0].price}</span>
+                      {/* <span className="text-blue-400 text-base">₹{item.discountedPrice}</span>
                       <span className="text-red-500 text-sm">{item.discount}% Off</span>
                       <p className="ml-auto text-xs  rounded text-red-500  ">
                         Remove Offer
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                 </div>
@@ -264,6 +268,7 @@ function Cart() {
       </div>
       </ScrollArea>
     </div>
+
  
   );
 }

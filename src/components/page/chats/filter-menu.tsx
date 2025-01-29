@@ -68,15 +68,15 @@ export function FilterMenu() {
   }
 
   return (
-    <div className="bg-transparent text-white p-4 w-full max-w-screen-xl">
-     
-       
-        <ScrollArea className="w-full">
-
-          {" "}
+    <div className=" ">
+      <div className="flex items-center my-2">
+        
+        <ScrollArea className="xl:w-[calc(89vw-100px)] md:w-[calc(90vw-100px)] md:block hidden bg-transparent  text-white p-4">
+          {" "} 
           {/* Adjust width to account for "Clear All" button */}
-          <div className="flex gap-2 pb-2">
-             <Button
+          <div className="flex gap-2 pb-2 flex-nowrap">
+            {" "}
+            <Button
           variant="link"
           className="text-red-500 hover:text-red-400 px-0 whitespace-nowrap"
           onClick={clearAllFilters}
@@ -84,8 +84,7 @@ export function FilterMenu() {
         >
           Clear All
         </Button>
-            {" "}
-            {/* Add bottom padding for ScrollBar */}
+            {/* Add flex-nowrap to prevent wrapping */}
             {filters?.map((filter) => (
               <DropdownMenu key={filter.title}>
                 <DropdownMenuTrigger asChild>
@@ -95,7 +94,7 @@ export function FilterMenu() {
                     size="sm"
                   >
                     <span>{filter.title}</span>
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="h-4 w-4 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 bg-slate-900 border-slate-800 max-h-[300px] overflow-y-auto">
@@ -116,9 +115,9 @@ export function FilterMenu() {
               </DropdownMenu>
             ))}
           </div>
-          <ScrollBar orientation="horizontal" />
+          <ScrollBar orientation="horizontal" className="opacity-10" />
         </ScrollArea>
-    
+      </div>
     </div>
   )
 }

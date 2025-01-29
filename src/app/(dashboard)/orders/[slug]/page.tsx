@@ -6,9 +6,13 @@ import ProductInventory from '@/components/page/order/products'
 import Profile from '@/components/page/order/profile'
 import { Button } from '@/components/ui/button'
 import React from 'react'
+import { useGetProductsQuery } from '@/store/features/apislice'
 
 function Page() {
   const [isOrderCreated, setIsOrderCreated] = useState(false);
+  const {data: products, isLoading: productsLoading} = useGetProductsQuery({})
+  console.log(products);
+  
   
   const handleOrderCreated = () => {
     setIsOrderCreated(!isOrderCreated);
@@ -21,10 +25,10 @@ function Page() {
         <Button className='bg-blue-500 hover:bg-blue-600' onClick={handleOrderCreated}>{isOrderCreated ? 'Cancel Order' : 'Create Order'}</Button>
       </div>
       <Profile/>
-    <div className='flex gap-4'>
+    <div className='flex gap-4 justify-end'>
 
       <Cart/>
-    <ProductInventory/>
+    <ProductInventory products={products || []} loading={productsLoading}/>
     <HistoryView/>
     </div>
     </div>

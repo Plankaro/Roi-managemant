@@ -18,12 +18,11 @@ export default auth(async function middleware(request: NextRequest) {
     const forwardedPath = request.nextUrl.pathname.replace("/api", "");
     const url = new URL(api_url + forwardedPath + request.nextUrl.search);
 
-    console.log("-> (m)forwarding-url:", url.toString());
+   
 
     // Rewrite the request to the API URL
     return NextResponse.rewrite(url.toString(), {
       headers: {
-        ...request.headers,
         ...request.headers,
         Authorization: `Bearer ${session?.access_token??""}`, 
       },

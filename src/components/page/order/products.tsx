@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import * as React from "react"
@@ -5,38 +6,43 @@ import { Search } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { addToCart,removeItem } from "@/store/features/cartSlice"
+import { useDispatch, useSelector } from "react-redux"
 
-interface Product {
-  id: number
-  name: string
-  inventory: number
-  amount: number
-  checked?: boolean
+interface ProductProps {
+  id: string;
+  title: string;
+  images: string[];
+  options: {
+    name: string;
+    values: string[];
+  }[];
+  variants: {
+    id: string;
+    availableForSale: boolean;
+    price: number;
+    title: string;
+  }[];
+  totalInventory: number;
 }
 
-const products: Product[] = [
-  { id: 1, name: "Product 1", inventory: 123, amount: 678 },
-  { id: 2, name: "Product 1", inventory: 34, amount: 123 },
-  { id: 3, name: "Product 1", inventory: 76, amount: 4567 },
-  { id: 4, name: "Product 1", inventory: 99, amount: 5678 },
-  { id: 5, name: "Product 1", inventory: 33, amount: 876 },
-  { id: 6, name: "Product 1", inventory: 123, amount: 678 },
-  { id: 7, name: "Product 1", inventory: 34, amount: 123 },
-  { id: 8, name: "Product 1", inventory: 76, amount: 4567 },
-  { id: 9, name: "Product 1", inventory: 99, amount: 5678 },
-  { id: 10, name: "Product 1", inventory: 33, amount: 876 },
-]
 
-export default function ProductInventory() {
+export default function ProductInventory({products}: {products: ProductProps[],loading: boolean}) {
+  const dispatch = useDispatch()
+  const cartItems = useSelector((state: any) => state.cart.cartItems)
+  console.log(cartItems)
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [checkedProducts, setCheckedProducts] = React.useState<number[]>([])
 
-  const handleCheckboxChange = (productId: number) => {
-    setCheckedProducts((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId],
-    )
-  }
-
+  const handleCheckboxChange = (product: any) => {
+    if (cartItems.some((item: any) => item.id === product.id)) {
+      console.log("Removing product:", product);
+      dispatch(removeItem(product.id));
+    } else {
+      console.log("Adding product:", product);
+      dispatch(addToCart(product));
+    }
+  };
+  
   return (
     <div className="border p-6 border-primary rounded-2xl">
       <h1 className="mb-6 text-2xl font-bold text-white">Products Available</h1>
@@ -61,18 +67,18 @@ export default function ProductInventory() {
 
         <ScrollArea className="h-[300px] no-scrollbar overflow-scroll">
           <div className="divide-y divide-[#2D477A] p-3">
-            {products.map((product) => (
+            {products && products.map((product) => (
               <div key={product.id} className="grid grid-cols-4 gap-4 py-4 text-sm text-gray-300">
                 <div className="col-span-2 flex items-center gap-2">
                   <Checkbox
-                    checked={checkedProducts.includes(product.id)}
-                    onCheckedChange={() => handleCheckboxChange(product.id)}
+                    checked={cartItems.some((item: any) => item.id === product.id)}
+                    onCheckedChange={() => handleCheckboxChange(product)}
                     className="border-gray-600"
                   />
-                  {product.name}
+                  {product.title}
                 </div>
-                <div>{product.inventory}</div>
-                <div>₹ {product.amount}</div>
+                <div>{product.totalInventory}</div>
+                <div>₹ {product.variants[0].price}</div>
               </div>
             ))}
           </div>
