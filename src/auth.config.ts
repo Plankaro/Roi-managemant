@@ -25,7 +25,7 @@ async function refreshAccessToken(token: any) {
                 },
             }
         );
-console.log(response);
+//console.log(response);
         const tokens = response.data.userTokens;
 
     
@@ -36,7 +36,7 @@ console.log(response);
             refreshToken: tokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
         };
     } catch (error) {
-        console.log(error);
+        //console.log(error);
 
         return {
             ...token,
@@ -61,7 +61,7 @@ export default {
                     const parsedCredentials = signInSchema.safeParse({ email, password });
             
                     if (!parsedCredentials.success) {
-                        console.error("Invalid credentials:", parsedCredentials.error.errors);
+                        //console.error("Invalid credentials:", parsedCredentials.error.errors);
                         throw new CredentialsSignin({ cause: "Required fields missing" });
                     }
                     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
@@ -78,7 +78,7 @@ export default {
 
                     return data;
                 } catch (error) {
-                    console.log(error);
+                    //console.log(error);
                 }
             },
         }),
@@ -93,8 +93,8 @@ export default {
             }
 
             if (account && user) {
-                console.log(`In jwt callback - User is ${JSON.stringify(user)}`);
-                console.log(`In jwt callback - account is ${JSON.stringify(account)}`);
+                //console.log(`In jwt callback - User is ${JSON.stringify(user)}`);
+                //console.log(`In jwt callback - account is ${JSON.stringify(account)}`);
 
                 return {
                     ...token,
@@ -105,12 +105,12 @@ export default {
             }
 
             if (Date.now() < token.accessTokenExpires) {
-                console.log("**** returning previous token ******");
+                //console.log("**** returning previous token ******");
                 return token;
             }
 
             // Access token has expired, try to update it
-            console.log("**** Update Refresh token ******");
+            //console.log("**** Update Refresh token ******");
             //return token;
             return refreshAccessToken(token);
         },

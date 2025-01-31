@@ -64,9 +64,7 @@ const DashboardLayout = () => {
             <p className="lg:text-base text-sm ml-3  text-white cursor-pointer">
               Sort By: All{" "}
             </p>
-            <p className="text-base lg:text-lg ml-3  text-red-500 underline cursor-pointer">
-              View Report{" "}
-            </p>
+         
             <Button className="bg-blue-500 hover:bg-blue-400">
               <Plus className="h-4 w-4" />
               <span className="ml-2 text-b">Broadcast Campaign</span>
@@ -77,7 +75,7 @@ const DashboardLayout = () => {
       </div>
       <div className="flex h-full flex-col ">
       <FilterMenu />
-        <div className="flex  gap-4 overflow-hidden md:h-[calc(100vh-190px)] h-[85vh]">
+        <div className="flex  gap-4 overflow-hidden md:h-[calc(100vh-220px)] h-[85vh]">
           {/* {children} */}
         <ChatLists/>
           <AllChats/>

@@ -1,6 +1,7 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import { apiSlice } from "./features/apislice";
+import chatReducer from "./features/chatSlice";
 import selectedProspectReducer from "./features/prospectslice";
 import cartReducer from "./features/cartSlice";
 
@@ -10,6 +11,8 @@ export const store = configureStore({
     [apiSlice.reducerPath]: apiSlice.reducer,
     selectedProspect: selectedProspectReducer,
     cart: cartReducer,
+    chat: chatReducer,
+
   },
 
   middleware: (getDefaultMiddleware) =>

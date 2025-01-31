@@ -82,6 +82,25 @@ export const apiSlice = createApi({
         body,
       }),
       invalidatesTags: ["shopifyCustomer"], // Invalidate the 'Prospect' tag after creating
+    }),
+    getChats: builder.query({
+      query: ({client_no, prospect_no }) => ({
+        url: 'chats',
+        params: {client_no, prospect_no }, // Pass parameters here
+      }),
+    }),
+    sendText: builder.mutation({
+      query: (sendChatDto) => ({
+        url: '/chats/text',
+        method: 'POST',
+        body: sendChatDto, // Send the required parameters in the body
+      }),
+    }),
+    getAllTemplates:builder.query({
+      query: () => ({
+        url: 'chats/templates',
+        method: 'GET',
+      }),
     })
   }),
 });
@@ -96,5 +115,7 @@ export const {
   useCreateProspectMutation,
   useGetProspectQuery,
   useGetProductsQuery,
-  useCreateOrderMutation
+  useCreateOrderMutation,
+  useGetChatsQuery,
+  useSendTextMutation
 } = apiSlice;
