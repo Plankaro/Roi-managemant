@@ -47,8 +47,11 @@ import { MdOutlineVideoLibrary } from "react-icons/md";
 import Messages from "@/components/page/chats/message";
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import TemplateBuilder from "@/components/page/chats/templatedialog";
+import { setChats } from "@/store/features/chatSlice";
+
 
 const AllChats = () => {
+  
   const selectedProspect = useSelector(
     (state: RootState) => state.selectedProspect?.selectedProspect
   );
@@ -72,7 +75,7 @@ const AllChats = () => {
       }).unwrap();
       setMessage("");
 
-      console.log("Message sent successfully:", response);
+         dispatch(setChats([response]))
     } catch (error) {
       console.error("Error sending message:", error);
     }

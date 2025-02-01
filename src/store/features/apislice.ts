@@ -98,7 +98,7 @@ export const apiSlice = createApi({
     }),
     getAllTemplates:builder.query({
       query: () => ({
-        url: 'chats/templates',
+        url: '/chats/template',
         method: 'GET',
       }),
     })
@@ -117,5 +117,6 @@ export const {
   useGetProductsQuery,
   useCreateOrderMutation,
   useGetChatsQuery,
-  useSendTextMutation
+  useSendTextMutation,
+  useGetAllTemplatesQuery
 } = apiSlice;

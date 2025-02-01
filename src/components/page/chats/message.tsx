@@ -103,7 +103,7 @@ function Messages({ selectedProspect }: { selectedProspect: any }) {
       <div className="space-y-4 p-4">
         {selectedChats.map((chat) => {
           const isMyMessage = chat.senderPhoneNo === myPhoneNo
-          console.log(chat)
+      
           return (
             <div key={chat.chatId} className={`flex flex-col max-w-[85%] ${isMyMessage ? "ml-auto" : "mr-auto"}`}>
               <div className="flex gap-3 items-start">

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { uniqBy } from "lodash";
 
@@ -45,14 +46,18 @@ interface Chat {
   prospectId?: string;
 }
 
+
+
 // Define Chat state
 interface ChatState {
   chats: Chat[];
+  selectedTemplates:any
 }
 
 // Set initial state
 const initialState: ChatState = {
   chats: [],
+  selectedTemplates:null
 };
 
 // Replace with actual phone number
@@ -82,9 +87,12 @@ const chatSlice = createSlice({
       // Ensure uniqueness after all modifications
       state.chats = uniqBy(state.chats, "chatId");
     },
+    setSelectedTemplates: (state, action: PayloadAction<any>) => {
+      state.selectedTemplates = action.payload;
+    },
   },
 });
 
 // Export actions and reducer
-export const { setChats } = chatSlice.actions;
+export const { setChats,setSelectedTemplates } = chatSlice.actions;
 export default chatSlice.reducer;
