@@ -19,7 +19,12 @@ const nextConfig: NextConfig = {
           protocol: "https",
           hostname: "cdn.shopify.com",
           pathname: "/**", // Allow all paths under example.com/images/
-        }
+        },
+        {
+          protocol: 'https',
+          hostname: 'scontent.whatsapp.net',
+          pathname: '/**', // '**' is a glob pattern to match any path under /v/
+        },
     ]
   }
 };
