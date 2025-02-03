@@ -11,6 +11,8 @@ import { useSocket } from "@/app/socketProvider"
 import { useDispatch, useSelector } from "react-redux"
 import { setChats } from "@/store/features/chatSlice"
 import type { RootState } from "@/store/store"
+import { Skeleton } from "@/components/ui/skeleton"
+
 
 export type Chat = {
   id: string
@@ -54,9 +56,51 @@ export enum BodyType {
   Document = "document",
 }
 
+function MessagesSkeleton() {
+  return (
+    <ScrollArea className="flex-1 pt-20 pb-4">
+      <div className="space-y-4 p-4">
+        {[...Array(5)].map((_, i) => {
+          const isMyMessage = i % 2 === 0 // Alternate between sent and received messages
+
+          return (
+            <div key={i} className={`flex flex-col max-w-[85%] ${isMyMessage ? "ml-auto" : "mr-auto"}`}>
+              <div className="flex gap-3 items-start">
+                {!isMyMessage && <Skeleton className="h-8 w-8 rounded-full bg-white/10" />}
+                <div className={`flex-1 flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}>
+                  <div
+                    className={`p-4 rounded-2xl ${
+                      isMyMessage ? "bg-blue-600/30 rounded-tr-none" : "bg-[#ECF0F7]/20 rounded-tl-none"
+                    }`}
+                  >
+                    {/* Randomly show image skeleton */}
+                    {i % 3 === 0 && (
+                      <div className="mb-2 -mt-1 -mx-1">
+                        <Skeleton className="w-full h-[200px] rounded-lg bg-white/10" />
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-48 bg-white/10" />
+                      <Skeleton className="h-4 w-32 bg-white/10" />
+                    </div>
+                  </div>
+                </div>
+                {isMyMessage && <Skeleton className="h-8 w-8 rounded-full bg-white/10" />}
+              </div>
+              <div className={`mt-1 ${isMyMessage ? "ml-auto" : "mr-auto"}`}>
+                <Skeleton className="h-3 w-12 bg-white/10" />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </ScrollArea>
+  )
+}
 function Messages({ selectedProspect }: { selectedProspect: any }) {
+ 
   const myPhoneNo = "15551365364" // Your phone number
-  const { data } = useGetChatsQuery({
+  const { data,isLoading } = useGetChatsQuery({
     client_no: myPhoneNo,
     prospect_no: selectedProspect.phoneNo,
   })
@@ -99,7 +143,10 @@ function Messages({ selectedProspect }: { selectedProspect: any }) {
   }, [socket])
 
   return (
-    <ScrollArea className="flex-1 pt-20 pb-4">
+    <>
+    {isLoading ?
+      <MessagesSkeleton />
+      : <ScrollArea className="flex-1 pt-20 pb-4">
       <div className="space-y-4 p-4">
         {selectedChats.map((chat) => {
           const isMyMessage = chat.senderPhoneNo === myPhoneNo
@@ -174,6 +221,10 @@ function Messages({ selectedProspect }: { selectedProspect: any }) {
         })}
       </div>
     </ScrollArea>
+        
+      
+    }
+   </>
   )
 }
 

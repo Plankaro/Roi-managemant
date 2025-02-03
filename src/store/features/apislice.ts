@@ -69,6 +69,12 @@ export const apiSlice = createApi({
       }),
       providesTags: ["Prospect"], // Provide the 'Prospect' tag
     }),
+    getSpecficProspect: builder.query({
+      query: (id) => ({
+        url: `/prospects/${id}`,
+        method: "GET",
+      })
+    }),
     getProducts: builder.query({
       query: () => ({
         url: "/products",
@@ -101,7 +107,23 @@ export const apiSlice = createApi({
         url: '/chats/template',
         method: 'GET',
       }),
+    }),
+    uploadFiles: builder.mutation({
+      query: (formData) => ({
+        url: "/cloudinary/upload-multiple",
+        method: "POST",
+        body: formData,
+      }),
     })
+    ,
+    sendTemplates:builder.mutation({
+      query: (formData) => ({
+        url: "/chats/template",
+        method: "POST",
+        body: formData,
+      }),
+    })
+
   }),
 });
 
@@ -114,9 +136,12 @@ export const {
   useGetSpecificShopifyContactsQuery,
   useCreateProspectMutation,
   useGetProspectQuery,
+  useGetSpecficProspectQuery,
   useGetProductsQuery,
   useCreateOrderMutation,
   useGetChatsQuery,
   useSendTextMutation,
-  useGetAllTemplatesQuery
+  useGetAllTemplatesQuery,
+  useUploadFilesMutation,
+  useSendTemplatesMutation
 } = apiSlice;

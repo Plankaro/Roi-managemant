@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -16,16 +17,31 @@ interface DialogContentProps {
 export default function TemplateBuilder({ open, setOpen }: DialogContentProps) {
   const { data: templates, isLoading } = useGetAllTemplatesQuery({})
   const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
+  const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  console.log(templates)
 
   useEffect(() => {
     if (templates && templates.length > 0) {
       setSelectedTemplate(templates[0])
+      setFilteredTemplate(templates)
     }
   }, [templates])
 
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = templates?.filter((template: any) =>
+        template.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setFilteredTemplate(filtered)
+    } else {
+      setFilteredTemplate(templates)
+    }
+  }, [searchQuery, templates])
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-[1000px] p-6 gap-6 bg-blue-50 overflow-y-auto max-h-[90vh]">
+      <DialogContent className="max-w-[1300px] p-6 gap-6 bg-blue-50  h-[80vh] no-scrollbar overflow-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr] gap-10">
           {/* Select Template Section */}
           <ScrollArea className="overflow-scroll h-[80vh] no-scrollbar">
@@ -33,12 +49,12 @@ export default function TemplateBuilder({ open, setOpen }: DialogContentProps) {
             <div className="space-y-4 relative">
               <div className="bg-blue-50 bg-background pt-0 pb-4 z-10">
                 <Search className="absolute left-3 top-2.5 h-4 w-4" />
-                <Input placeholder="Search here..." className="pl-9" />
+                <Input placeholder="Search here..." className="pl-9"  value={searchQuery} onChange={(e) =>{setSearchQuery(e.target.value)}}/>
               </div>
               <div className="space-y-2 ">
                 {!isLoading &&
-                  templates &&
-                  templates.map((template: any) => (
+                  filteredTemplate &&
+                  filteredTemplate?.map((template: any) => (
                     <div
                       key={template.name}
                       className={`p-3 flex gap-3 cursor-pointer border-b-4 border-blue-700 ${

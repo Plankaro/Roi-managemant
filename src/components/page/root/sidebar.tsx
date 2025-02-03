@@ -22,6 +22,8 @@ import { toggleMenuModal } from "@/store/features/prospectslice";
 import { RootState } from "@/store/store";
 import Logo from "@/components/ui/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {  useSession } from "next-auth/react";
+
 
 export const sidebarItems = [
   { icon: AIBuilder, label: "Overview", slug: "/" },
@@ -35,6 +37,7 @@ export const sidebarItems = [
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const session:any = useSession();
   const isOpen = useSelector(
     (state: RootState) => state.selectedProspect.openMenuModal
   );
@@ -73,8 +76,8 @@ const Sidebar = () => {
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col  text-white">
-                  <span className="text-xs ">Skin Bae Support</span>
-                  <span className="text-xs">skin@gmail.com</span>
+                <span className="text-sm ">{session?.data?.user?.user?.name??""}</span>
+                <span className="text-xs">{session?.data?.user?.user?.email??""}</span>
                 </div>
                
               </div>

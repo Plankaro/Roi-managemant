@@ -1,35 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Skeleton } from "@/components/ui/skeleton"
 import { ChevronRight } from "lucide-react"
+import { format } from 'date-fns';
 
-export default function HistoryView() {
-  const orders = [
-    {
-      id: "1234",
-      amount: 678.1,
-      date: "25/01/2025",
-      status: "Fulfilled",
-    },
-    {
-      id: "1234",
-      amount: 678.1,
-      date: "25/01/2025",
-      status: "Fulfilled",
-    },
-    {
-      id: "1234",
-      amount: 678.1,
-      date: "25/01/2025",
-      status: "Fulfilled",
-    },
-    {
-      id: "1234",
-      amount: 678.1,
-      date: "25/01/2025",
-      status: "Fulfilled",
-    },
-  ]
-
-  return (
-    <div className="w-[320px] rounded-3xl bg-transparent border border-primary p-6 text-white">
+export default function HistoryView({order,isLoading}:{order:any,isLoading:boolean}) {
+  console.log(order)
+  if (isLoading) {
+    return(
+      <div className="w-[320px] rounded-3xl border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white">
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold">History</h2>
 
@@ -37,31 +15,70 @@ export default function HistoryView() {
           <div className="flex justify-between text-sm">
             <div className="space-y-1">
               <p className="text-gray-400">Total Spent</p>
-              <p className="text-xl text-primary">₹ {orders.reduce((acc, order) => acc + order.amount, 0).toFixed(2)}</p>
+              <Skeleton className="h-7 w-24 bg-white/10" />
             </div>
             <div className="space-y-1 text-right">
               <p className="text-gray-400">Orders</p>
-              <p className="text-xl">{orders.length}</p>
+              <Skeleton className="h-7 w-16 bg-white/10 ml-auto" />
             </div>
           </div>
 
-          <div className="h-0.5 w-full bg-blue-600/30 my-4" />
+          <div className="h-0.5 w-full bg-primary my-4" />
 
-          <div className="divide-y divide-[#2D477A] no-scrollbar overflow-scroll">
-            {orders.map((order, index) => (
-              <button
-                key={index}
-                className="w-full flex items-center justify-between p-2  hover:bg-white/5 transition-colors"
-              >
+          <div className="divide-y divide-primary no-scrollbar overflow-scroll">
+            {[...Array(5)].map((_, index) => (
+              <div key={index} className="w-full flex items-center justify-between py-4">
                 <div className="space-y-0.5">
-                  <p className="text-sm font-medium">#{order.id}</p>
-                  <p className="text-lg">₹ {order.amount.toFixed(2)}</p>
+                  <Skeleton className="h-4 w-16 bg-white/10" />
+                  <Skeleton className="h-6 w-24 bg-white/10" />
                 </div>
                 <div className="text-right space-y-0.5">
-                  <p className="text-sm">{order.date}</p>
-                  <p className="text-sm text-blue-500">{order.status}</p>
+                  <Skeleton className="h-4 w-20 bg-white/10 ml-auto" />
+                  <Skeleton className="h-4 w-16 bg-white/10 ml-auto" />
                 </div>
-                <ChevronRight className="w-5 h-5 ml-2 text-gray-400" />
+                <ChevronRight className="w-5 h-5 ml-2 text-blue-500/50" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+    )
+  }
+  return (
+    <div className="w-[320px] h-full  no-scrollbar overflow-scroll  rounded-3xl  border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white ">
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold">History</h2>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <div className="space-y-1">
+              <p className="text-gray-400">Total Spent</p>
+              <p className="text-xl text-blue-500">₹ {order.reduce((acc:any, order:any) => acc + Number(order.amount), 0).toFixed(2)}</p>
+            </div>
+            <div className="space-y-1 text-right">
+              <p className="text-gray-400">Orders</p>
+              <p className="text-xl">{order.length}</p>
+            </div>
+          </div>
+
+          <div className="h-0.5 w-full bg-primary my-4" />
+
+          <div className="divide-y divide-primary">
+            {order && order.map((order:any, index:number) => (
+              <button
+                key={index}
+                className="w-full flex items-center justify-between py-4  hover:bg-white/5 transition-colors"
+              >
+                <div className="space-y-0.5">
+                  <p className=" font-medium text-left">#{index+1}</p>
+                  <p className="text-lg">₹ {Number(order.amount).toFixed(2)}</p>
+                </div>
+                <div className="text-right space-y-0.5">
+                  <p className="text-sm">{format(order.Date, 'dd/MM/yy')}</p>
+                  <p className="text-sm text-blue-400">{order.status}</p>
+                </div>
+                <ChevronRight className="w-5 h-5 ml-2 text-blue-500" />
               </button>
             ))}
           </div>

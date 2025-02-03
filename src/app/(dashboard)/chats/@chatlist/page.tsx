@@ -17,91 +17,32 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState,AppDispatch } from "@/store/store";
 import { selectProspect } from "@/store/features/prospectslice";
 import FilterDropdown from "@/components/page/chats/filter-dropdown";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const contacts = [
-  {
-    id: 1,
-    name: "Grace Miller",
-    phone: "+91 9873535637",
-    message: "Lorem ipsum dolor sit amet, consectetur adipisc...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    assigned: false,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: true,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: false,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: false,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: false,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: false,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: false,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: false,
-  },
-  {
-    id: 2,
-    name: "Jacob Math",
-    phone: "+91 8765498768",
-    message: "Lorem ipsum dolor sit amet, consectetur adip...",
-    time: "2:46 pm",
-    avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    assigned: false,
-  },
-  // Add more contacts as needed
-];
+
+export function ChatListSkeleton() {
+  return (
+    <div className="space-y-2 p-2 w-full animate-pulse">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="p-3 rounded-lg w-full bg-white/5 backdrop-blur-lg">
+          <div className="flex items-center gap-5">
+            <Skeleton className="h-14 w-14 rounded-full bg-white/10" />
+            <div className="flex-1 w-full h-14 py-[2px] flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-24 bg-white/10" />
+                <Skeleton className="h-3 w-12 bg-white/10" />
+              </div>
+              <div className="flex gap-10 items-center justify-between w-full">
+                <Skeleton className="h-3 w-40 bg-white/10" />
+                <Skeleton className="h-4 w-4 rounded-full bg-white/10" />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 const ChatLists = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -142,8 +83,7 @@ const ChatLists = () => {
           />
         </div>
       </div>
-      
-      <ScrollArea className="w-full no-scrollbar">
+      {isLoading ? <ChatListSkeleton />:  <ScrollArea className="w-full no-scrollbar">
         <div className="space-y-2 p-2 w-full">
           {data && data.map((contact: any) => {
          
@@ -199,7 +139,8 @@ const ChatLists = () => {
          
           })}
         </div>
-      </ScrollArea>
+      </ScrollArea>}
+    
     </div>
   );
 };

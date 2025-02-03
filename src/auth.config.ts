@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
@@ -8,8 +8,8 @@ import { CredentialsSignin, NextAuthConfig } from "next-auth";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-const publicRoutes = ["/auth/signin", "/auth/signup"];
-const authRoutes = ["/auth/signin", "/auth/signup"];
+
+const authRoute = ["/sign-in","/sign-up","/verify","/reset-password","/get-token"];
 
 async function refreshAccessToken(token: any) {
 
@@ -84,6 +84,25 @@ export default {
         }),
     ],
     callbacks: {
+        authorized({ request: { nextUrl }, auth }) {
+            const isLoggedIn = !!auth?.user;
+            console.log(auth);
+            console.log(isLoggedIn);
+            const { pathname } = nextUrl;
+            if (authRoute.includes(pathname)) {
+                return true;
+            }
+
+            // Allow access to the home route for all users
+          
+            // Redirect authenticated users away from auth routes
+            if (authRoute.includes(pathname)) {
+                return isLoggedIn ? Response.redirect(new URL('/chats', nextUrl)) : true;
+            }
+
+            // For all other routes, require user to be logged in
+            return isLoggedIn || Response.redirect(new URL('/sign-in', nextUrl));
+        },
         jwt: async ({ token, account, user }: any) => {
        
             if (token.access_token) {
@@ -118,6 +137,7 @@ export default {
             session.user = token.user as any;
             session.access_token = token.access_token as any;
 
+            console.log("sessiontoken",session,)
             return session;
         },
     },

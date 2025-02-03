@@ -25,6 +25,13 @@ const nextConfig: NextConfig = {
           hostname: 'scontent.whatsapp.net',
           pathname: '/**', // '**' is a glob pattern to match any path under /v/
         },
+        {
+          protocol: 'https',
+          hostname: 'res.cloudinary.com',
+          pathname: '/**', // '**' is a glob pattern to match any path under /v/
+        },
+        
+
     ]
   }
 };

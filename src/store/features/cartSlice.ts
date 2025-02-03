@@ -85,11 +85,15 @@ interface Product {
         state.cartItems = state.cartItems.filter((item) => item.id != action.payload);
         console.log("Removed cartItems:", state.cartItems);
       },
-      
-    },
+      removeall: (state)=>{
+        state.cartItems = [];
+        state.TotalPrice = 0;
+        console.log("Cart cleared")
+      }
+    }
   });
   
-  export const { addToCart, updateVariant, updateQuantity, getTotalPrice,removeItem } = cartSlice.actions;
+  export const { addToCart, updateVariant, updateQuantity, getTotalPrice,removeItem,removeall } = cartSlice.actions;
   
   export default cartSlice.reducer;
 

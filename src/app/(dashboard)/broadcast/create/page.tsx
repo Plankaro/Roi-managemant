@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import SelectTemplate from "@/components/page/broadcast/select-template";
+import SelectTemplate from "@/components/page/broadcast/templates";
 import { ArrowUpRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import RecipientContents from "@/components/page/broadcast/recepient-contents";
-import Schedule from "@/components/page/broadcast/schedule";
+import RecipientContents from "@/components/page/broadcast/recipient";
 import Settings from "@/components/page/broadcast/settings";
+import Schedule from "@/components/page/broadcast/schedule";
+import Finalize from "@/components/page/broadcast/finalize";
+import Link from "next/link";
 
 interface Step {
   id: number;
@@ -20,6 +22,7 @@ const steps: Step[] = [
   { id: 2, title: "Recipients & Contents" },
   { id: 3, title: "Settings" },
   { id: 4, title: "Schedule" },
+  { id: 5, title: "Finalize" },
 ];
 
 export default function BroadcastHeader() {
@@ -46,9 +49,9 @@ export default function BroadcastHeader() {
   return (
     <>
       <div className="w-full  py-3 flex items-center justify-between ">
-        <h1 className=" font-semibold text-2xl text-white">
+        <Link className=" font-semibold text-2xl text-white" href={"/broadcast/create"}>
           Create Broadcast Campaign
-        </h1>
+        </Link>
 
         <div className="flex items-center gap-2 flex-1 mx-8">
           {steps.map((step, index) => (
@@ -62,15 +65,17 @@ export default function BroadcastHeader() {
                 }
                 className={cn(
                   "flex items-center gap-2 px-3 py-1.5 rounded-full",
-                  currentStep === step.id && "bg-blue-200",
+                  currentStep === step.id && "bg-[#D7D7D7] ",
                   "hover:bg-[#1C1D36]/50 transition-colors",
                   "disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
               >
                 <span
                   className={cn(
-                    "text-sm",
-                    currentStep === step.id ? "text-white" : "text-gray-400"
+                    "text-sm text-white",
+                    currentStep === step.id && "text-black font-semibold",
+
+                    
                   )}
                 >
                   {step.title}
@@ -80,10 +85,10 @@ export default function BroadcastHeader() {
                     "w-5 h-5 rounded-full flex items-center justify-center text-xs",
                     currentStep === step.id || completedSteps.includes(step.id)
                       ? "bg-blue-600 text-white"
-                      : "border-2 border-gray-600 text-gray-600"
+                      : "border-2 bg-[#D7D7D7] text-black"
                   )}
                 >
-                  {currentStep === step.id ||
+                  {
                   completedSteps.includes(step.id) ? (
                     <svg
                       width="14"
@@ -113,17 +118,20 @@ export default function BroadcastHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link href={"/broadcast"}>
           <Button
             variant="outline"
-            size="sm"
-            className="bg-[#1C1D36] text-white border-none hover:bg-[#2C2D46]"
+           
+            className="bg-[#1C1D36] text-white hover:text-slate-50 border-none hover:bg-[#2C2D46]"
           >
             Exit
           </Button>
+          </Link>
+        
           <Button
             onClick={handleProceed}
-            disabled={currentStep === steps.length}
-            size="sm"
+            
+         
             className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Proceed
@@ -136,6 +144,7 @@ export default function BroadcastHeader() {
           {currentStep === 2 && <RecipientContents />}
           {currentStep === 3 && <Settings />}
           {currentStep === 4 && <Schedule />}
+          {currentStep === 5 && <Finalize />}
           </div>
           <div className="w-[400px]">
             <div className="sticky top-6">
@@ -148,7 +157,7 @@ export default function BroadcastHeader() {
                   <ArrowUpRight className="text-white w-4 h-4" />
                 </div>
 
-                <ScrollArea className="bg-white rounded-lg p-3 h-[400px]">
+                <ScrollArea className="bg-white rounded-lg p-3 h-[550px]">
                   <img
                     src="https://images.unsplash.com/photo-1737223450924-5e1a0d5ab85f"
                     alt="Product"

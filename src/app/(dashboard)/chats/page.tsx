@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import ChatLists from "./@chatlist/page";
 import AllChats from "./@allchats/page";
+import Link from "next/link";
+import { auth } from "@/auth";
 
 // const filters = [
 //   { label: "Conversation Status", icon: ChevronDown },
@@ -54,7 +56,7 @@ const DashboardLayout = () => {
   //     resizeObserver.disconnect();
   //   };
   // }, []);
-
+console.log(auth)
   return (
     <div className="flex flex-col w-full">
       <div className="">
@@ -64,11 +66,12 @@ const DashboardLayout = () => {
             <p className="lg:text-base text-sm ml-3  text-white cursor-pointer">
               Sort By: All{" "}
             </p>
-         
+         <Link  href={"/broadcast/create"}>
             <Button className="bg-blue-500 hover:bg-blue-400">
               <Plus className="h-4 w-4" />
               <span className="ml-2 text-b">Broadcast Campaign</span>
             </Button>
+            </Link>
           </div>
         </div>
        

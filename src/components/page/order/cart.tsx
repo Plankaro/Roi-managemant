@@ -43,7 +43,7 @@ type Product = {
 };
 
 
-function Cart({id}:{id:string}) {
+function Cart({id,refetch}:{id:string,refetch:()=>void}) {
 
   const dispatch = useDispatch()
   const cartItems = useSelector((state: any) => state.cart.cartItems)
@@ -142,7 +142,7 @@ function Cart({id}:{id:string}) {
           error: (error: any) =>
             error?.data?.message || "An error occurred while placing the order.",
         })
-        console.log(await promise)
+        promise.then(() =>refetch())
        
       }
     } catch (error: any) {
@@ -171,8 +171,8 @@ function Cart({id}:{id:string}) {
 
   return (
     
-    <div className="border-primary flex-1 border rounded-lg  flex items-center w-full  justify-center ">
-        <ScrollArea className="h-[420px] w-full px-10 no-scrollbar overflow-scroll">
+    <div className="border-primary xl:flex-1  border rounded-lg  flex items-center w-full  justify-center bg-[#19191980]">
+        <ScrollArea className="h-[450px] w-full px-10 no-scrollbar overflow-scroll">
       <div className="w-full   rounded-3xl text-white">
         <h1 className="text-2xl font-semibold mb-6">Cart</h1>
         

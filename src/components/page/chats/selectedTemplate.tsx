@@ -1,9 +1,16 @@
-import React, { useState, useRef, useEffect } from "react"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type React from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Upload } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Upload, FileText } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
+import { toast } from "react-hot-toast"
+import { useUploadFilesMutation } from "@/store/features/apislice"
+import { useSelector } from "react-redux"
+import { RootState } from "@/store/store"
+import { useSendTemplatesMutation } from "@/store/features/apislice"
 
 interface TemplateComponent {
   type: string
@@ -11,6 +18,8 @@ interface TemplateComponent {
   text?: string
   example?: {
     header_handle?: string[]
+    header_text?: string[]
+    header_text_named_params?: { param_name: string; example: string }[]
     body_text?: string[][]
     body_text_named_params?: { param_name: string; example: string }[]
   }
@@ -18,6 +27,7 @@ interface TemplateComponent {
     type: string
     text: string
     url?: string
+    phone_number?: string
     example?: string[]
   }[]
 }
@@ -38,36 +48,69 @@ interface TemplateProps {
 }
 
 const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => {
-  const [formData, setFormData] = useState<{ [key: string]: string }>({})
+  const[sendTemplate] = useSendTemplatesMutation({})
+ const selectedProspect = useSelector(
+    (state: RootState) => state.selectedProspect?.selectedProspect
+  );
+  const [uploadFiles,{isLoading:isuploadingfile}] = useUploadFilesMutation()
+  const [formData, setFormData] = useState<{
+    header: { type: string; value: string; isEditable: boolean }
+    body: { parameter_name: string; value: string }[]
+    buttons: { type: string; value: string }[]
+  }>({
+    header: { type: "", value: "", isEditable: false },
+    body: [],
+    buttons: [],
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (selectedTemplate) {
-      const defaultData: { [key: string]: string } = {}
-      selectedTemplate.components.forEach((component, index) => {
+      const newFormData = {
+        header: { type: "", value: "", isEditable: false },
+        body: [] as { parameter_name: string; value: string }[],
+        buttons: [] as { type: string; value: string }[],
+      }
+
+      selectedTemplate.components.forEach((component) => {
         if (component.type === "HEADER") {
-          if (component.format === "TEXT") {
-            defaultData[`header-${component.type}`] = component.text || ""
-          } else if (component.format === "IMAGE" && component.example?.header_handle) {
-            defaultData[`header-${component.type}`] = component.example.header_handle[0]
+          newFormData.header.type = component.format || ""
+          if (["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") && component.example?.header_handle) {
+            newFormData.header.value = component.example.header_handle[0]
+            newFormData.header.isEditable = true
+          } else if (component.format === "TEXT") {
+            if (selectedTemplate.parameter_format === "POSITIONAL" && component.example?.header_text) {
+              newFormData.header.value = component.example.header_text[0]
+              newFormData.header.isEditable = true
+            } else if (selectedTemplate.parameter_format === "NAMED" && component.example?.header_text_named_params) {
+              newFormData.header.value = component.example.header_text_named_params[0].example
+              newFormData.header.isEditable = true
+            } else {
+              newFormData.header.value = component.text || ""
+              newFormData.header.isEditable = false
+            }
           }
         } else if (component.type === "BODY") {
           if (selectedTemplate.parameter_format === "POSITIONAL" && component.example?.body_text) {
-            component.example.body_text[0].forEach((value, i) => {
-              defaultData[`body-${i}`] = value
-            })
+            newFormData.body = component.example.body_text[0].map((value, index) => ({
+              parameter_name: `{{${index + 1}}}`,
+              value,
+            }))
           } else if (selectedTemplate.parameter_format === "NAMED" && component.example?.body_text_named_params) {
-            component.example.body_text_named_params.forEach((param) => {
-              defaultData[`body-${param.param_name}`] = param.example
-            })
+            newFormData.body = component.example.body_text_named_params.map((param) => ({
+              parameter_name: `{{${param.param_name}}}`,
+              value: param.example,
+            }))
           }
         } else if (component.type === "BUTTONS" && component.buttons) {
-          component.buttons.forEach((button, i) => {
-            defaultData[`button-${i}`] = button.text || ""
-          })
+          newFormData.buttons = component.buttons.map((button) => ({
+            type: button.type,
+            value: button.type === "URL" ? button.url || "" : button.example?.[0] || "",
+          }))
         }
       })
-      setFormData(defaultData)
+
+      setFormData(newFormData)
     }
   }, [selectedTemplate])
 
@@ -75,19 +118,46 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     return <div>No template selected</div>
   }
 
-  const handleInputChange = (key: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }))
+  const handleInputChange = (section: "header" | "body" | "buttons", index: number, key: string, value: string) => {
+    setFormData((prev) => {
+      const newData = { ...prev }
+      if (section === "header") {
+        newData.header = { ...newData.header, [key]: value }
+      } else if (section === "body") {
+        newData.body[index] = { ...newData.body[index], [key]: value }
+      } else if (section === "buttons") {
+        newData.buttons[index] = { ...newData.buttons[index], [key]: value }
+      }
+      return newData
+    })
   }
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: string) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const uploadedUrl = e.target?.result as string
-        handleInputChange(type, uploadedUrl)
+      const formData = new FormData()
+      formData.append("file", file)
+
+      try {
+        const promise =  uploadFiles(formData).unwrap()
+        toast.promise(promise,{
+          loading: "Uploading...",
+          success: "File uploaded successfully!",
+          error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+        })
+        const data = await promise
+        const link = data[0].link
+
+
+
+        // const { url } = data
+        // console.log(data)
+        handleInputChange("header", 0, "value",link )
+
+      }catch(error){
+        console.log(error)
       }
-      reader.readAsDataURL(file)
+     
     }
   }
 
@@ -98,164 +168,327 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     }
   }
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const validateForm = () => {
+    if (!selectedTemplate) return false
+
+    // Check header
+    if (formData.header.isEditable && !formData.header.value ) {
+      toast.error("Please fill in the header content")
+      return false
+    }
+   
+
+    // Check body parameters
+    const emptyBodyParams = formData.body.filter((param) => !param.value)
+    if (emptyBodyParams.length > 0) {
+      toast.error("Please fill in all body parameters")
+      return false
+    }
+
+    // Check button values
+    const emptyButtons = formData.buttons.filter(
+      (button) => (button.type === "URL" || button.type === "COPY_CODE") && !button.value,
+    )
+    if (emptyButtons.length > 0) {
+      toast.error("Please fill in all button values")
+      return false
+    }
+
+    return true
+  }
+
+  const handleSubmit = async(event: React.FormEvent) => {
     event.preventDefault()
-    console.log("Form Data:", formData)
-    // Here you would typically send this data to your backend
+    if (validateForm()) {
+      const logData = {
+        recipientNo: selectedProspect?.phoneNo,
+
+
+        template_name: selectedTemplate.name,
+        language: selectedTemplate.language,
+    
+    
+        parameter_format: selectedTemplate.parameter_format,
+      
+        header: { ...formData.header },
+        body: formData.body.map((param) => ({
+          ...param,
+          parameter_name: param.parameter_name.replace(/[{}]/g, ""),
+        })),
+        buttons: formData.buttons.filter((button) => button.type === "URL" || button.type === "COPY_CODE"),
+      }
+      console.log(logData)
+      const response = await sendTemplate(logData)
+      console.log(response)
+  
+      toast.success("Message sent successfully")
+    }
+  }
+
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url)
+      return true
+    } catch {
+      return false
+    }
   }
 
   const renderPreview = () => {
-    let previewContent = selectedTemplate.components.map((component, index) => {
+    const previewContent = selectedTemplate.components.map((component, index) => {
       switch (component.type) {
         case "HEADER":
-          if (component.format === "IMAGE" && formData[`header-${component.type}`]) {
+          if (["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") && formData.header.value) {
+            const headerContent = formData.header.value
             return (
-              <Image
-                key={`preview-header-${index}`}
-                src={formData[`header-${component.type || "/placeholder.svg"}`]}
-                alt="Header image"
-                width={300}
-                height={300}
-                className="aspect-square rounded-lg mb-3 object-cover"
-              />
+              <div key={`preview-header-${index}`} className="mb-3">
+                {component.format === "IMAGE" &&
+                  (isValidUrl(headerContent) ? (
+                    <Image
+                      src={headerContent || "/placeholder.svg"}
+                      alt="Header image"
+                      width={300}
+                      height={300}
+                      className="aspect-square rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-[300px] bg-gray-200 flex items-center justify-center rounded-lg">
+                      <p className="text-gray-500">Invalid image URL</p>
+                    </div>
+                  ))}
+                {component.format === "VIDEO" &&
+                  (isValidUrl(headerContent) ? (
+                    <video src={headerContent} controls className="w-full rounded-lg" />
+                  ) : (
+                    <div className="w-full h-[200px] bg-gray-200 flex items-center justify-center rounded-lg">
+                      <p className="text-gray-500">Invalid video URL</p>
+                    </div>
+                  ))}
+                {component.format === "DOCUMENT" && (
+                  <div className="p-4 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <FileText className="h-12 w-12 text-gray-500" />
+                  </div>
+                )}
+              </div>
             )
           } else if (component.format === "TEXT") {
             return (
-              <h3 key={`preview-header-${index}`} className="font-medium text-sm mb-2">
-                {formData[`header-${component.type}`] || component.text}
+              <h3 key={`preview-header-${index}`} className="font-medium text-lg mb-2">
+                {formData.header.value || component.text}
               </h3>
             )
           }
           break
         case "BODY":
           let bodyText = component.text || ""
-          if (selectedTemplate.parameter_format === "POSITIONAL") {
-            component.example?.body_text?.[0]?.forEach((_, i) => {
-              bodyText = bodyText.replace(`{{${i + 1}}}`, formData[`body-${i}`] || `{{${i + 1}}}`)
-            })
-          } else if (selectedTemplate.parameter_format === "NAMED") {
-            component.example?.body_text_named_params?.forEach((param) => {
-              bodyText = bodyText.replace(`{{${param.param_name}}}`, formData[`body-${param.param_name}`] || `{{${param.param_name}}}`)
-            })
-          }
+          formData.body.forEach((param) => {
+            bodyText = bodyText.replace(param.parameter_name, param.value)
+          })
           return (
-            <p key={`preview-body-${index}`} className="text-xs mb-2 whitespace-pre-line">
+            <p key={`preview-body-${index}`} className="text-sm mb-4 whitespace-pre-line">
               {bodyText}
             </p>
           )
+        case "FOOTER":
+          return (
+            <p key={`preview-footer-${index}`} className="text-xs text-gray-500 mb-2">
+              {component.text}
+            </p>
+          )
         case "BUTTONS":
-          return component.buttons?.map((button, i) => (
-            <Button key={`preview-button-${i}`} variant="outline" className="text-xs mt-2 w-full">
-              {formData[`button-${i}`] || button.text}
-            </Button>
-          ))
+          return (
+            <div key={`preview-buttons-${index}`} className="space-y-2">
+              {component.buttons?.map((button, i) => (
+                <Button key={`preview-button-${i}`} variant="outline" className="text-xs w-full">
+                  {button.text}
+                </Button>
+              ))}
+            </div>
+          )
       }
     })
 
     return (
-      <Card className="p-3">
-        <div className="space-y-1.5">{previewContent}</div>
+      <Card className="p-4">
+        <div className="space-y-2">{previewContent}</div>
       </Card>
     )
   }
 
+  const hasEditableParts = () => {
+    if (!selectedTemplate) return false
+
+    const hasEditableHeader = selectedTemplate.components.some(
+      (component) =>
+        component.type === "HEADER" &&
+        ((component.format === "TEXT" &&
+          ((selectedTemplate.parameter_format === "POSITIONAL" && component.example?.header_text) ||
+            (selectedTemplate.parameter_format === "NAMED" && component.example?.header_text_named_params))) ||
+          ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "")),
+    )
+
+    const hasEditableBody = selectedTemplate.components.some(
+      (component) =>
+        component.type === "BODY" &&
+        ((selectedTemplate.parameter_format === "POSITIONAL" && component.example?.body_text?.length) ||
+          (selectedTemplate.parameter_format === "NAMED" && component.example?.body_text_named_params?.length)),
+    )
+
+    const hasEditableButtons = selectedTemplate.components.some(
+      (component) =>
+        component.type === "BUTTONS" &&
+        component.buttons?.some((button) => button.type === "URL" || button.type === "COPY_CODE"),
+    )
+
+    return hasEditableHeader || hasEditableBody || hasEditableButtons
+  }
+
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Template: {selectedTemplate.name}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {selectedTemplate.components.map((component, index) => (
-              <div key={`${component.type}-${index}`} className="space-y-2">
-                <h3 className="text-sm font-medium">{component.type}</h3>
-                {component.type === "HEADER" && (
-                  <>
-                    {component.format === "TEXT" && (
-                      <Input
-                        placeholder="Enter header text"
-                        value={formData[`header-${component.type}`] || ""}
-                        onChange={(e) => handleInputChange(`header-${component.type}`, e.target.value)}
-                        className="text-sm"
-                      />
-                    )}
-                    {["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") && (
-                      <>
-                        <input
-                          type="file"
-                          accept={
-                            component.format === "IMAGE"
-                              ? "image/*"
-                              : component.format === "VIDEO"
-                              ? "video/*"
-                              : "*/*"
-                          }
-                          onChange={(e) => handleFileUpload(e, `header-${component.type}`)}
-                          className="hidden"
-                          ref={fileInputRef}
-                        />
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          className="bg-blue-500 hover:bg-blue-400 text-white justify-start text-sm"
-                          onClick={() => handleUploadClick(`header-${component.type}`)}
-                        >
-                          <Upload className="mr-2 h-4 w-4" />
-                          Upload {component.format?.toLowerCase()}
-                        </Button>
-                      </>
-                    )}
-                  </>
-                )}
-                {component.type === "BODY" && (
-                  <>
-                    <p className="text-xs text-muted-foreground">Enter the parameters for your message.</p>
-                    {selectedTemplate.parameter_format === "POSITIONAL" &&
-                      component.example?.body_text?.[0]?.map((param, paramIndex) => (
-                        <Input
-                          key={`body-${paramIndex}`}
-                          placeholder={`Enter value for {{${paramIndex + 1}}}`}
-                          value={formData[`body-${paramIndex}`] || ""}
-                          onChange={(e) => handleInputChange(`body-${paramIndex}`, e.target.value)}
-                          className="text-sm mt-2"
-                        />
-                      ))}
-                    {selectedTemplate.parameter_format === "NAMED" &&
-                      component.example?.body_text_named_params?.map((param, paramIndex) => (
-                        <Input
-                          key={`body-${param.param_name}`}
-                          placeholder={`Enter value for {{${param.param_name}}}`}
-                          value={formData[`body-${param.param_name}`] || ""}
-                          onChange={(e) => handleInputChange(`body-${param.param_name}`, e.target.value)}
-                          className="text-sm mt-2"
-                        />
-                      ))}
-                  </>
-                )}
-                {component.type === "BUTTONS" &&
-                  component.buttons?.map((button, buttonIndex) => (
-                    <div key={`button-${buttonIndex}`} className="space-y-2">
-                      <h4 className="text-xs font-medium">{button.type} Button</h4>
-                      <Input
-                        placeholder={`Enter ${button.type.toLowerCase()} for button`}
-                        value={formData[`button-${buttonIndex}`] || ""}
-                        onChange={(e) => handleInputChange(`button-${buttonIndex}`, e.target.value)}
-                        className="text-sm"
-                      />
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] xl:grid-cols-[1.2fr,1fr] gap-6">
+      <div className="space-y-6 h-[90%]">
+        <Card className="bg-white shadow-none border-0 h-full overflow-y-scroll no-scrollbar">
+          <CardContent className="p-6 ">
+            <h2 className="text-xl font-semibold mb-6">Add Content</h2>
+            {!hasEditableParts() ? (
+              <p className="text-sm text-muted-foreground">This template is static and has no editable parts.</p>
+            ) : (
+              <form className="space-y-8">
+                {selectedTemplate?.components.map((component, index) => {
+                  const hasEditableContent =
+                    (component.type === "HEADER" &&
+                      ((component.format === "TEXT" &&
+                        ((selectedTemplate.parameter_format === "POSITIONAL" && component.example?.header_text) ||
+                          (selectedTemplate.parameter_format === "NAMED" &&
+                            component.example?.header_text_named_params))) ||
+                        ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || ""))) ||
+                    (component.type === "BODY" && formData.body.length > 0) ||
+                    (component.type === "BUTTONS" &&
+                      formData.buttons.some((b) => b.type === "URL" || b.type === "COPY_CODE"))
+
+                  return (
+                    <div key={`${component.type}-${index}`} className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-base font-medium">{component.format || component.type}</h3>
+                        {!hasEditableContent && (
+                          <p className="text-sm text-muted-foreground">This section doesn&apos;t have editable parts</p>
+                        )}
+                      </div>
+
+                      {component.type === "HEADER" && (
+                        <div className="space-y-3">
+                          {component.format === "TEXT" &&
+                            ((selectedTemplate.parameter_format === "POSITIONAL" && component.example?.header_text) ||
+                              (selectedTemplate.parameter_format === "NAMED" &&
+                                component.example?.header_text_named_params)) && (
+                              <div className="space-y-2">
+                                <label htmlFor="header-input" className="text-sm font-medium">
+                                  {selectedTemplate.parameter_format === "POSITIONAL"
+                                    ? "{{1}}"
+                                    : `{{${component.example?.header_text_named_params?.[0]?.param_name}}}`}
+                                </label>
+                                <Input
+                                  id="header-input"
+                                  placeholder="Enter header text"
+                                  value={formData.header.value}
+                                  onChange={(e) => handleInputChange("header", 0, "value", e.target.value)}
+                                  className="border-blue-500 focus:ring-blue-500"
+                                />
+                              </div>
+                            )}
+                          {["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") && (
+                            <>
+                              <p className="text-sm text-muted-foreground">
+                                Upload a {component?.format?.toLowerCase()} under 5 MB with a recommended aspect ratio of
+                                1.91:1.
+                              </p>
+                              <input
+                                type="file"
+                                accept={
+                                  component.format === "IMAGE"
+                                    ? "image/*"
+                                    : component.format === "VIDEO"
+                                      ? "video/*"
+                                      : "*/*"
+                                }
+                                onChange={handleFileUpload}
+                                className="hidden"
+                                ref={fileInputRef}
+                              />
+                              <Button
+                                type="button"
+                                className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white"
+                                onClick={() => handleUploadClick(component.format || "")}
+                              >
+                                <Upload className="mr-2 h-4 w-4" />
+                                Upload {component?.format?.toLowerCase()}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      )}
+                      {component.type === "BODY" && formData.body.length > 0 && (
+                        <div className="space-y-3">
+                          <p className="text-sm text-muted-foreground">Enter the parameters for your message.</p>
+                          {formData.body.map((param, paramIndex) => (
+                            <div key={`body-${paramIndex}`} className="space-y-2">
+                              <label htmlFor={`body-${paramIndex}`} className="text-sm font-medium">
+                                {param.parameter_name}
+                              </label>
+                              <Input
+                                id={`body-${paramIndex}`}
+                                placeholder={`Enter value for ${param.parameter_name}`}
+                                value={param.value}
+                                onChange={(e) => handleInputChange("body", paramIndex, "value", e.target.value)}
+                                className="border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {component.type === "BUTTONS" &&
+                        formData.buttons.map((button, buttonIndex) => (
+                          <div key={`button-${buttonIndex}`} className="space-y-3">
+                            <h3 className="text-base font-medium">
+                              {button.type === "URL"
+                                ? "CTA Button"
+                                : button.type === "COPY_CODE"
+                                  ? "Copy Code"
+                                  : "Button"}
+                            </h3>
+                            {(button.type === "URL" || button.type === "COPY_CODE") && (
+                              <>
+                                <p className="text-sm text-muted-foreground">
+                                  Enter the {button.type === "URL" ? "URL for the CTA Button" : "code to copy"}
+                                </p>
+                                <Input
+                                  placeholder={button.type === "URL" ? "Enter URL" : "Enter code to copy"}
+                                  value={button.value}
+                                  onChange={(e) => handleInputChange("buttons", buttonIndex, "value", e.target.value)}
+                                  className="border-blue-500 focus:ring-blue-500"
+                                />
+                              </>
+                            )}
+                          </div>
+                        ))}
                     </div>
-                  ))}
-              </div>
-            ))}
+                  )
+                })}
+              </form>
+            )}
           </CardContent>
         </Card>
-        <Button type="submit" className="bg-blue-500 hover:bg-blue-400 text-white w-full">
-          Send Message
-        </Button>
-      </form>
-      <div>
-        <h2 className="text-lg font-semibold mb-4 bg-background top-0 pt-2">Preview</h2>
-        {renderPreview()}
+      </div>
+
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold mb-6">Preview</h2>
+          {renderPreview()}
+        </div>
+        <div className="flex justify-end mt-6">
+          <Button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-600 text-white" size="lg" disabled={isuploadingfile}>
+            Send
+          </Button>
+        </div>
       </div>
     </div>
   )

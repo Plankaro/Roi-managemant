@@ -44,7 +44,7 @@ export default function ProductInventory({products}: {products: ProductProps[],l
   };
   
   return (
-    <div className="border p-6 border-primary rounded-2xl">
+    <div className="border p-6 border-blue-500  rounded-2xl  bg-[var(--Background-50,#19191980)]">
       <h1 className="mb-6 text-2xl font-bold text-white">Products Available</h1>
 
       <div className="mb-8 relative">
@@ -59,7 +59,7 @@ export default function ProductInventory({products}: {products: ProductProps[],l
       </div>
 
       <div className="rounded-lg bg-transparent ">
-        <div className="grid grid-cols-4 gap-4 p-3 bg-[#19191980]/50 pb-4 text-sm font-medium text-white">
+        <div className="grid grid-cols-4 gap-4 p-3 bg-[#19191980] pb-4 text-sm font-medium text-white">
           <div className="col-span-2">Product</div>
           <div>Inventory</div>
           <div>Amount</div>
@@ -68,12 +68,12 @@ export default function ProductInventory({products}: {products: ProductProps[],l
         <ScrollArea className="h-[300px] no-scrollbar overflow-scroll">
           <div className="divide-y divide-[#2D477A] p-3">
             {products && products.map((product) => (
-              <div key={product.id} className="grid grid-cols-4 gap-4 py-4 text-sm text-gray-300">
-                <div className="col-span-2 flex items-center gap-2">
+              <div key={product.id} className="grid grid-cols-4 gap-4 py-4 text-sm text-gray-300 ">
+                <div className="col-span-2 flex items-center gap-2 line-clamp-1 ">
                   <Checkbox
                     checked={cartItems.some((item: any) => item.id === product.id)}
                     onCheckedChange={() => handleCheckboxChange(product)}
-                    className="border-gray-600"
+                    className="border-gray-600 "
                   />
                   {product.title}
                 </div>

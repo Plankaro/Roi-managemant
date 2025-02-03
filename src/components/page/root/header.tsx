@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/components/ui/logo";
 import { Search, Bell, X, Menu } from "lucide-react";
@@ -5,8 +6,10 @@ import React from "react";
 import { useDispatch,useSelector } from "react-redux";
 import { toggleMenuModal } from "@/store/features/prospectslice";
 import { RootState } from "@/store/store";
-
+import {  useSession } from "next-auth/react";
 const Header = () => {
+  const session:any = useSession();
+  console.log(session)
     const isOpen = useSelector((state:RootState)=>state.selectedProspect.openMenuModal)
     const dispatch = useDispatch()
   return (
@@ -24,8 +27,8 @@ const Header = () => {
         <Bell className="text-white" />
         <div className=" items-center gap-2 sm:flex hidden">
           <div className="flex flex-col  text-white">
-            <span className="text-sm ">Skin Bae Support</span>
-            <span className="text-xs">skin@gmail.com</span>
+            <span className="text-sm ">{session?.data?.user?.user?.name??""}</span>
+            <span className="text-xs">{session?.data?.user?.user?.email??""}</span>
           </div>
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" height={28} width={28} />
