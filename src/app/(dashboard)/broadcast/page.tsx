@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -19,24 +20,9 @@ import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
 
-export interface Broadcast {
-  id: string
-  title: string
-  type: "Marketing" | "Transactional"
-  content: string
-  status: "Completed" | "Aborted" | "Scheduled" | "Draft" | "Running" | "Pause"
-  createdAt: string
-  scheduledAt: string
-  metrics: {
-    contacts: number
-    delivered: number
-    read: number
-    skipped: number
-    failed: number
-  }
-}
 
-export const broadcasts: Broadcast[] = [
+
+ const broadcasts: any = [
   {
     id: "1",
     title: "Unlock Exclusive Access to Our New Features!",
@@ -363,7 +349,7 @@ export default function BroadcastDashboard() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const statuses = ["all", "Completed", "Aborted", "Scheduled", "Draft", "Running", "Pause"]
 
-  const filteredBroadcasts = broadcasts.filter((broadcast) =>
+  const filteredBroadcasts = broadcasts.filter((broadcast:any) =>
     statusFilter === "all" ? true : broadcast.status === statusFilter,
   )
 
@@ -391,7 +377,7 @@ export default function BroadcastDashboard() {
 
       {/* Mobile View - Cards */}
       <div className="lg:hidden space-y-4 ">
-        {broadcasts.map((broadcast) => (
+        {broadcasts.map((broadcast:any) => (
           <Card key={broadcast.id} className="text-black bg-blue-50">
             <CardContent className="p-4 space-y-4">
               <div className="flex justify-between items-start">
@@ -507,7 +493,7 @@ export default function BroadcastDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody className="bg-blue-50 text-black">
-                {filteredBroadcasts.map((broadcast) => (
+                {filteredBroadcasts.map((broadcast:any) => (
                   <TableRow key={broadcast.id} className="hover:bg-gray-50 transition-colors">
                     <TableCell>
                       <div className="space-y-1 w-80">
