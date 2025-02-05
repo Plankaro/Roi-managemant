@@ -23,6 +23,7 @@ import { RootState } from "@/store/store";
 import Logo from "@/components/ui/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {  useSession } from "next-auth/react";
+import { handleSignOut } from "@/app/(auth)/sign-in/action";
 
 
 export const sidebarItems = [
@@ -108,9 +109,9 @@ const Sidebar = () => {
             <Settings className="h-5 w-5" />
             <span className="xl:inline md:hidden inline">Settings</span>
           </button>
-          <button className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-50 hover:text-white hover:bg-white/5 justify-normal ">
+          <button onClick={() => handleSignOut()} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-50 hover:text-white hover:bg-white/5 justify-normal ">
             <LogOut className="h-5 w-5" />
-            <span className="xl:inline md:hidden inline">Log Out</span>
+            <span className="xl:inline md:hidden inline" >Log Out</span>
           </button>
         </div>
       </div>

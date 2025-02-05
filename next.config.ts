@@ -30,6 +30,11 @@ const nextConfig: NextConfig = {
           hostname: 'res.cloudinary.com',
           pathname: '/**', // '**' is a glob pattern to match any path under /v/
         },
+        {
+          protocol: 'https',
+          hostname: 'wallpapercave.com',
+          pathname: '/**', // '**' is a glob pattern to match any path under /v/
+        }
         
 
     ]

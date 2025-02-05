@@ -7,7 +7,7 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
   console.log(order)
   if (isLoading) {
     return(
-      <div className="w-[320px] rounded-3xl border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white">
+      <div className="xl:w-[320px] w-full rounded-3xl border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white">
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold">History</h2>
 
@@ -46,7 +46,7 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
     )
   }
   return (
-    <div className="w-[320px] h-full  no-scrollbar overflow-scroll  rounded-3xl  border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white ">
+    <div className="xl:w-[320px] w-full min-h-[400px] h-full  no-scrollbar overflow-scroll  rounded-3xl  border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white ">
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold">History</h2>
 

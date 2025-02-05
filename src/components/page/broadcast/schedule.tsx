@@ -31,7 +31,7 @@ function Schedule() {
         <div className="space-y-6">
           <h2 className="text-lg font-medium">Schedule</h2>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid LG:grid-cols-2  grid-cols-1 gap-4">
             <div className="space-y-2">
               <label className="text-sm text-gray-600">Frequency</label>
               <Select defaultValue="once">
@@ -49,7 +49,7 @@ function Schedule() {
 
             <div className="space-y-2">
               <label className="text-sm text-gray-600">Date & Time (IST)</label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid md:grid-cols-2 grid-cols-1 gap-2">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -146,7 +146,7 @@ function Schedule() {
                         <Button variant="outline" onClick={() => setIsTimePickerOpen(false)}>
                           Cancel
                         </Button>
-                        <Button onClick={() => setIsTimePickerOpen(false)}>OK</Button>
+                        <Button onClick={() => setIsTimePickerOpen(false)} className="bg-primary text-white">OK</Button>
                       </div>
                     </div>
                   </PopoverContent>

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,15 +49,30 @@ import Messages from "@/components/page/chats/message";
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import TemplateBuilder from "@/components/page/chats/templatedialog";
 import { setChats } from "@/store/features/chatSlice";
+import { UseSelector } from "react-redux";
+import { intervalToDuration, formatDuration } from "date-fns";
+import { timeUntil24Hours } from "@/lib/timetill";
+import { useSendMediaMutation,useUploadFilesMutation } from "@/store/features/apislice";
+import toast from "react-hot-toast";
+type FileType = "image" | "video" | "document"
 
+interface FileUploadProps {
+  onFileSelect: (file: File, type: FileType) => void
+}
 
 const AllChats = () => {
-  
+    const [fileType, setFileType] = useState<FileType | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
   const selectedProspect = useSelector(
     (state: RootState) => state.selectedProspect?.selectedProspect
   );
+  const prospectLastMessageTiming = useSelector(
+    (state: RootState) => state.selectedProspect.lastchattime
+  );
   const [message, setMessage] = useState("");
   const [sendText, { isLoading }] = useSendTextMutation();
+const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
+  const [sendMedia, { isLoading: isSendingMedia }] = useSendMediaMutation()
 
   console.log(selectedProspect);
   const [takeOver, settakeOver] = useState(false);
@@ -75,11 +91,88 @@ const AllChats = () => {
       }).unwrap();
       setMessage("");
 
-         dispatch(setChats([response]))
+      dispatch(setChats([response]));
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    // Determine file type synchronously
+    let determinedType: FileType;
+    if (file.type.startsWith("image/")) {
+      determinedType = "image";
+    } else if (file.type.startsWith("video/")) {
+      determinedType = "video";
+    } else {
+      determinedType = "document";
+    }
+  
+    // Update state (optional if you need to display it)
+    setFileType(determinedType);
+  
+    // Check file size (limit 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size should be less than 5MB");
+      return;
+    }
+  
+    // Prepare file for upload
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    try {
+      const uploadPromise = uploadFiles(formData).unwrap();
+      toast.promise(uploadPromise, {
+        loading: "Uploading...",
+        success: "File uploaded successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      });
+      const data = await uploadPromise;
+      const link = data[0].link;
+  
+      // Use the locally determined type rather than relying on state
+      const sendMediaPromise = sendMedia({
+        recipientNo: selectedProspect?.phoneNo.slice(1),
+        mediaUrl: link,
+        type: determinedType,
+      }).unwrap();
+  
+      toast.promise(sendMediaPromise, {
+        loading: "Sending...",
+        success: "File sent successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      });
+  
+      console.log(await sendMediaPromise);
+      // dispatch(setChats([await sendMediaPromise]));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
+ 
+
+  const handleDocumentUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.accept = ".pdf,.doc,.docx,.txt"
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleMediaUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.accept = "image/*,video/*"
+      fileInputRef.current.click()
+    }
+  }
+
 
   useEffect(() => {
     setShow(false);
@@ -128,7 +221,9 @@ const AllChats = () => {
 
                     <div className="flex gap-3  px-3 py-2 rounded-3xl items-center bg-[#A7B8D9]">
                       <Hourglass className="sm:w-4 sm:h-4 w-3 h-3" />
-                      <span className="sm:text-sm text-xs">23h 40m</span>
+                      <span className="sm:text-sm text-xs">
+                        {timeUntil24Hours(prospectLastMessageTiming)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -202,35 +297,51 @@ const AllChats = () => {
               </div>
             ) : (
               <div className="p-4 border-t border-primary bg-primary rounded-b-[20px]">
+                 <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                            accept={fileType === "document" ? ".pdf,.doc,.docx,.txt" : "image/*,video/*"}
+                          />
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-white hover:text-white/90  hover:bg-white/10 aspect-square"
                   >
-                    <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                    <DropdownMenu
+                      open={dropdownOpen}
+                      onOpenChange={setDropdownOpen}
+                    >
                       <DropdownMenuTrigger asChild>
-                        <Button variant={"ghost"} className="bg-transparent hover:bg-transparent hover:text-white"> <PlusCircle /></Button>
-                
+                        <Button
+                          variant={"ghost"}
+                          className="bg-transparent hover:bg-transparent hover:text-white"
+                        >
+                          {" "}
+                          <PlusCircle />
+                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-blue-500 text-white border-0">
                         <DropdownMenuItem
                           className="flex gap-2"
-                          onClick={() => {setDialog(true)
-                            setDropdownOpen(false)
-                          }
-                        }
+                          onClick={() => {
+                            setDialog(true);
+                            setDropdownOpen(false);
+                          }}
                         >
                           <LayoutGrid />
                           Templates
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="flex gap-2">
+                        <DropdownMenuItem className="flex gap-2" onClick={handleDocumentUpload}>
+                         
                           <FileText />
                           Documents
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="flex gap-2">
+                        <DropdownMenuItem className="flex gap-2" onClick={handleMediaUpload}>
                           <MdOutlineVideoLibrary />
                           Photos & Videos
                         </DropdownMenuItem>
@@ -361,7 +472,7 @@ const AllChats = () => {
 
                 {/* Action Buttons */}
                 <div className="space-y-3 pt-4">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10"
                   >
@@ -374,7 +485,7 @@ const AllChats = () => {
                   >
                     <Trash2 className="h-5 w-5 mr-2" />
                     Delete
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>

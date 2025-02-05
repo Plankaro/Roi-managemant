@@ -48,15 +48,15 @@ interface TemplateProps {
 }
 
 const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => {
-  const[sendTemplate] = useSendTemplatesMutation({})
- const selectedProspect = useSelector(
+  const [sendTemplate] = useSendTemplatesMutation({})
+  const selectedProspect = useSelector(
     (state: RootState) => state.selectedProspect?.selectedProspect
-  );
-  const [uploadFiles,{isLoading:isuploadingfile}] = useUploadFilesMutation()
+  )
+  const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
   const [formData, setFormData] = useState<{
     header: { type: string; value: string; isEditable: boolean }
     body: { parameter_name: string; value: string }[]
-    buttons: { type: string; value: string }[]
+    buttons: { type: string; value: string,isEditable: boolean }[]
   }>({
     header: { type: "", value: "", isEditable: false },
     body: [],
@@ -69,20 +69,29 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
       const newFormData = {
         header: { type: "", value: "", isEditable: false },
         body: [] as { parameter_name: string; value: string }[],
-        buttons: [] as { type: string; value: string }[],
+        buttons: [] as { type: string; value: string ;isEditable: boolean}[],
       }
 
       selectedTemplate.components.forEach((component) => {
         if (component.type === "HEADER") {
           newFormData.header.type = component.format || ""
-          if (["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") && component.example?.header_handle) {
+          if (
+            ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
+            component.example?.header_handle
+          ) {
             newFormData.header.value = component.example.header_handle[0]
             newFormData.header.isEditable = true
           } else if (component.format === "TEXT") {
-            if (selectedTemplate.parameter_format === "POSITIONAL" && component.example?.header_text) {
+            if (
+              selectedTemplate.parameter_format === "POSITIONAL" &&
+              component.example?.header_text
+            ) {
               newFormData.header.value = component.example.header_text[0]
               newFormData.header.isEditable = true
-            } else if (selectedTemplate.parameter_format === "NAMED" && component.example?.header_text_named_params) {
+            } else if (
+              selectedTemplate.parameter_format === "NAMED" &&
+              component.example?.header_text_named_params
+            ) {
               newFormData.header.value = component.example.header_text_named_params[0].example
               newFormData.header.isEditable = true
             } else {
@@ -91,12 +100,18 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
             }
           }
         } else if (component.type === "BODY") {
-          if (selectedTemplate.parameter_format === "POSITIONAL" && component.example?.body_text) {
+          if (
+            selectedTemplate.parameter_format === "POSITIONAL" &&
+            component.example?.body_text
+          ) {
             newFormData.body = component.example.body_text[0].map((value, index) => ({
               parameter_name: `{{${index + 1}}}`,
               value,
             }))
-          } else if (selectedTemplate.parameter_format === "NAMED" && component.example?.body_text_named_params) {
+          } else if (
+            selectedTemplate.parameter_format === "NAMED" &&
+            component.example?.body_text_named_params
+          ) {
             newFormData.body = component.example.body_text_named_params.map((param) => ({
               parameter_name: `{{${param.param_name}}}`,
               value: param.example,
@@ -106,6 +121,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
           newFormData.buttons = component.buttons.map((button) => ({
             type: button.type,
             value: button.type === "URL" ? button.url || "" : button.example?.[0] || "",
+            isEditable: /{{.+?}}/.test(button.type === "URL" ? button.url || "" : button.example?.[0] || "")
           }))
         }
       })
@@ -118,7 +134,12 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     return <div>No template selected</div>
   }
 
-  const handleInputChange = (section: "header" | "body" | "buttons", index: number, key: string, value: string) => {
+  const handleInputChange = (
+    section: "header" | "body" | "buttons",
+    index: number,
+    key: string,
+    value: string
+  ) => {
     setFormData((prev) => {
       const newData = { ...prev }
       if (section === "header") {
@@ -134,13 +155,19 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+ 
     if (file) {
+      console.log(file.size)
+      if(file.size>5*1024*1024) {
+        toast.error("File size should be less than 5MB")
+        return
+      }
       const formData = new FormData()
       formData.append("file", file)
 
       try {
-        const promise =  uploadFiles(formData).unwrap()
-        toast.promise(promise,{
+        const promise = uploadFiles(formData).unwrap()
+        toast.promise(promise, {
           loading: "Uploading...",
           success: "File uploaded successfully!",
           error: (error: any) => error?.data?.message || "An unexpected error occurred.",
@@ -148,16 +175,11 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
         const data = await promise
         const link = data[0].link
 
-
-
-        // const { url } = data
-        // console.log(data)
-        handleInputChange("header", 0, "value",link )
-
-      }catch(error){
+        // Set the header value with the uploaded link
+        handleInputChange("header", 0, "value", link)
+      } catch (error) {
         console.log(error)
       }
-     
     }
   }
 
@@ -172,11 +194,10 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     if (!selectedTemplate) return false
 
     // Check header
-    if (formData.header.isEditable && !formData.header.value ) {
+    if (formData.header.isEditable && !formData.header.value) {
       toast.error("Please fill in the header content")
       return false
     }
-   
 
     // Check body parameters
     const emptyBodyParams = formData.body.filter((param) => !param.value)
@@ -187,7 +208,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
 
     // Check button values
     const emptyButtons = formData.buttons.filter(
-      (button) => (button.type === "URL" || button.type === "COPY_CODE") && !button.value,
+      (button) => (button.type === "URL" || button.type === "COPY_CODE") && !button.value
     )
     if (emptyButtons.length > 0) {
       toast.error("Please fill in all button values")
@@ -197,30 +218,70 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     return true
   }
 
-  const handleSubmit = async(event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (validateForm()) {
+      // Build the preview header using formData.header
+      const previewHeader = {
+        type: formData.header.type,
+        value: formData.header.value,
+      }
+
+      // Compute the full body text by replacing variables in the template’s body text
+      let previewBodyText = ""
+      selectedTemplate.components.forEach((component) => {
+        if (component.type === "BODY") {
+          let text = component.text || ""
+          formData.body.forEach((param) => {
+            text = text.replace(param.parameter_name, param.value)
+          })
+          previewBodyText = text
+        }
+      })
+
+      // Get footer text from the template if available
+      let previewFooter = ""
+      selectedTemplate.components.forEach((component) => {
+        if (component.type === "FOOTER") {
+          previewFooter = component.text || ""
+        }
+      })
+
+      // Build an array of button names from the template buttons
+      const previewButtons: string[] = []
+      selectedTemplate.components.forEach((component) => {
+        if (component.type === "BUTTONS" && component.buttons) {
+          component.buttons.forEach((button) => {
+            previewButtons.push(button.text)
+          })
+        }
+      })
+
+      // Prepare the payload including the preview section
       const logData = {
         recipientNo: selectedProspect?.phoneNo,
-
-
         template_name: selectedTemplate.name,
         language: selectedTemplate.language,
-    
-    
         parameter_format: selectedTemplate.parameter_format,
-      
         header: { ...formData.header },
         body: formData.body.map((param) => ({
           ...param,
           parameter_name: param.parameter_name.replace(/[{}]/g, ""),
         })),
-        buttons: formData.buttons.filter((button) => button.type === "URL" || button.type === "COPY_CODE"),
+        buttons: formData.buttons.filter(
+          (button) => button.type === "URL" || button.type === "COPY_CODE"
+        ),
+        previewSection: {
+          header: previewHeader,
+          bodyText: previewBodyText,
+          footer: previewFooter,
+          buttons: previewButtons,
+        },
       }
       console.log(logData)
       const response = await sendTemplate(logData)
       console.log(response)
-  
+
       toast.success("Message sent successfully")
     }
   }
@@ -238,7 +299,10 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     const previewContent = selectedTemplate.components.map((component, index) => {
       switch (component.type) {
         case "HEADER":
-          if (["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") && formData.header.value) {
+          if (
+            ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
+            formData.header.value
+          ) {
             const headerContent = formData.header.value
             return (
               <div key={`preview-header-${index}`} className="mb-3">
@@ -324,20 +388,20 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
         ((component.format === "TEXT" &&
           ((selectedTemplate.parameter_format === "POSITIONAL" && component.example?.header_text) ||
             (selectedTemplate.parameter_format === "NAMED" && component.example?.header_text_named_params))) ||
-          ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "")),
+          ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || ""))
     )
 
     const hasEditableBody = selectedTemplate.components.some(
       (component) =>
         component.type === "BODY" &&
         ((selectedTemplate.parameter_format === "POSITIONAL" && component.example?.body_text?.length) ||
-          (selectedTemplate.parameter_format === "NAMED" && component.example?.body_text_named_params?.length)),
+          (selectedTemplate.parameter_format === "NAMED" && component.example?.body_text_named_params?.length))
     )
 
     const hasEditableButtons = selectedTemplate.components.some(
       (component) =>
         component.type === "BUTTONS" &&
-        component.buttons?.some((button) => button.type === "URL" || button.type === "COPY_CODE"),
+        component.buttons?.some((button) => button.type === "URL" || button.type === "COPY_CODE")
     )
 
     return hasEditableHeader || hasEditableBody || hasEditableButtons
@@ -463,6 +527,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
                                 <Input
                                   placeholder={button.type === "URL" ? "Enter URL" : "Enter code to copy"}
                                   value={button.value}
+                                  disabled={!button.isEditable}
                                   onChange={(e) => handleInputChange("buttons", buttonIndex, "value", e.target.value)}
                                   className="border-blue-500 focus:ring-blue-500"
                                 />
@@ -485,7 +550,12 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
           {renderPreview()}
         </div>
         <div className="flex justify-end mt-6">
-          <Button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-600 text-white" size="lg" disabled={isuploadingfile}>
+          <Button
+            onClick={handleSubmit}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+            size="lg"
+            disabled={isuploadingfile}
+          >
             Send
           </Button>
         </div>

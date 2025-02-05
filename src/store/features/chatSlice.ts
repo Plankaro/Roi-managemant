@@ -2,28 +2,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { uniqBy } from "lodash";
 
+
 // Define enums
-export enum MessageStatus {
-  Pending = "pending",
-  Sent = "sent",
-  Delivered = "delivered",
-  Read = "read",
-}
-
-export enum HeaderType {
-  Image = "Image",
-  Video = "Video",
-  Document = "Document",
-}
-
-export enum BodyType {
-  Image = "image",
-  Text = "text",
-  Document = "document",
-}
-
-// Define Chat interface
-interface Chat {
+export type Chat = {
   id: string;
   chatId: string;
   senderPhoneNo: string;
@@ -32,20 +13,46 @@ interface Chat {
   template_used: boolean;
   template_name?: string;
   header_type?: HeaderType;
-  header_url?: string;
-  body_type: BodyType;
-  body_attachmentUrl: string[];
+  header_value?: string;
   body_text?: string;
   footer_included: boolean;
-  footer_url?: string;
   footer_text?: string;
+  Buttons: string[];
   createdAt: Date;
   updatedAt: Date;
   deleted: boolean;
   Status: MessageStatus;
+  Prospect?: Prospect;
   prospectId?: string;
+};
+
+export enum MessageStatus {
+  PENDING = "pending",
+  SENT = "sent",
+  DELIVERED = "delivered",
+  READ = "read",
+  FAILED = "failed",
 }
 
+export enum HeaderType {
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
+  DOCUMENT = "DOCUMENT",
+  TEXT = "TEXT",
+}
+
+export enum BodyType {
+  IMAGE = "image",
+  TEXT = "text",
+  DOCUMENT = "document",
+}
+
+export type Prospect = {
+  id: string;
+  name: string;
+  phoneNo: string;
+  email?: string;
+};
 
 
 // Define Chat state

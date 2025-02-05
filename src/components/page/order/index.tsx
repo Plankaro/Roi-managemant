@@ -40,7 +40,7 @@ function OrderIndex({id}:{id:string}) {
         <Button className='bg-blue-500 hover:bg-blue-600' onClick={handleOrderCreated}>{isOrderCreated ? 'Cancel Order' : 'Create Order'}</Button>
       </div>
       <Profile image={prospect?.image??""} name={prospect?.name??""} isLoading={prospectLoading}/>
-    <div className='flex xl:flex-row flex-col-reverse gap-4 justify-end h-[65vh] '> 
+    <div className='flex xl:flex-row flex-col-reverse gap-4 justify-end xl:h-[65vh] md:h-[70vh] h-[90vh]'> 
 
     {isOrderCreated && <Cart id = {id} refetch={prospectrefetch}/>}
     {isOrderCreated && <ProductInventory products={products || []} loading={productsLoading} />}

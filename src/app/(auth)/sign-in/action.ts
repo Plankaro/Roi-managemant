@@ -1,5 +1,5 @@
 "use server";
-import { signIn } from "@/auth";
+import { signIn,signOut } from "@/auth";
 import { AuthError } from "next-auth";
 
 export async function handleCredentialsSignin({
@@ -13,13 +13,13 @@ export async function handleCredentialsSignin({
 }) {
   try {
     console.log({ email, password });
-    await signIn("credentials", { email, password, redirectTo: "/" });
+    await signIn("credentials", { email, password, redirectTo: "/chats" });
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
           return {
-            message: "Invalid credentials",
+            message: "Invalid credentials or unverified account",
           };
         default:
           return {
@@ -29,4 +29,8 @@ export async function handleCredentialsSignin({
     }
     throw error;
   }
+}
+
+export async function handleSignOut() {
+  await signOut();
 }

@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Minus, Plus, HelpCircle } from "lucide-react"
 
+
 const Settings = () => {
   const [inactiveDays, setInactiveDays] = React.useState(15)
   const [marketingMessages, setMarketingMessages] = React.useState(2)
@@ -46,16 +47,17 @@ const Settings = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-base font-medium">Skip Inactive Contacts</h3>
-              <div className="flex items-center gap-2">
+              <div className="flex md:flex-row flex-col md:items-center t gap-2">
+              
+                <Label htmlFor="skip-inactive " className="text-sm flex gap-2">
                 <Checkbox id="skip-inactive" />
-                <Label htmlFor="skip-inactive" className="text-sm">
                   Skip contacts who haven&apos;t engaged with WhatsApp in the last:
                 </Label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center  gap-2">
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary hover:text-white"
                     onClick={() => setInactiveDays(Math.max(0, inactiveDays - 1))}
                   >
                     <Minus className="h-4 w-4" />
@@ -64,7 +66,7 @@ const Settings = () => {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary hover:text-white"
                     onClick={() => setInactiveDays(inactiveDays + 1)}
                   >
                     <Plus className="h-4 w-4" />
@@ -77,34 +79,38 @@ const Settings = () => {
             {/* Limit Marketing Messages */}
             <div className="space-y-2">
               <h3 className="text-base font-medium">Limit Marketing Messages</h3>
-              <div className="flex items-center gap-2">
+              <div className="flex md:flex-row flex-col md:items-center gap-2">
+             
+                <Label htmlFor="limit-marketing" className="text-sm flex gap-2 items-cente">
                 <Checkbox id="limit-marketing" />
-                <Label htmlFor="limit-marketing" className="text-sm">
                   Skip contacts who have already received:
                 </Label>
-                <div className="flex items-center gap-2">
+                <div className="flex md:flex-row flex-col gap-2">
+                  <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary hover:text-white"
                     onClick={() => setMarketingMessages(Math.max(0, marketingMessages - 1))}
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="w-8 text-center">{marketingMessages}</span>
+                  <span className="w-8 text-center block">{marketingMessages}</span>
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary hover:text-white"
                     onClick={() => setMarketingMessages(marketingMessages + 1)}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
+                  </div>
                   <span>messages in the last</span>
+                  <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary hover:text-white"
                     onClick={() => setMarketingHours(Math.max(0, marketingHours - 1))}
                   >
                     <Minus className="h-4 w-4" />
@@ -113,13 +119,14 @@ const Settings = () => {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 bg-primary text-white hover:bg-primary hover:text-white"
                     onClick={() => setMarketingHours(marketingHours + 1)}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                   <span>hours</span>
-                  <HelpCircle className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <HelpCircle className="h-4 w-4 text-gray-400 md:block hidden" />
                 </div>
               </div>
             </div>

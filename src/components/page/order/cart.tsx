@@ -171,8 +171,8 @@ function Cart({id,refetch}:{id:string,refetch:()=>void}) {
 
   return (
     
-    <div className="border-primary xl:flex-1  border rounded-lg  flex items-center w-full  justify-center bg-[#19191980]">
-        <ScrollArea className="h-[450px] w-full px-10 no-scrollbar overflow-scroll">
+    <div className="border-primary xl:flex-1  border rounded-lg flex items-center w-full  justify-center bg-[#19191980]">
+        <ScrollArea className="h-[450px] w-full md:px-10 sm:px-5 px-3 no-scrollbar overflow-scroll">
       <div className="w-full   rounded-3xl text-white">
         <h1 className="text-2xl font-semibold mb-6">Cart</h1>
         
@@ -182,8 +182,11 @@ function Cart({id,refetch}:{id:string,refetch:()=>void}) {
              
               
               return (
-                <div key={item.id} className="flex gap-16">
-                  <div className="w-28 h-28 overflow-hidden">
+                <div key={item.id} className="flex  md:flex-row flex-col  md:gap-16 gap-8 relative">
+                  <button className="text-gray-300 hover:text-white absolute right-0 -top-5" onClick={() => dispatch(removeItem(item.id))}>
+                        <X size={20} />
+                      </button>
+                  <div className="w-28 h-28  overflow-hidden">
                     <img 
                     src={findVariant(item?.id, item.selectedVariant)?.image || item.images[0]}
                       alt={item.title}
@@ -193,12 +196,10 @@ function Cart({id,refetch}:{id:string,refetch:()=>void}) {
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium">{item.title}</h3>
-                        <p className="text-xs text-gray-200">{item.description}</p>
+                        <h3 className="font-medium line-clamp-1">{item.title}</h3>
+                        <p className="text-xs text-gray-200 line-clamp-3">{item.description}</p>
                       </div>
-                      <button className="text-gray-300 hover:text-white" onClick={() => dispatch(removeItem(item.id))}>
-                        <X size={20} />
-                      </button>
+                      
                     </div>
                     
                     <div className="mt-2 flex gap-4">

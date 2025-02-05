@@ -13,7 +13,12 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-
+    logout:builder.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+    }),
     signup: builder.mutation({
       query: (body) => ({
         url: "/auth/register",
@@ -122,6 +127,13 @@ export const apiSlice = createApi({
         method: "POST",
         body: formData,
       }),
+    }),
+    sendMedia:builder.mutation({
+      query: (formData) => ({
+        url: "/chats/media",
+        method: "POST",
+        body: formData,
+      }),
     })
 
   }),
@@ -143,5 +155,6 @@ export const {
   useSendTextMutation,
   useGetAllTemplatesQuery,
   useUploadFilesMutation,
-  useSendTemplatesMutation
+  useSendTemplatesMutation,
+  useSendMediaMutation
 } = apiSlice;

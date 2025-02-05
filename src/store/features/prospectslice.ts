@@ -5,11 +5,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface SelectedProspectState {
   selectedProspect: any | null; // Holds the selected prospect
   openMenuModal: boolean;
+  lastchattime:string; //
 }
 
 const initialState: SelectedProspectState = {
   selectedProspect: null, 
-  openMenuModal: false
+  openMenuModal: false,
+  lastchattime: ""
 };
 
 const selectedProspectSlice = createSlice({
@@ -28,10 +30,14 @@ const selectedProspectSlice = createSlice({
     toggleMenuModal: (state) => {
       state.openMenuModal =!state.openMenuModal;
     },
+    updateLastChatTime: (state, action: PayloadAction<string>) => {
+      state.lastchattime = action.payload;
+    },
+    // Add more reducers here if needed...
 
   },
 });
 
-export const { selectProspect, clearProspect, toggleMenuModal } = selectedProspectSlice.actions;
+export const { selectProspect, clearProspect, toggleMenuModal,updateLastChatTime } = selectedProspectSlice.actions;
 
 export default selectedProspectSlice.reducer;

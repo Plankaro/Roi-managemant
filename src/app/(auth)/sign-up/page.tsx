@@ -4,44 +4,50 @@
 import { SignUpFormValues, signUpSchema } from "@/zod/auth/auth.schema";
 import AuthForm from "@/components/page/auth/auth-form";
 import toast from "react-hot-toast";
-import { useSignupMutation,useGetTokenMutation } from "@/store/features/apislice";
+
+import axios from "axios";
+import { useState } from "react";
 
 
 
 export default function SignUpPage() {
 
-    const [signup, { isLoading }] = useSignupMutation();
-    const [getTokens,{isLoading:getTokensLoading}]=useGetTokenMutation()
+  const [loading ,setLoading] = useState(false)
+    
     const onSubmit = async (values: SignUpFormValues) => {
         if (values.password !== values.confirmPassword) {
-            toast.error("Passwords do not match");
-            return;
+          toast.error("Passwords do not match");
+          return;
         }
-    
-        try {
-            const promise =await signup(values).unwrap();
-    
-       
-    
-            const data = await promise;
-    
-            if (data.email) {
-                await getTokens(data.email);
-            }
-    
-            toast.success("Sign-up successful!");
-        } catch (error: any) {
-            // Check if the error contains a specific message from the server
       
-            if (error?.data?.message) {
-                toast.error(error.data.message); // Show server-side error message
-            } else {
-                toast.error("An unexpected error occurred. Please try again.");
-            }
-    
-            console.error("Sign-up error:", error); // Log for debugging
+        try {
+          setLoading(true)
+          // Send the sign-up data via axios POST request.
+          const promise =await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, values);
+          
+          
+          const { data } = promise;
+          console.log("first_hit",data);
+          
+          if (data.email) {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/token-link`,{email:data.email});
+            console.log("second-hit",response)
+          }
+         
+          
+          toast.success("Sign-up successful!");
+        } catch (error: any) {
+          // Check if the error response contains a specific message from the server.
+          if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
+          } else {
+            toast.error("An unexpected error occurred. Please try again.");
+          }
+          console.error("Sign-up error:", error);
+        }finally{
+          setLoading(false)
         }
-    };
+      };
     
 
     return (
@@ -56,7 +62,7 @@ export default function SignUpPage() {
                 password: "",
                 confirmPassword: ""
             }}
-            loading={isLoading || getTokensLoading}
+            loading={loading}
             authDescription="Start your 30 day free trial. Cancel any time"
             authTitle="Account Sign In"
 

@@ -63,16 +63,13 @@ export default function SelectTemplate() {
   const [search, setSearch] = React.useState("")
 
   return (
-    <div className="  text-white p-8 w-full">
-      <div className=" mx-auto space-y-8">
+    <div className="text-white p-4 sm:p-8 w-full overflow-hidden">
+      <div className="mx-auto space-y-8">
         {/* Header Section */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-2">
             <label className="text-sm font-medium">Broadcast Name</label>
-            <Input
-              className="bg-transparent border-[#3B82F6] focus:border-[#3B82F6] rounded-lg"
-              placeholder="Enter broadcast name"
-            />
+            <Input className="bg-transparent border-blue-500 rounded-lg" placeholder="Enter broadcast name" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Category</label>
@@ -105,10 +102,10 @@ export default function SelectTemplate() {
           </div>
 
           {/* Templates Table */}
-          <div className="rounded-lg overflow-hidden border border-gray-800">
-            <Table>
-              <TableHeader className="bg-[#4B6BFB]">
-                <TableRow className="hover:bg-[#4B6BFB]/90">
+          <div className="rounded-lg overflow-auto border border-gray-800 max-h-[60vh]">
+            <Table className="min-w-full">
+              <TableHeader className="bg-blue-500 sticky top-0">
+                <TableRow>
                   <TableHead className="text-white font-medium">Name</TableHead>
                   <TableHead className="text-white font-medium">
                     <Button variant="ghost" className="text-white font-medium p-0 hover:bg-transparent">
@@ -169,9 +166,9 @@ export default function SelectTemplate() {
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="bg-blue-50 text-black">
                 {templates.map((template) => (
-                  <TableRow key={template.id} className="hover:bg-gray-800/50 bg-[#E8EEF9]/5">
+                  <TableRow key={template.id}>
                     <TableCell className="font-medium">
                       <div className="space-y-1">
                         <div className="font-semibold">{template.title}</div>

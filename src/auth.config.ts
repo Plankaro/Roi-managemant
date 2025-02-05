@@ -9,7 +9,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 
-const authRoute = ["/sign-in","/sign-up","/verify","/reset-password","/get-token"];
+const authRoute = ["/sign-in", "/sign-up", "/verify", "/reset-password", "/get-token"];
 
 async function refreshAccessToken(token: any) {
 
@@ -64,21 +64,27 @@ export default {
                         //console.error("Invalid credentials:", parsedCredentials.error.errors);
                         throw new CredentialsSignin({ cause: "Required fields missing" });
                     }
+                    console.log(parsedCredentials);
                     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
                         email,
                         password,
                     });
+                
 
                     const data = {
                         access_token: response.data.userTokens.access_token,
                         refresh_token: response.data.userTokens.refresh_token,
                         user: response.data.user,
                     };
-                    
+                   
 
                     return data;
                 } catch (error) {
-                    //console.log(error);
+                    if (axios.isAxiosError(error) && error.response?.status === 403) {
+                        console.log("An error occurred")
+                        throw new CredentialsSignin({ message: "Email not verified" });
+                      }
+                   throw new CredentialsSignin({"cause": "Invalid credentials"});
                 }
             },
         }),
@@ -86,23 +92,16 @@ export default {
     callbacks: {
         authorized({ request: { nextUrl }, auth }) {
             const isLoggedIn = !!auth?.user;
-            console.log(auth);
-            console.log(isLoggedIn);
             const { pathname } = nextUrl;
-            if (authRoute.includes(pathname)) {
-                return true;
+            
+            // Allow any route that starts with one of the auth route prefixes.
+            if (authRoute.some((route) => pathname.startsWith(route))) {
+              return true;
             }
-
-            // Allow access to the home route for all users
-          
-            // Redirect authenticated users away from auth routes
-            if (authRoute.includes(pathname)) {
-                return isLoggedIn ? Response.redirect(new URL('/chats', nextUrl)) : true;
-            }
-
-            // For all other routes, require user to be logged in
+            
+            // For all other routes, require the user to be logged in.
             return isLoggedIn || Response.redirect(new URL('/sign-in', nextUrl));
-        },
+          },
         jwt: async ({ token, account, user }: any) => {
        
             if (token.access_token) {

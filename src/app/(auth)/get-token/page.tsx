@@ -2,16 +2,18 @@
 "use client";
 import AuthForm from '@/components/page/auth/auth-form';
 import { forgotPasswordSchema } from '@/zod/auth/auth.schema'
-import React from 'react'
-import { useGetTokenMutation } from '@/store/features/apislice';
+import React, { useState } from 'react'
+
 import toast from "react-hot-toast";
+import axios from 'axios';
 const GetTokenPage = () => {
-    const [getTokens,{isLoading}]=useGetTokenMutation()
+ const [isLoading,setIsLoading] = useState(false)
     async function onSubmit(values: { email: string }) {
+        setIsLoading(true);
         try {
-            const promise = getTokens({email:values.email}).unwrap(); // Unwrap the result to handle errors correctly
+            const response =  axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/token-link`,{email:values.email});// Unwrap the result to handle errors correctly
             toast.promise(
-                promise,
+                response,
                 {
                     loading: 'Loading...',
                     success: 'Verification link sent successfully!',
@@ -19,11 +21,13 @@ const GetTokenPage = () => {
                         error?.data?.message || 'An unexpected error occurred.',
                 }
             );
-            console.log(await promise); // Log the resolved value
+            console.log(await response); // Log the resolved value
         } catch (error: any) {
             // This block might not be necessary since toast.promise handles the errors
             toast.error(error?.data?.message || 'An unexpected error occurred.');
             console.error("Error:", error);
+        }finally {
+            setIsLoading(false);
         }
     }
 
