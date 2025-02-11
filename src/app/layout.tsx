@@ -20,21 +20,24 @@ export default async function RootLayout({
   const session = await auth() 
   return (
     <SessionProvider session={session} refetchOnWindowFocus={false}>
+    <StoreProvider>
+  
       <SocketProvider>
     <html lang="en">
       <body
         className={` ${font.className} antialiased`}
       >
-        <StoreProvider>
+
         <div>
           {children}
           <Toaster />
           
         </div>
-        </StoreProvider>
+       
       </body>
     </html>
     </SocketProvider>
+    </StoreProvider>
     </SessionProvider>
   );
 }

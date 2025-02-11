@@ -18,7 +18,7 @@ import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { toggleMenuModal } from "@/store/features/prospectslice";
+import { toggleMenuModal } from "@/store/features/prospect";
 import { RootState } from "@/store/store";
 import Logo from "@/components/ui/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -40,7 +40,7 @@ const Sidebar = () => {
   const pathname = usePathname();
   const session:any = useSession();
   const isOpen = useSelector(
-    (state: RootState) => state.selectedProspect.openMenuModal
+    (state: RootState) => state.Prospect.openMenuModal
   );
   const dispatch = useDispatch();
 

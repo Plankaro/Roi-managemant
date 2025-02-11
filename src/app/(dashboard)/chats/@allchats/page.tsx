@@ -41,20 +41,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
-import { clearProspect } from "@/store/features/prospectslice";
-import { useSendTextMutation } from "@/store/features/apislice";
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { clearSelectedProspects } from "@/store/features/prospect";
+
+
 import { MdOutlineVideoLibrary } from "react-icons/md";
 import Messages from "@/components/page/chats/message";
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import TemplateBuilder from "@/components/page/chats/templatedialog";
 import { setChats } from "@/store/features/chatSlice";
-import { UseSelector } from "react-redux";
-import { intervalToDuration, formatDuration } from "date-fns";
-import { timeUntil24Hours } from "@/lib/timetill";
-import { useSendMediaMutation,useUploadFilesMutation } from "@/store/features/apislice";
+
+
+import { useSendMediaMutation,useUploadFilesMutation,useGetSpecficProspectQuery,useGetChatsQuery, useSendTextMutation } from "@/store/features/apislice";
 import toast from "react-hot-toast";
 type FileType = "image" | "video" | "document"
+
 
 interface FileUploadProps {
   onFileSelect: (file: File, type: FileType) => void
@@ -64,15 +64,22 @@ const AllChats = () => {
     const [fileType, setFileType] = useState<FileType | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
   const selectedProspect = useSelector(
-    (state: RootState) => state.selectedProspect?.selectedProspect
+    (state: RootState) => state.Prospect?.selectedProspect
   );
-  const prospectLastMessageTiming = useSelector(
-    (state: RootState) => state.selectedProspect.lastchattime
-  );
+const {data:chats,isLoading:isChatsLoading} = useGetChatsQuery({prospectId:selectedProspect?.id??""})
+console.log("chats",chats)
+useEffect(()=>{
+  if(chats){
+    dispatch(setChats(chats));
+
+  }
+})
+
   const [message, setMessage] = useState("");
   const [sendText, { isLoading }] = useSendTextMutation();
 const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
   const [sendMedia, { isLoading: isSendingMedia }] = useSendMediaMutation()
+  const{data} = useGetSpecficProspectQuery({})
 
   console.log(selectedProspect);
   const [takeOver, settakeOver] = useState(false);
@@ -86,8 +93,9 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
   const handleSendMessage = async () => {
     try {
       const response = await sendText({
-        recipientNo: selectedProspect?.phoneNo.slice(1),
+        recipientNo: selectedProspect?.phoneNo,
         message: message,
+        prospect_id: selectedProspect?.id,
       }).unwrap();
       setMessage("");
 
@@ -201,7 +209,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
                   <div className="relative flex items-center  gap-5">
                     <button
                       className=" md:hidden flex"
-                      onClick={() => dispatch(clearProspect())}
+                      onClick={() => dispatch(clearSelectedProspects())}
                     >
                       <ChevronLeft className="text-white" />
                     </button>
@@ -209,7 +217,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
                       <Image
                         fill
                         src={selectedProspect?.image || "/placeholder.svg"}
-                        alt={selectedProspect?.name}
+                        alt={selectedProspect?.name??""}
                         className="object-cover"
                       />
                     </Avatar>
@@ -222,7 +230,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
                     <div className="flex gap-3  px-3 py-2 rounded-3xl items-center bg-[#A7B8D9]">
                       <Hourglass className="sm:w-4 sm:h-4 w-3 h-3" />
                       <span className="sm:text-sm text-xs">
-                        {timeUntil24Hours(prospectLastMessageTiming)}
+                        {/* {timeUntil24Hours(prospectLastMessageTiming)} */}
                       </span>
                     </div>
                   </div>
@@ -277,7 +285,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
             </div>
 
             {/* Messages */}
-            <Messages selectedProspect={selectedProspect} />
+            <Messages isLoading={isChatsLoading} />
 
             {/* Input */}
             {!takeOver ? (

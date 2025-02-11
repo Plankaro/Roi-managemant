@@ -95,9 +95,9 @@ export const apiSlice = createApi({
       invalidatesTags: ["shopifyCustomer"], // Invalidate the 'Prospect' tag after creating
     }),
     getChats: builder.query({
-      query: ({client_no, prospect_no }) => ({
+      query: ({prospect_id }) => ({
         url: 'chats',
-        params: {client_no, prospect_no }, // Pass parameters here
+        params: {prospect_id }, // Pass parameters here
       }),
     }),
     sendText: builder.mutation({

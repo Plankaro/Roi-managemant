@@ -2,8 +2,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { uniqBy } from "lodash";
 
-
-// Define enums
+// Define Chat Type
 export type Chat = {
   id: string;
   chatId: string;
@@ -22,10 +21,10 @@ export type Chat = {
   updatedAt: Date;
   deleted: boolean;
   Status: MessageStatus;
-  Prospect?: Prospect;
-  prospectId?: string;
+  prospectId: string; // Ensures each chat is linked to a prospect
 };
 
+// Define Enums
 export enum MessageStatus {
   PENDING = "pending",
   SENT = "sent",
@@ -41,65 +40,70 @@ export enum HeaderType {
   TEXT = "TEXT",
 }
 
-export enum BodyType {
-  IMAGE = "image",
-  TEXT = "text",
-  DOCUMENT = "document",
-}
-
-export type Prospect = {
-  id: string;
-  name: string;
-  phoneNo: string;
-  email?: string;
-};
-
-
-// Define Chat state
-interface ChatState {
+// Define Grouped Chats State
+interface GroupedChat {
+  prospectId: string;
   chats: Chat[];
-  selectedTemplates:any
 }
 
-// Set initial state
+// Define Chat State
+interface ChatState {
+  chats: GroupedChat[];
+}
+
+// Initial State
 const initialState: ChatState = {
   chats: [],
-  selectedTemplates:null
 };
 
-// Replace with actual phone number
+// Replace with actual user phone number
 const myPhoneNo = "15551365364";
 
+// Chat Slice
 const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
     setChats: (state, action: PayloadAction<Chat[]>) => {
-      const filteredChats = action.payload.filter(
-        (chat) => chat.senderPhoneNo === myPhoneNo || chat.receiverPhoneNo === myPhoneNo
-      );
+      action.payload.forEach((newChat) => {
+        // Find the prospect's chat group
+        let prospectChatGroup = state.chats.find(
+          (group) => group.prospectId === newChat.prospectId
+        );
 
-      filteredChats.forEach((newChat) => {
-        const existingChat = state.chats.find((chat) => chat.chatId === newChat.chatId);
-
-        if (existingChat) {
-          // Update status if message exists
-          existingChat.Status = newChat.Status;
-        } else {
-          // Add new unique chat
-          state.chats.push(newChat);
+        if (!prospectChatGroup) {
+          // Create a new group if it doesn't exist
+          prospectChatGroup = {
+            prospectId: newChat.prospectId,
+            chats: [],
+          };
+          state.chats.push(prospectChatGroup);
         }
-      });
 
-      // Ensure uniqueness after all modifications
-      state.chats = uniqBy(state.chats, "chatId");
+        // Check if the message already exists
+        const existingChatIndex = prospectChatGroup.chats.findIndex(
+          (chat) => chat.chatId === newChat.chatId
+        );
+
+        if (existingChatIndex !== -1) {
+          // Update message status if it already exists
+          prospectChatGroup.chats[existingChatIndex].Status = newChat.Status;
+        } else {
+          // Add new chat for this prospect
+          prospectChatGroup.chats.push(newChat);
+        }
+
+        // Ensure unique chats within this group
+        prospectChatGroup.chats = uniqBy(prospectChatGroup.chats, "chatId");
+      });
     },
-    setSelectedTemplates: (state, action: PayloadAction<any>) => {
-      state.selectedTemplates = action.payload;
+
+    clearChats: (state) => {
+      state.chats = [];
     },
   },
 });
 
 // Export actions and reducer
-export const { setChats,setSelectedTemplates } = chatSlice.actions;
+export const { setChats, clearChats } = chatSlice.actions;
 export default chatSlice.reducer;

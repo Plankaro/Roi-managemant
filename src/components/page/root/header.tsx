@@ -4,13 +4,13 @@ import Logo from "@/components/ui/logo";
 import { Search, Bell, X, Menu } from "lucide-react";
 import React from "react";
 import { useDispatch,useSelector } from "react-redux";
-import { toggleMenuModal } from "@/store/features/prospectslice";
+import { toggleMenuModal } from "@/store/features/prospect";
 import { RootState } from "@/store/store";
 import {  useSession } from "next-auth/react";
 const Header = () => {
   const session:any = useSession();
   console.log(session)
-    const isOpen = useSelector((state:RootState)=>state.selectedProspect.openMenuModal)
+    const isOpen = useSelector((state:RootState)=>state.Prospect.openMenuModal)
     const dispatch = useDispatch()
   return (
     <div className="w-full flex items-center justify-between  py-2 h-[72px]">

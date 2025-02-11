@@ -11,6 +11,8 @@ import { useUploadFilesMutation } from "@/store/features/apislice"
 import { useSelector } from "react-redux"
 import { RootState } from "@/store/store"
 import { useSendTemplatesMutation } from "@/store/features/apislice"
+import { useDispatch } from "react-redux"
+import { setChats } from "@/store/features/chatSlice"
 
 interface TemplateComponent {
   type: string
@@ -48,9 +50,11 @@ interface TemplateProps {
 }
 
 const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => {
+  const dispatch = useDispatch()
   const [sendTemplate] = useSendTemplatesMutation({})
+ 
   const selectedProspect = useSelector(
-    (state: RootState) => state.selectedProspect?.selectedProspect
+    (state: RootState) => state.Prospect?.selectedProspect
   )
   const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
   const [formData, setFormData] = useState<{
@@ -280,7 +284,8 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
       }
       console.log(logData)
       const response = await sendTemplate(logData)
-      console.log(response)
+      dispatch(setChats([response.data]))
+      
 
       toast.success("Message sent successfully")
     }

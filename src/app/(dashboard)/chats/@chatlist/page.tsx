@@ -15,9 +15,11 @@ import { useGetProspectQuery } from "@/store/features/apislice";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState,AppDispatch } from "@/store/store";
-import { selectProspect } from "@/store/features/prospectslice";
+import { selectProspect } from "@/store/features/prospect";
 import FilterDropdown from "@/components/page/chats/filter-dropdown";
 import { Skeleton } from "@/components/ui/skeleton";
+import { addProspect } from "@/store/features/prospect";
+import { useEffect } from "react";
 
 
 export function ChatListSkeleton() {
@@ -47,8 +49,17 @@ export function ChatListSkeleton() {
 const ChatLists = () => {
   const dispatch = useDispatch<AppDispatch>();
   const {data,isLoading} = useGetProspectQuery({})
-  console.log(data)
-  const selectedProspect = useSelector((state: RootState) => state.selectedProspect?.selectedProspect);
+ 
+  const {selectedProspect,prospects} = useSelector((state: RootState) => state.Prospect);
+  console.log(prospects)
+
+  
+  useEffect(() => {
+    if (data) {
+      dispatch(addProspect(data));
+      console.log("added");
+    }
+  }, [data, dispatch]);
 
   console.log(selectedProspect)
   return (
@@ -85,7 +96,7 @@ const ChatLists = () => {
       </div>
       {isLoading ? <ChatListSkeleton />:  <ScrollArea className="w-full no-scrollbar">
         <div className="space-y-2 p-2 w-full">
-          {data && data.map((contact: any) => {
+          {prospects && prospects.map((contact: any) => {
          
             return(
               <button
@@ -110,7 +121,7 @@ const ChatLists = () => {
                     />
                    <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
                      >
-                        {contact.name.slice(0, 2).toUpperCase()}
+                        {contact?.name?.slice(0, 2).toUpperCase()??""}
                       </AvatarFallback>
                     
                   </Avatar>
@@ -125,9 +136,9 @@ const ChatLists = () => {
                       {contact.message?.[0].created_at??""}
                     </span>
                   </div>
-                  <div className="flex lg:gap-10 gap-2 items-center justify-between w-full">
-                    <p className="text-sm text-gray-400 line-clamp-1 mt-auto ">
-                      {contact.message?.[0].body_text??"Send your first message"}
+                  <div className="flex lg:gap-4 gap-2 items-center justify-between w-full">
+                    <p className="text-sm text-gray-400 line-clamp-1 mt-auto max-w-56">
+                      {contact.chats?.[0]?.body_text??"Send your first message"}
                     </p>
 
                   {contact.assignedTo ? <Person /> : <PersonAlert />}

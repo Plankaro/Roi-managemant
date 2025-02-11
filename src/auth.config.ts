@@ -26,14 +26,14 @@ async function refreshAccessToken(token: any) {
             }
         );
 //console.log(response);
-        const tokens = response.data.userTokens;
+        const tokens = response.data;
 
-    
+    console.log(response.data)
 
         return {
             ...token,
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token// Fall back to old refresh token
         };
     } catch (error) {
         //console.log(error);
@@ -64,7 +64,7 @@ export default {
                         //console.error("Invalid credentials:", parsedCredentials.error.errors);
                         throw new CredentialsSignin({ cause: "Required fields missing" });
                     }
-                    console.log(parsedCredentials);
+              
                     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
                         email,
                         password,
@@ -111,8 +111,7 @@ export default {
             }
 
             if (account && user) {
-                //console.log(`In jwt callback - User is ${JSON.stringify(user)}`);
-                //console.log(`In jwt callback - account is ${JSON.stringify(account)}`);
+            
 
                 return {
                     ...token,
@@ -123,20 +122,20 @@ export default {
             }
 
             if (Date.now() < token.accessTokenExpires) {
-                //console.log("**** returning previous token ******");
+                console.log("**** returning previous token ******");
                 return token;
             }
 
-            // Access token has expired, try to update it
-            //console.log("**** Update Refresh token ******");
-            //return token;
+          
+            console.log("**** Update Refresh token ******");
+            
             return refreshAccessToken(token);
         },
         session: async ({ session, token }: any) => {
             session.user = token.user as any;
             session.access_token = token.access_token as any;
 
-            console.log("sessiontoken",session,)
+          
             return session;
         },
     },

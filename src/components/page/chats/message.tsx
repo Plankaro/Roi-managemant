@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { IoIosDocument } from "react-icons/io";
 
 import { Clock, Send, Check, CheckCircle2, AlertCircle } from "lucide-react";
-import { updateLastChatTime } from "@/store/features/prospectslice";
+import { updateLastChatTime } from "@/store/features/prospect";
 
 function MessagesSkeleton() {
   return (
@@ -74,70 +74,69 @@ function MessagesSkeleton() {
     </ScrollArea>
   );
 }
-function Messages({ selectedProspect }: { selectedProspect: any }) {
+function Messages({isLoading }: { isLoading: boolean, }) {
   const myPhoneNo = "15551365364"; // Your phone number
-  const { data, isLoading } = useGetChatsQuery({
-    client_no: myPhoneNo,
-    prospect_no: selectedProspect.phoneNo,
-  });
+ 
+const selectedProspect = useSelector((state:RootState)=>state.Prospect.selectedProspect)
 
-  const chats = useSelector((state: RootState) => state.chat);
-  const selectedChats = chats.chats
-    .filter(
-      (chat: Chat) =>
-        (chat.senderPhoneNo === myPhoneNo &&
-          chat.receiverPhoneNo === selectedProspect.phoneNo.slice(1)) ||
-        (chat.receiverPhoneNo === myPhoneNo &&
-          chat.senderPhoneNo === selectedProspect.phoneNo.slice(1))
-    )
-    .sort(
-      (a: any, b: any) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    ); // Ascending order
+  const selectedChats = useSelector((state: RootState) =>
+    state.chat.chats.find((chatGroup) => chatGroup.prospectId === selectedProspect?.id)?.chats || []
+)
 
-    useEffect(() => {
-      const prospectMessages = selectedChats.filter(
-        (chat: Chat) => chat.senderPhoneNo !== myPhoneNo
-      );
-      const lastProspectMessage =
-        prospectMessages.length > 0
-          ? prospectMessages[prospectMessages.length - 1]
-          : null;
-console.log(lastProspectMessage) 
-      if (lastProspectMessage) {
-        dispatch(updateLastChatTime(`${lastProspectMessage.createdAt}`))
-      } 
-    },[selectedChats])
+  
+
+//     useEffect(() => {
+//       const prospectMessages = selectedChats.filter(
+//         (chat: Chat) => chat.senderPhoneNo !== myPhoneNo
+//       );
+//       const lastProspectMessage =
+//         prospectMessages.length > 0
+//           ? prospectMessages[prospectMessages.length - 1]
+//           : null;
+// console.log(lastProspectMessage) 
+//       if (lastProspectMessage) {
+//         dispatch(updateLastChatTime(`${lastProspectMessage.createdAt}`))
+//       } 
+//     },[selectedChats])
    
   
 
-  const dispatch = useDispatch();
 
-  const socket = useSocket();
 
-  useEffect(() => {
-    if (data) {
-      dispatch(setChats(data));
-    }
-  }, [data, dispatch]);
+  // useEffect(() => {
+  //   if (data) {
+  //     dispatch(setChats(data));
+  //   }
+  // }, [data, dispatch]);
 
-  useEffect(() => {
-    console.log("Connecting socket...");
-    socket.connect();
+  // useEffect(() => {
+  //   console.log("Connecting socket...");
+  //   socket.connect();
 
-    socket.on("connect", () => {
-      console.log("Socket connected!");
-    });
+  //   socket.on("connect", () => {
+  //     console.log("Socket connected!");
+  //   });
 
-    socket.on("message", (messageData) => {
-      dispatch(setChats(messageData));
-    });
+  //   socket.emit("subscribe", "15551365364");
 
-    return () => {
-      console.log("Disconnecting socket...");
-      socket.disconnect();
-    };
-  }, [socket]);
+  //   // Listen for new messages
+  //   socket.on("messages", (data) => {
+      
+  //     console.log("📩 New Messages:", data);
+  //     // setMessages((prev) => [...prev, ...data.processedResults]);
+  //   });
+
+  //   // Listen for new prospects
+  //   socket.on("prospect", (data) => {
+  //     console.log("👤 New Prospect Created:", data);
+  //     // setProspect(data);
+  //   });
+
+  //   return () => {
+  //     console.log("Disconnecting socket...");
+  //     socket.disconnect();
+  //   };
+  // }, [socket]);
 
   return (
     <>
@@ -164,10 +163,10 @@ console.log(lastProspectMessage)
                           <Image
                             fill
                             src={
-                              selectedProspect.image ||
+                              selectedProspect?.image ||
                               "https://github.com/shadcn.png"
                             }
-                            alt={selectedProspect.name}
+                            alt={selectedProspect?.name??""}
                             className="object-cover"
                           />
                         </Avatar>
@@ -279,6 +278,7 @@ console.log(lastProspectMessage)
               })}
           </div>
         </ScrollArea>
+ 
       )}
     </>
   );

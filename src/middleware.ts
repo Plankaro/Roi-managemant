@@ -12,7 +12,7 @@ export default auth(async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api")) {
     const api_url = process.env.NEXT_PUBLIC_API_URL;
     const session = await auth() as any
-    
+
 
     // Remove `/api` from the forwarded path
     const forwardedPath = request.nextUrl.pathname.replace("/api", "");
