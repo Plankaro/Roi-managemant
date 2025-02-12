@@ -32,7 +32,7 @@ function Profile({ image, name, isLoading }: { image: string; name: string; isLo
       <div className="flex items-center gap-4">
         <div className="relative">
           <Avatar className="h-10 w-10">
-            <Image fill src={image || "/placeholder.svg"} alt={name} className="object-cover" />
+            <Image src={image || "/placeholder.svg"} alt={name} className="object-cover"  height={40} width={40}/>
           </Avatar>
         </div>
         <div className="relative flex items-center gap-16 bg">

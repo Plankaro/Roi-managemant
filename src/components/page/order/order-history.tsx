@@ -54,7 +54,8 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
           <div className="flex justify-between text-sm">
             <div className="space-y-1">
               <p className="text-gray-400">Total Spent</p>
-              <p className="text-xl text-blue-500">₹ {order.reduce((acc:any, order:any) => acc + Number(order.amount), 0).toFixed(2)}</p>
+              <p className="text-xl text-blue-500">₹ {order.reduce((acc:any, order:any) => acc + Number(order.totalPriceSet
+                .shopMoney.amount), 0).toFixed(2)}</p>
             </div>
             <div className="space-y-1 text-right">
               <p className="text-gray-400">Orders</p>
@@ -72,11 +73,12 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
               >
                 <div className="space-y-0.5">
                   <p className=" font-medium text-left">#{index+1}</p>
-                  <p className="text-lg">₹ {Number(order.amount).toFixed(2)}</p>
+                  <p className="text-lg">₹ {Number(order.totalPriceSet
+                .shopMoney.amount).toFixed(2)}</p>
                 </div>
                 <div className="text-right space-y-0.5">
-                  <p className="text-sm">{format(order.Date, 'dd/MM/yy')}</p>
-                  <p className="text-sm text-blue-400">{order.status}</p>
+                  <p className="text-sm">{format(order.createdAt, 'dd/MM/yy')}</p>
+                  <p className="text-sm text-blue-400">{order.fulfillmentStatus || 'Pending'}</p>
                 </div>
                 <ChevronRight className="w-5 h-5 ml-2 text-blue-500" />
               </button>

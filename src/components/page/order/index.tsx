@@ -6,7 +6,7 @@ import ProductInventory from '@/components/page/order/products'
 import Profile from '@/components/page/order/profile'
 import { Button } from '@/components/ui/button'
 import React from 'react'
-import { useGetProductsQuery, useGetSpecficProspectQuery, } from '@/store/features/apislice'
+import { useGetProductsQuery,  useGetSpecificShopifyContactsQuery, } from '@/store/features/apislice'
 import { removeall } from '@/store/features/cartSlice'
 import { useDispatch } from 'react-redux'
 
@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux'
 function OrderIndex({id}:{id:string}) {
   const [isOrderCreated, setIsOrderCreated] = useState(false);
   const {data: products, isLoading: productsLoading} = useGetProductsQuery({})
-  const {data: prospect, isLoading: prospectLoading,refetch:prospectrefetch} = useGetSpecficProspectQuery(id)
+  const {data: prospect, isLoading: prospectLoading,refetch:prospectrefetch} = useGetSpecificShopifyContactsQuery(id)
   console.log(prospect)
   const dispatch = useDispatch()
 ;
@@ -39,14 +39,19 @@ function OrderIndex({id}:{id:string}) {
         <div className='text-2xl font-bold text-white'>Create Order</div>
         <Button className='bg-blue-500 hover:bg-blue-600' onClick={handleOrderCreated}>{isOrderCreated ? 'Cancel Order' : 'Create Order'}</Button>
       </div>
-      <Profile image={prospect?.image??""} name={prospect?.name??""} isLoading={prospectLoading}/>
+      <Profile
+        image={prospect?.image.url ?? ""}
+        name={`${prospect?.firstName ?? ""} ${prospect?.lastName ?? ""}`}
+        isLoading={prospectLoading}
+      />
     <div className='flex xl:flex-row flex-col-reverse gap-4 justify-end xl:h-[65vh] md:h-[70vh] h-[90vh]'> 
 
     {isOrderCreated && <Cart id = {id} refetch={prospectrefetch}/>}
     {isOrderCreated && <ProductInventory products={products || []} loading={productsLoading} />}
-    <HistoryView order={prospect?.order || []} isLoading={prospectLoading}/>
+    <HistoryView order={prospect?.orders.nodes || []} isLoading={prospectLoading}/>
     </div>
     </div>
+    
   )
 }
 
