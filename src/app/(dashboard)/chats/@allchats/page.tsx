@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
 import { clearSelectedProspects } from "@/store/features/prospect";
-
+import { getLastOnlineStatus } from "@/lib/last_online";
 
 import { MdOutlineVideoLibrary } from "react-icons/md";
 import Messages from "@/components/page/chats/message";
@@ -87,10 +87,11 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
   const [dialog, setDialog] = useState(false);
   console.log(dialog);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  console.log(selectedProspect);
+  const lastOnlineStatus = getLastOnlineStatus(selectedProspect?.last_Online as Date);
   const dispatch = useDispatch();
 
   const handleSendMessage = async () => {
+   
     try {
       const response = await sendText({
         recipientNo: selectedProspect?.phoneNo,
@@ -408,7 +409,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
                     <h2 className="text-white text-lg font-medium">
                       {selectedProspect?.name ?? ""}
                     </h2>
-                    <p className="text-red-500 text-sm">Last seen: 2 min ago</p>
+                    <p className="text-red-500 text-sm">{lastOnlineStatus}</p>
                   </div>
                 </div>
 

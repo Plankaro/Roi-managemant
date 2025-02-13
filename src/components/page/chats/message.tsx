@@ -147,7 +147,7 @@ const selectedProspect = useSelector((state:RootState)=>state.Prospect.selectedP
           <div className="space-y-4 p-4">
             {selectedChats &&
               selectedChats.length > 0 &&
-              selectedChats.map((chat) => {
+              selectedChats.map((chat:any) => {
                 const isMyMessage = chat.senderPhoneNo === myPhoneNo;
                 console.log(selectedChats);
                 return (
@@ -228,7 +228,7 @@ const selectedProspect = useSelector((state:RootState)=>state.Prospect.selectedP
                           <div className="flex gap-2 mt-2">
                             {chat?.Buttons &&
                               chat.Buttons?.length > 0 &&
-                              chat.Buttons.map((button, index) => (
+                              chat.Buttons.map((button:any, index:number) => (
                                 <Button
                                   key={index}
                                   className="bg-primary-100 w-full text-black"

@@ -23,8 +23,12 @@ export const signUpSchema = z.object({
     lastName: z.string().min(2, {
         message: "Last name must be at least 2 characters.",
     }),
+
     email: z.string().email({
         message: "Please enter a valid email address.",
+    }),
+    buisnessname: z.string().min(2, {
+        message: "Buisness name must be at least 2 characters.",
     }),
     password: z.string()
         .min(8, { message: "Password must be at least 8 characters." })

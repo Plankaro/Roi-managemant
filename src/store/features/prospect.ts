@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { uniqBy } from "lodash";
+import { findIndex, merge } from "lodash";
 
 // Define Prospect type
 export type Prospect = {
@@ -10,6 +10,7 @@ export type Prospect = {
   image?: string;
   phoneNo: string;
   lead: string;
+  last_Online:Date;
   assignedToId?: string;
   businessId?: string;
   buisnessNo: string;
@@ -33,31 +34,44 @@ const initialState: ProspectState = {
 };
 
 const ProspectSlice = createSlice({
-  name: "selectedProspect",
+  name: "prospect",
   initialState,
   reducers: {
-    // Add a new prospect ensuring uniqueness
+    // Add or update prospects based on id using lodash functions
     addProspect: (state, action: PayloadAction<Prospect[]>) => {
-      state.prospects = uniqBy([...state.prospects, ...action.payload], "id");
+      action.payload.forEach((incomingProspect) => {
+        // Locate the existing prospect in the array by id
+        const index = findIndex(state.prospects, { id: incomingProspect.id });
+        if (index !== -1) {
+          // Merge incoming changes with the existing prospect
+          state.prospects[index] = merge({}, state.prospects[index], incomingProspect);
+          
+          // If this prospect is selected, update the selected prospect as well
+          if (state.selectedProspect && state.selectedProspect.id === incomingProspect.id) {
+            state.selectedProspect = merge({}, state.selectedProspect, incomingProspect);
+          }
+        } else {
+          // If not found, add it as a new prospect
+          state.prospects.push(incomingProspect);
+        }
+      });
     },
 
-    // Select a prospect (store it separately)
+    // Select a prospect
     selectProspect: (state, action: PayloadAction<Prospect | null>) => {
-      state.selectedProspect = action.payload; // Assign the selected prospect
+      state.selectedProspect = action.payload;
     },
 
     // Remove a specific prospect by ID
     removeProspect: (state, action: PayloadAction<string>) => {
       state.prospects = state.prospects.filter((p) => p.id !== action.payload);
-      // If the removed prospect was selected, clear selection
       if (state.selectedProspect?.id === action.payload) {
         state.selectedProspect = null;
       }
     },
 
-    // Clear all prospects
+    // Clear selected prospect
     clearSelectedProspects: (state) => {
-      // state.prospects = [];
       state.selectedProspect = null;
     },
 
@@ -73,14 +87,13 @@ const ProspectSlice = createSlice({
   },
 });
 
-export const { 
-  addProspect, 
-  selectProspect, 
-  removeProspect, 
-  clearSelectedProspects, 
-  toggleMenuModal, 
-  updateLastChatTime 
+export const {
+  addProspect,
+  selectProspect,
+  removeProspect,
+  clearSelectedProspects,
+  toggleMenuModal,
+  updateLastChatTime,
 } = ProspectSlice.actions;
 
 export default ProspectSlice.reducer;
- 

@@ -57,7 +57,7 @@ const initialState: ChatState = {
 };
 
 // Replace with actual user phone number
-const myPhoneNo = "15551365364";
+// const myPhoneNo = "15551365364";
 
 // Chat Slice
 const chatSlice = createSlice({

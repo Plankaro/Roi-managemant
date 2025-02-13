@@ -35,7 +35,8 @@ export default function SignUpPage() {
           }
          
           
-          toast.success("Sign-up successful!");
+          toast.success("Sign-up successful sent verification mail");
+          
         } catch (error: any) {
           // Check if the error response contains a specific message from the server.
           if (error.response?.data?.message) {
@@ -59,8 +60,10 @@ export default function SignUpPage() {
                 firstName: "",
                 lastName: "",
                 email: "",
+                buisnessname: "", 
                 password: "",
-                confirmPassword: ""
+                confirmPassword: "",
+                
             }}
             loading={loading}
             authDescription="Start your 30 day free trial. Cancel any time"

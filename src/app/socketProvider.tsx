@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { addProspect } from "@/store/features/prospect";
 import { setChats } from "@/store/features/chatSlice";
 import { createContext, useMemo, useContext, useEffect, ReactNode,} from "react";
 import { useDispatch } from "react-redux";
 import io, { Socket } from "socket.io-client";
-
+import { useSession } from "next-auth/react";
 type SocketContextType = Socket | null;
 
 const SocketContext = createContext<SocketContextType>(null);
@@ -15,6 +16,10 @@ interface SocketProviderProps {
 
 const SocketProvider = ({ children }: SocketProviderProps) => {
 
+  const session:any = useSession();
+  console.log(session)
+
+const user = session?.data?.user?.user
 const dispatch = useDispatch()
 
   const socket = useMemo(() => io(process.env.NEXT_PUBLIC_API_URL, { 
@@ -32,7 +37,8 @@ const dispatch = useDispatch()
       console.log("✅ WebSocket Connected!");
       
       // Subscribe automatically (replace with dynamic phone number if needed)
-      const phoneNumber = "15551365364"; // Replace with dynamic number if necessary
+      const phoneNumber = user?.buisness?.[0]?.whatsapp_mobile??"";
+      console.log(phoneNumber) // Replace with dynamic number if necessary
       socket.emit("subscribe", phoneNumber);
       console.log(`🔔 Subscribed to ${phoneNumber}`);
     });

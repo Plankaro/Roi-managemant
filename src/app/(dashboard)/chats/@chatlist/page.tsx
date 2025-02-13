@@ -67,7 +67,7 @@ const ChatLists = () => {
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white">All Chats</h2>
-          <ScrollableContactDialog>
+          {/* <ScrollableContactDialog>
           <Button
             variant="outline"
             size="sm"
@@ -78,7 +78,7 @@ const ChatLists = () => {
 
             <BookOpen className="h-4 w-4" /> contacts
           </Button>
-          </ScrollableContactDialog>
+          </ScrollableContactDialog> */}
         </div>
         <div className="w-full flex my-5 md:hidden justify-between">
         <FilterDropdown>
