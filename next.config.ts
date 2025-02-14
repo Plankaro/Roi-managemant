@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         pathname: "/**",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "github.com",
+        pathname: "/**", // Allow all paths under picsum.photos
+      },
     
         {
           protocol: "https",

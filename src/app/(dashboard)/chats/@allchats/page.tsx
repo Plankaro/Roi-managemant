@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 "use client";
-
+import { z } from 'zod';
 import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
-import { clearSelectedProspects } from "@/store/features/prospect";
+import { addProspect, clearSelectedProspects } from "@/store/features/prospect";
 import { getLastOnlineStatus } from "@/lib/last_online";
 
 import { MdOutlineVideoLibrary } from "react-icons/md";
@@ -50,16 +50,18 @@ import Messages from "@/components/page/chats/message";
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import TemplateBuilder from "@/components/page/chats/templatedialog";
 import { setChats } from "@/store/features/chatSlice";
-
+import { updateProspectSchema } from '@/zod/chats/chat';
 import {
   useSendMediaMutation,
   useUploadFilesMutation,
   useGetSpecficProspectQuery,
   useGetChatsQuery,
   useSendTextMutation,
-  useUpdateProspectMutation
+  useUpdateProspectMutation,
+  useGetProspectQuery
 } from "@/store/features/apislice";
 import toast from "react-hot-toast";
+import EditableField from "@/components/page/chats/editablediv";
 type FileType = "image" | "video" | "document";
 
 interface FileUploadProps {
@@ -70,6 +72,7 @@ const AllChats = () => {
   const [fileType, setFileType] = useState<FileType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
+  const {refetch} = useGetProspectQuery({})
   const selectedProspect = useSelector(
     (state: RootState) => state.Prospect?.selectedProspect
   );
@@ -82,6 +85,7 @@ const AllChats = () => {
       dispatch(setChats(chats));
     }
   });
+  
 
   const [message, setMessage] = useState("");
   const [sendText, { isLoading }] = useSendTextMutation();
@@ -194,34 +198,62 @@ const AllChats = () => {
   const handleProfileImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      console.log("No file selected");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size should be less than 5MB");
-      return;
-    }
-
-    // Prepare file for upload
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const uploadPromise = uploadFiles(formData).unwrap();
-    toast.promise(uploadPromise, {
-      loading: "Uploading...",
-      success: "File uploaded successfully!",
-      error: (error: any) =>
-        error?.data?.message || "An unexpected error occurred.",
-    });
-    const data = await uploadPromise;
-    const link = data[0].link; 
-    console.log(link);
-    
+   try {
+     const file = event.target.files?.[0];
+     if (!file) {
+       console.log("No file selected");
+       return;
+     }
+     if (file.size > 5 * 1024 * 1024) {
+       toast.error("File size should be less than 5MB");
+       return;
+     }
+ 
+     // Prepare file for upload
+     const formData = new FormData();
+     formData.append("file", file);
+ 
+     const uploadPromise = uploadFiles(formData).unwrap();
+     toast.promise(uploadPromise, {
+       loading: "Uploading...",
+       success: "File uploaded successfully!",
+       error: (error: any) =>
+         error?.data?.message || "An unexpected error occurred.",
+     });
+     const data = await uploadPromise;
+     const link = data[0].link; 
+    const update:any = await updateProspect({id:selectedProspect?.id, body:{image:link}});
+   
+    dispatch(addProspect([update.data]))
+ 
+   } catch (error) {
+    console.log(error)
+   }
   
   
   };
+
+  const handleeditDetails = async(body:any) => {
+    try {
+      const santized = updateProspectSchema.safeParse(body);
+      if (!santized.success) {
+        toast.error("Invalid details");
+        return;
+      }
+      const promise =  updateProspect({id:selectedProspect?.id, body});
+      toast.promise(promise,{
+        loading: "Updating...",
+        success: "Details updated successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      })
+      const prospect:any = await promise
+      console.log(data)
+      dispatch(addProspect([prospect.data]))
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handleMediaUpload = () => {
     if (fileInputRef.current) {
@@ -230,9 +262,7 @@ const AllChats = () => {
     }
   };
 
-  useEffect(() => {
-    setShow(false);
-  }, [selectedProspect]);
+
 
   return (
     <>
@@ -261,9 +291,9 @@ const AllChats = () => {
                     >
                       <ChevronLeft className="text-white" />
                     </button>
-                    <Avatar className="sm:h-10 sm:w-10 h-8 w-8">
-                      <Image
-                        fill
+                    <Avatar className="sm:h-14 sm:w-14 h-8 w-8">
+                      <AvatarImage
+                        
                         src={selectedProspect?.image || "/placeholder.svg"}
                         alt={selectedProspect?.name ?? ""}
                         className="object-cover"
@@ -272,7 +302,7 @@ const AllChats = () => {
                   </div>
                   <div className="relative flex items-center md:gap-10 gap-5 bg">
                     <h3 className="sm:text-lg text-sm font-semibold text-white">
-                      {selectedProspect?.name}
+                      {selectedProspect?.name || selectedProspect?.phoneNo}
                     </h3>
 
                     <div className="flex gap-3  px-3 py-2 rounded-3xl items-center bg-[#A7B8D9]">
@@ -459,6 +489,7 @@ const AllChats = () => {
                       <AvatarImage
                         src={selectedProspect?.image ?? ""}
                         alt="Profile"
+                        className="h-16 w-16"
                       />
                       <AvatarFallback>
                         {selectedProspect?.name ?? ""}
@@ -480,27 +511,34 @@ const AllChats = () => {
                     </Button>
                   </div>
                   <div className="text-center">
-                    <h2 className="text-white text-lg font-medium">
-                      {selectedProspect?.name ?? ""}
+                    <h2 className="text-white text-lg font-medium flex justify-center items-center">
+                      <EditableField initialValue={selectedProspect?.name??""} onSave={(name)=>handleeditDetails({name:name})} />
                     </h2>
-                    <p className="text-red-500 text-sm">{lastOnlineStatus}</p>
+                    <p className="text-red-500 text-sm mt-5">{lastOnlineStatus}</p>
                   </div>
                 </div>
 
                 {/* Contact Info */}
                 <div className="space-y-4">
-                  {[
+                  {/* {[
                     { icon: Mail, text: selectedProspect?.email ?? "" },
                     { icon: Phone, text: selectedProspect?.phoneNo ?? "" },
-                  ].map((item, index) => (
+                  ].map((item, index) => ( */}
                     <div
-                      key={index}
+                   
                       className="flex items-center gap-3 text-white"
                     >
-                      <item.icon className="h-5 w-5 text-gray-400" />
-                      <span className="text-sm">{item.text}</span>
+                      <Mail className="h-5 w-5 text-gray-400" />
+                      <EditableField initialValue={selectedProspect?.email??""} onSave={(email)=>handleeditDetails({email:email})} inputClassName="text-sm" textClassName="text-sm"/>
                     </div>
-                  ))}
+                     <div
+                     
+                     className="flex items-center gap-3 text-white"
+                   >
+                     <Phone className="h-5 w-5 text-gray-400" />
+                     <span className="text-sm">{selectedProspect?.phoneNo ?? ""}</span>
+                   </div>
+                  {/* ))} */}
 
                   {/* Role Select */}
                   <div className="flex items-center  gap-3">

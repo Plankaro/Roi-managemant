@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+
 import Person from "@/components/icons/person";
 import PersonAlert from "@/components/icons/person-alert";
 import ScrollableContactDialog from "@/components/page/chats/contacts";
@@ -128,13 +128,13 @@ const ChatLists = () => {
                   <Avatar className="lg:h-14 lg:w-14">
                     <AvatarImage
                       src={contact.image}
-                      alt="@shadcn"
-                      className="object-contain lg:h-14 lg:w-14 h-10 w-10"
+                      alt="/placeholder.svg"
+                      className="object-cover lg:h-14 lg:w-14 h-10 w-10"
                      
                     />
                    <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
                      >
-                        {contact?.name?.slice(0, 2).toUpperCase()??""}
+                        {contact?.name?.slice(0, 2).toUpperCase()??"cn" }
                       </AvatarFallback>
                     
                   </Avatar>
@@ -143,7 +143,7 @@ const ChatLists = () => {
                 <div className="flex-1 w-full h-14 py-[2px] flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-white truncate">
-                      {contact.name}
+                      {contact.name || contact.phoneNo}
                     </p>
                     <span className="text-xs text-gray-400">
                       {contact.message?.[0].created_at??""}

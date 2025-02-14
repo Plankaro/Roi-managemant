@@ -80,12 +80,12 @@ export const apiSlice = createApi({
         method: "GET",
       })
     }),
-    updateProspect:builder.mutation({
-      query: (body) => ({
-        url: "/prospects",
-        method: "PUT",
-        body
-      })
+    updateProspect: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/prospects/${id}`,
+        method: "PATCH",
+        body,
+      }),
     }),
     getProducts: builder.query({
       query: () => ({
