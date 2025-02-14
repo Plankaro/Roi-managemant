@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   LayoutGrid,
   FileText,
+  Pencil,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -50,36 +51,46 @@ import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import TemplateBuilder from "@/components/page/chats/templatedialog";
 import { setChats } from "@/store/features/chatSlice";
 
-
-import { useSendMediaMutation,useUploadFilesMutation,useGetSpecficProspectQuery,useGetChatsQuery, useSendTextMutation } from "@/store/features/apislice";
+import {
+  useSendMediaMutation,
+  useUploadFilesMutation,
+  useGetSpecficProspectQuery,
+  useGetChatsQuery,
+  useSendTextMutation,
+  useUpdateProspectMutation
+} from "@/store/features/apislice";
 import toast from "react-hot-toast";
-type FileType = "image" | "video" | "document"
-
+type FileType = "image" | "video" | "document";
 
 interface FileUploadProps {
-  onFileSelect: (file: File, type: FileType) => void
+  onFileSelect: (file: File, type: FileType) => void;
 }
 
 const AllChats = () => {
-    const [fileType, setFileType] = useState<FileType | null>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
+  const [fileType, setFileType] = useState<FileType | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const profileInputRef = useRef<HTMLInputElement>(null);
   const selectedProspect = useSelector(
     (state: RootState) => state.Prospect?.selectedProspect
   );
-const {data:chats,isLoading:isChatsLoading} = useGetChatsQuery({prospectId:selectedProspect?.id??""})
-console.log("chats",chats)
-useEffect(()=>{
-  if(chats){
-    dispatch(setChats(chats));
-
-  }
-})
+  const { data: chats, isLoading: isChatsLoading } = useGetChatsQuery({
+    prospectId: selectedProspect?.id ?? "",
+  });
+  console.log("chats", chats);
+  useEffect(() => {
+    if (chats) {
+      dispatch(setChats(chats));
+    }
+  });
 
   const [message, setMessage] = useState("");
   const [sendText, { isLoading }] = useSendTextMutation();
-const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
-  const [sendMedia, { isLoading: isSendingMedia }] = useSendMediaMutation()
-  const{data} = useGetSpecficProspectQuery({})
+  const [priview,setPreview] = useState("");
+  const [uploadFiles, { isLoading: isuploadingfile }] =
+    useUploadFilesMutation();
+  const [sendMedia, { isLoading: isSendingMedia }] = useSendMediaMutation();
+  const [updateProspect, { isLoading: isUpdatingProspect }] = useUpdateProspectMutation();
+  const { data } = useGetSpecficProspectQuery({});
 
   console.log(selectedProspect);
   const [takeOver, settakeOver] = useState(false);
@@ -87,11 +98,12 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
   const [dialog, setDialog] = useState(false);
   console.log(dialog);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const lastOnlineStatus = getLastOnlineStatus(selectedProspect?.last_Online as Date);
+  const lastOnlineStatus = getLastOnlineStatus(
+    selectedProspect?.last_Online as Date
+  );
   const dispatch = useDispatch();
 
   const handleSendMessage = async () => {
-   
     try {
       const response = await sendText({
         recipientNo: selectedProspect?.phoneNo,
@@ -110,7 +122,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-  
+
     // Determine file type synchronously
     let determinedType: FileType;
     if (file.type.startsWith("image/")) {
@@ -120,20 +132,20 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
     } else {
       determinedType = "document";
     }
-  
+
     // Update state (optional if you need to display it)
     setFileType(determinedType);
-  
+
     // Check file size (limit 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("File size should be less than 5MB");
       return;
     }
-  
+
     // Prepare file for upload
     const formData = new FormData();
     formData.append("file", file);
-  
+
     try {
       const uploadPromise = uploadFiles(formData).unwrap();
       toast.promise(uploadPromise, {
@@ -144,44 +156,79 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
       });
       const data = await uploadPromise;
       const link = data[0].link;
-  
+
       // Use the locally determined type rather than relying on state
       const sendMediaPromise = sendMedia({
         recipientNo: selectedProspect?.phoneNo.slice(1),
         mediaUrl: link,
         type: determinedType,
       }).unwrap();
-  
+
       toast.promise(sendMediaPromise, {
         loading: "Sending...",
         success: "File sent successfully!",
         error: (error: any) =>
           error?.data?.message || "An unexpected error occurred.",
       });
-  
+
       console.log(await sendMediaPromise);
       // dispatch(setChats([await sendMediaPromise]));
     } catch (error) {
       console.log(error);
     }
   };
-  
- 
 
   const handleDocumentUpload = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.accept = ".pdf,.doc,.docx,.txt"
-      fileInputRef.current.click()
+      fileInputRef.current.accept = ".pdf,.doc,.docx,.txt";
+      fileInputRef.current.click();
+    }
+  };
+
+  const openprofile = () => {
+    if (profileInputRef.current) {
+      profileInputRef.current.accept = "image/*";
+      profileInputRef.current.click();
     }
   }
+  const handleProfileImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      console.log("No file selected");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size should be less than 5MB");
+      return;
+    }
+
+    // Prepare file for upload
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const uploadPromise = uploadFiles(formData).unwrap();
+    toast.promise(uploadPromise, {
+      loading: "Uploading...",
+      success: "File uploaded successfully!",
+      error: (error: any) =>
+        error?.data?.message || "An unexpected error occurred.",
+    });
+    const data = await uploadPromise;
+    const link = data[0].link; 
+    console.log(link);
+    
+  
+  
+  };
 
   const handleMediaUpload = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.accept = "image/*,video/*"
-      fileInputRef.current.click()
+      fileInputRef.current.accept = "image/*,video/*";
+      fileInputRef.current.click();
     }
-  }
-
+  };
 
   useEffect(() => {
     setShow(false);
@@ -218,7 +265,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
                       <Image
                         fill
                         src={selectedProspect?.image || "/placeholder.svg"}
-                        alt={selectedProspect?.name??""}
+                        alt={selectedProspect?.name ?? ""}
                         className="object-cover"
                       />
                     </Avatar>
@@ -306,13 +353,17 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
               </div>
             ) : (
               <div className="p-4 border-t border-primary bg-primary rounded-b-[20px]">
-                 <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            className="hidden"
-                            accept={fileType === "document" ? ".pdf,.doc,.docx,.txt" : "image/*,video/*"}
-                          />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept={
+                    fileType === "document"
+                      ? ".pdf,.doc,.docx,.txt"
+                      : "image/*,video/*"
+                  }
+                />
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
@@ -344,13 +395,18 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
                           Templates
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="flex gap-2" onClick={handleDocumentUpload}>
-                         
+                        <DropdownMenuItem
+                          className="flex gap-2"
+                          onClick={handleDocumentUpload}
+                        >
                           <FileText />
                           Documents
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="flex gap-2" onClick={handleMediaUpload}>
+                        <DropdownMenuItem
+                          className="flex gap-2"
+                          onClick={handleMediaUpload}
+                        >
                           <MdOutlineVideoLibrary />
                           Photos & Videos
                         </DropdownMenuItem>
@@ -398,13 +454,31 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
 
                 {/* Profile Section */}
                 <div className="flex flex-col justify-center items-center space-y-3 pt-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage
-                      src={selectedProspect?.image ?? ""}
-                      alt="Profile"
+                  <div className="relative inline-block">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage
+                        src={selectedProspect?.image ?? ""}
+                        alt="Profile"
+                      />
+                      <AvatarFallback>
+                        {selectedProspect?.name ?? ""}
+                      </AvatarFallback>
+                    </Avatar>
+                    <input
+                      type="file"
+                      ref={profileInputRef}
+                      onChange={handleProfileImageChange}
+                      accept="image/*"
+                      className="hidden"
                     />
-                    <AvatarFallback>GM</AvatarFallback>
-                  </Avatar>
+                    <Button
+                    size={"icon"}
+                     
+                      className="absolute bg-primary/70 -bottom-2 -right-3 rounded-full" onClick={openprofile}
+                    >
+                      <Pencil className="h-2 w-2 text-white" />
+                    </Button>
+                  </div>
                   <div className="text-center">
                     <h2 className="text-white text-lg font-medium">
                       {selectedProspect?.name ?? ""}
@@ -481,7 +555,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
 
                 {/* Action Buttons */}
                 <div className="space-y-3 pt-4">
-                  {/* <Button
+                  <Button
                     variant="ghost"
                     className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10"
                   >
@@ -494,7 +568,7 @@ const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
                   >
                     <Trash2 className="h-5 w-5 mr-2" />
                     Delete
-                  </Button> */}
+                  </Button>
                 </div>
               </div>
             </div>

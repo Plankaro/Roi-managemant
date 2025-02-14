@@ -19,7 +19,7 @@ import { selectProspect } from "@/store/features/prospect";
 import FilterDropdown from "@/components/page/chats/filter-dropdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addProspect } from "@/store/features/prospect";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 
 export function ChatListSkeleton() {
@@ -49,7 +49,8 @@ export function ChatListSkeleton() {
 const ChatLists = () => {
   const dispatch = useDispatch<AppDispatch>();
   const {data,isLoading} = useGetProspectQuery({})
- 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const {selectedProspect,prospects} = useSelector((state: RootState) => state.Prospect);
   console.log(prospects)
 
@@ -60,6 +61,16 @@ const ChatLists = () => {
       console.log("added");
     }
   }, [data, dispatch]);
+
+  const filteredProspects = prospects.filter((contact: any) => {
+    if (!searchQuery) return true;
+    const lowerQuery = searchQuery.toLowerCase();
+    return (
+      (contact.name && contact.name.toLowerCase().includes(lowerQuery)) ||
+      (contact.email && contact.email.toLowerCase().includes(lowerQuery)) ||
+      (contact.phoneNo && contact.phoneNo.toLowerCase().includes(lowerQuery))
+    );
+  });
 
   console.log(selectedProspect)
   return (
@@ -90,19 +101,21 @@ const ChatLists = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search here..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 bg-white/5 border-gray-700 text-white placeholder:text-gray-400 w-full md:max-w-[18.75rem]"
           />
         </div>
       </div>
       {isLoading ? <ChatListSkeleton />:  <ScrollArea className="w-full no-scrollbar">
         <div className="space-y-2 p-2 w-full">
-          {prospects && prospects.map((contact: any) => {
+          {filteredProspects  && filteredProspects.map((contact: any) => {
          
             return(
               <button
               key={contact.id}
               className={cn(
-                " p-3 rounded-lg text-left transition-colors w-full ",
+                " p-3 rounded-lg text-left transition-colors w-full overflow-y-auto",
                 selectedProspect?.id==contact.id ? "bg-primary text-white":"hover:bg-primary hover:text-white"
               )}
               onClick={() => {

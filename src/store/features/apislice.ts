@@ -80,6 +80,13 @@ export const apiSlice = createApi({
         method: "GET",
       })
     }),
+    updateProspect:builder.mutation({
+      query: (body) => ({
+        url: "/prospects",
+        method: "PUT",
+        body
+      })
+    }),
     getProducts: builder.query({
       query: () => ({
         url: "/products",
@@ -107,6 +114,7 @@ export const apiSlice = createApi({
         body: sendChatDto, // Send the required parameters in the body
       }),
     }),
+    
     getAllTemplates:builder.query({
       query: () => ({
         url: '/chats/template',
@@ -149,6 +157,7 @@ export const {
   useCreateProspectMutation,
   useGetProspectQuery,
   useGetSpecficProspectQuery,
+  useUpdateProspectMutation,
   useGetProductsQuery,
   useCreateOrderMutation,
   useGetChatsQuery,
@@ -156,5 +165,6 @@ export const {
   useGetAllTemplatesQuery,
   useUploadFilesMutation,
   useSendTemplatesMutation,
-  useSendMediaMutation
+  useSendMediaMutation,
+
 } = apiSlice;

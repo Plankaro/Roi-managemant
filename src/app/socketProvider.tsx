@@ -37,7 +37,7 @@ const dispatch = useDispatch()
       console.log("✅ WebSocket Connected!");
       
       // Subscribe automatically (replace with dynamic phone number if needed)
-      const phoneNumber = user?.buisness?.[0]?.whatsapp_mobile??"";
+      const phoneNumber = user?.buisness?.whatsapp_mobile??"";
       console.log(phoneNumber) // Replace with dynamic number if necessary
       socket.emit("subscribe", phoneNumber);
       console.log(`🔔 Subscribed to ${phoneNumber}`);
