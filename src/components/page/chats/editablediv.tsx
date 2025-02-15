@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -9,26 +10,46 @@ interface EditableFieldProps {
   containerClassName?: string
   textClassName?: string
   inputClassName?: string
+  placeholder?: string
 }
 
 export default function EditableField({
   initialValue,
   onSave,
+  placeholder = "",
   containerClassName = "",
   textClassName = "",
   inputClassName = "",
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState(initialValue)
+  const [loading, setLoading] = useState(false)
+
+  
 
   useEffect(() => {
     setValue(initialValue)
   }, [initialValue])
 
-  const handleSave = () => {
-    onSave(value)
-    setIsEditing(false)
+ 
+
+  const handleSave = async () => {
+    if (value === initialValue) {
+      setIsEditing(false)
+      return
+    }
+  
+    try {
+      setLoading(true)
+      const result: any = await onSave(value)
+      setLoading(false)
+      if (!result) return
+      setIsEditing(false)
+    } catch (error) {
+      console.log(error)
+    }
   }
+  
 
   return (
     <div className={`flex items-center ${containerClassName}`}>
@@ -36,19 +57,17 @@ export default function EditableField({
         <input
           type="text"
           value={value}
+          placeholder={placeholder}
           onChange={(e) => setValue(e.target.value)}
           className={`bg-transparent w-full text-white text-lg font-medium border-b border-white focus:outline-none ${inputClassName}`}
           onBlur={handleSave}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
-              handleSave()
-            }
-          }}
+         
         />
       ) : (
-        <span className={`text-white text-lg w-full font-medium ${textClassName}`}>{value}</span>
+        <span className={`text-white text-lg w-full font-medium  ${textClassName}`}>{value}</span>
       )}
       <button
+      disabled={loading}
         onClick={() => {
           if (isEditing) {
             handleSave()

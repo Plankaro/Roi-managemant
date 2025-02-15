@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { addProspect } from "@/store/features/prospect";
+import { addProspect, updateLastChat } from "@/store/features/prospect";
 import { setChats } from "@/store/features/chatSlice";
 import { createContext, useMemo, useContext, useEffect, ReactNode,} from "react";
 import { useDispatch } from "react-redux";
@@ -47,6 +47,7 @@ const dispatch = useDispatch()
     socket.on("messages", (data) => {
       console.log("📩 New Messages:", data);
       dispatch(setChats([data]));
+      dispatch(updateLastChat(data));
      ; // Append new messages
     });
 

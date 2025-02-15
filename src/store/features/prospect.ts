@@ -1,7 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { findIndex, merge } from "lodash";
+import { find, findIndex, merge } from "lodash";
 
 // Define Prospect type
+export type Chat = {
+  id: string;
+  chatId: string;
+  senderPhoneNo: string;
+  receiverPhoneNo: string;
+  sendDate: Date;
+  template_used: boolean;
+  template_name?: string;
+  header_type?: string;
+  header_value?: string;
+  body_text?: string;
+  footer_included: boolean;
+  footer_text?: string;
+  Buttons: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  deleted: boolean;
+  Status: string;
+  prospectId: string; // Ensures each chat is linked to a prospect
+};
+
+// Updated Prospect type now includes one chat (optional)
 export type Prospect = {
   id: string;
   shopify_id?: string;
@@ -10,13 +32,14 @@ export type Prospect = {
   image?: string;
   phoneNo: string;
   lead: string;
-  last_Online:Date;
+  last_Online: Date;
   assignedToId?: string;
   businessId?: string;
   buisnessNo: string;
   is_blocked: boolean;
   created_at: string;
   updated_at: string;
+  chats?: Chat[]; // Added property to store one chat (e.g., latest chat)
 };
 
 interface ProspectState {
@@ -44,11 +67,22 @@ const ProspectSlice = createSlice({
         const index = findIndex(state.prospects, { id: incomingProspect.id });
         if (index !== -1) {
           // Merge incoming changes with the existing prospect
-          state.prospects[index] = merge({}, state.prospects[index], incomingProspect);
-          
+          state.prospects[index] = merge(
+            {},
+            state.prospects[index],
+            incomingProspect
+          );
+
           // If this prospect is selected, update the selected prospect as well
-          if (state.selectedProspect && state.selectedProspect.id === incomingProspect.id) {
-            state.selectedProspect = merge({}, state.selectedProspect, incomingProspect);
+          if (
+            state.selectedProspect &&
+            state.selectedProspect.id === incomingProspect.id
+          ) {
+            state.selectedProspect = merge(
+              {},
+              state.selectedProspect,
+              incomingProspect
+            );
           }
         } else {
           // If not found, add it as a new prospect
@@ -84,6 +118,15 @@ const ProspectSlice = createSlice({
     updateLastChatTime: (state, action: PayloadAction<string>) => {
       state.lastchattime = action.payload;
     },
+    updateLastChat: (state, action: PayloadAction<Chat>) => {
+      const incomingChat = action.payload;
+      const prospect = find(state.prospects, { id: incomingChat.prospectId });
+      if (prospect) {
+        // Replace the entire chats array with the incoming chat
+        prospect.chats = [incomingChat];
+      }
+    },
+    
   },
 });
 
@@ -94,6 +137,7 @@ export const {
   clearSelectedProspects,
   toggleMenuModal,
   updateLastChatTime,
+  updateLastChat
 } = ProspectSlice.actions;
 
 export default ProspectSlice.reducer;

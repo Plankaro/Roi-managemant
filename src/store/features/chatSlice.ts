@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { uniqBy } from "lodash";
+import { find, uniqBy } from "lodash";
 
 // Define Chat Type
 export type Chat = {
@@ -98,8 +98,11 @@ const chatSlice = createSlice({
       });
     },
 
-    clearChats: (state) => {
-      state.chats = [];
+    clearChats: (state, action: PayloadAction<string>) => {
+      const prospectChatGroup = find(state.chats, { prospectId: action.payload });
+      if (prospectChatGroup) {
+        prospectChatGroup.chats = [];
+      }
     },
   },
 });

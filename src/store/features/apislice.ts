@@ -87,6 +87,13 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    changeBlockStatus:builder.mutation({
+      query: ({ id }) => ({
+        url: `/prospects/block/${id}`,
+        method: "PATCH",
+        
+      }),
+    }),
     getProducts: builder.query({
       query: () => ({
         url: "/products",
@@ -154,6 +161,7 @@ export const {
   useResetPasswordMutation,
   useGetAllShopifyContactsQuery,
   useGetSpecificShopifyContactsQuery,
+  useChangeBlockStatusMutation,
   useCreateProspectMutation,
   useGetProspectQuery,
   useGetSpecficProspectQuery,

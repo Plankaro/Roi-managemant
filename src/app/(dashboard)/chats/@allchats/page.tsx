@@ -16,12 +16,13 @@ import {
   Mail,
   Phone,
   X,
-  Shield,
+  ShieldX,
   Trash2,
   ChevronLeft,
   LayoutGrid,
   FileText,
   Pencil,
+  ShieldCheck,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -63,6 +64,7 @@ import {
 import toast from "react-hot-toast";
 import EditableField from "@/components/page/chats/editablediv";
 type FileType = "image" | "video" | "document";
+import { useChangeBlockStatusMutation } from '@/store/features/apislice';
 
 interface FileUploadProps {
   onFileSelect: (file: File, type: FileType) => void;
@@ -72,7 +74,7 @@ const AllChats = () => {
   const [fileType, setFileType] = useState<FileType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
-  const {refetch} = useGetProspectQuery({})
+
   const selectedProspect = useSelector(
     (state: RootState) => state.Prospect?.selectedProspect
   );
@@ -94,6 +96,7 @@ const AllChats = () => {
     useUploadFilesMutation();
   const [sendMedia, { isLoading: isSendingMedia }] = useSendMediaMutation();
   const [updateProspect, { isLoading: isUpdatingProspect }] = useUpdateProspectMutation();
+  const [changeBlockStatus, { isLoading: isChangingBlockStatus }] = useChangeBlockStatusMutation();
   const { data } = useGetSpecficProspectQuery({});
 
   console.log(selectedProspect);
@@ -182,6 +185,22 @@ const AllChats = () => {
     }
   };
 
+  const handleBlockStatusChange = async(id:string)=>{
+    try {
+      const changeBlockpromise =  changeBlockStatus({id:id});
+      toast.promise(changeBlockpromise, {
+        loading: `${selectedProspect?.is_blocked?"Unblocking":"Blocking"} `,
+        success: `${selectedProspect?.is_blocked?"Unblocked":"Blocked"} successfully!`,
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      })
+      const data = await changeBlockpromise
+      dispatch(addProspect([data.data]))
+    } catch (error) {
+      
+    }
+  }
+
   const handleDocumentUpload = () => {
     if (fileInputRef.current) {
       fileInputRef.current.accept = ".pdf,.doc,.docx,.txt";
@@ -237,8 +256,9 @@ const AllChats = () => {
     try {
       const santized = updateProspectSchema.safeParse(body);
       if (!santized.success) {
-        toast.error("Invalid details");
-        return;
+        toast.error("Invalid field value");
+        return
+       
       }
       const promise =  updateProspect({id:selectedProspect?.id, body});
       toast.promise(promise,{
@@ -250,6 +270,7 @@ const AllChats = () => {
       const prospect:any = await promise
       console.log(data)
       dispatch(addProspect([prospect.data]))
+      return prospect
     } catch (error) {
       console.log(error)
     }
@@ -504,7 +525,7 @@ const AllChats = () => {
                     />
                     <Button
                     size={"icon"}
-                     
+                     disabled={isUpdatingProspect}
                       className="absolute bg-primary/70 -bottom-2 -right-3 rounded-full" onClick={openprofile}
                     >
                       <Pencil className="h-2 w-2 text-white" />
@@ -512,28 +533,25 @@ const AllChats = () => {
                   </div>
                   <div className="text-center">
                     <h2 className="text-white text-lg font-medium flex justify-center items-center">
-                      <EditableField initialValue={selectedProspect?.name??""} onSave={(name)=>handleeditDetails({name:name})} />
+                      <EditableField initialValue={selectedProspect?.name??""} onSave={(name)=>handleeditDetails({name:name})} placeholder='enter the name'/>
                     </h2>
-                    <p className="text-red-500 text-sm mt-5">{lastOnlineStatus}</p>
+                    <p className="text-red-500 text-sm mt-2">{lastOnlineStatus}</p>
                   </div>
                 </div>
 
                 {/* Contact Info */}
                 <div className="space-y-4">
-                  {/* {[
-                    { icon: Mail, text: selectedProspect?.email ?? "" },
-                    { icon: Phone, text: selectedProspect?.phoneNo ?? "" },
-                  ].map((item, index) => ( */}
+           
                     <div
                    
                       className="flex items-center gap-3 text-white"
                     >
                       <Mail className="h-5 w-5 text-gray-400" />
-                      <EditableField initialValue={selectedProspect?.email??""} onSave={(email)=>handleeditDetails({email:email})} inputClassName="text-sm" textClassName="text-sm"/>
+                      <EditableField initialValue={selectedProspect?.email??""} onSave={(email)=>handleeditDetails({email:email})} inputClassName="text-sm" textClassName="text-sm min-w-[160px]" placeholder='enter the email'/>
                     </div>
                      <div
                      
-                     className="flex items-center gap-3 text-white"
+                     className="flex items-center gap-3 text-white "
                    >
                      <Phone className="h-5 w-5 text-gray-400" />
                      <span className="text-sm">{selectedProspect?.phoneNo ?? ""}</span>
@@ -543,14 +561,15 @@ const AllChats = () => {
                   {/* Role Select */}
                   <div className="flex items-center  gap-3">
                     <User className="h-5 w-5 text-gray-400" />
-                    <Select>
+                    <Select value={selectedProspect?.lead} onValueChange={(lead) => handleeditDetails({lead:lead})}>
                       <SelectTrigger className=" bg-transparent border-gray-800 text-white">
-                        <SelectValue placeholder="Lead" />
+                        <SelectValue placeholder={selectedProspect?.lead} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="lead">Lead</SelectItem>
-                        <SelectItem value="customer">Customer</SelectItem>
-                        <SelectItem value="prospect">Prospect</SelectItem>
+                        <SelectItem value="LEAD">Lead</SelectItem>
+                        <SelectItem value="LOST">Lost</SelectItem>
+                        <SelectItem value=" NEGOTIATION">Negotiation</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -596,9 +615,12 @@ const AllChats = () => {
                   <Button
                     variant="ghost"
                     className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                    onClick={() => {handleBlockStatusChange(selectedProspect?.id)}}
+
                   >
-                    <Shield className="h-5 w-5 mr-2" />
-                    Block
+                    
+                    {selectedProspect?.is_blocked?<ShieldCheck className="h-5 w-5 mr-2" />:<ShieldX className="h-5 w-5 mr-2" />}
+                    {selectedProspect?.is_blocked ? "Unblock" : "Block"}
                   </Button>
                   <Button
                     variant="ghost"

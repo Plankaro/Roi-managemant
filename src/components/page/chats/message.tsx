@@ -14,7 +14,7 @@ import { Chat, setChats } from "@/store/features/chatSlice";
 import type { RootState } from "@/store/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IoIosDocument } from "react-icons/io";
-
+import { orderBy } from "lodash";
 import { Clock, Send, Check, CheckCircle2, AlertCircle } from "lucide-react";
 import { updateLastChatTime } from "@/store/features/prospect";
 
@@ -79,9 +79,13 @@ function Messages({isLoading }: { isLoading: boolean, }) {
  
 const selectedProspect = useSelector((state:RootState)=>state.Prospect.selectedProspect)
 
-  const selectedChats = useSelector((state: RootState) =>
-    state.chat.chats.find((chatGroup) => chatGroup.prospectId === selectedProspect?.id)?.chats || []
-)
+const selectedChats = useSelector((state: RootState) =>
+  orderBy(
+    state.chat.chats.find((chatGroup) => chatGroup.prospectId === selectedProspect?.id)?.chats || [],
+    ['createdAt'],
+  
+  )
+);
 
   
 
