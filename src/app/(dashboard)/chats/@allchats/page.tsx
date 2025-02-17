@@ -43,14 +43,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
-import { addProspect, clearSelectedProspects } from "@/store/features/prospect";
+import { addProspect, clearlastChat, clearSelectedProspects } from "@/store/features/prospect";
 import { getLastOnlineStatus } from "@/lib/last_online";
 
 import { MdOutlineVideoLibrary } from "react-icons/md";
 import Messages from "@/components/page/chats/message";
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import TemplateBuilder from "@/components/page/chats/templatedialog";
-import { setChats } from "@/store/features/chatSlice";
+import { clearChats, setChats } from "@/store/features/chatSlice";
 import { updateProspectSchema } from '@/zod/chats/chat';
 import {
   useSendMediaMutation,
@@ -59,12 +59,15 @@ import {
   useGetChatsQuery,
   useSendTextMutation,
   useUpdateProspectMutation,
-  useGetProspectQuery
+  useGetProspectQuery,
+  useDeleteChatsMutation
 } from "@/store/features/apislice";
 import toast from "react-hot-toast";
 import EditableField from "@/components/page/chats/editablediv";
 type FileType = "image" | "video" | "document";
 import { useChangeBlockStatusMutation } from '@/store/features/apislice';
+import { getTimeDifference } from '@/lib/timetill';
+
 
 interface FileUploadProps {
   onFileSelect: (file: File, type: FileType) => void;
@@ -81,7 +84,7 @@ const AllChats = () => {
   const { data: chats, isLoading: isChatsLoading } = useGetChatsQuery({
     prospectId: selectedProspect?.id ?? "",
   });
-  console.log("chats", chats);
+
   useEffect(() => {
     if (chats) {
       dispatch(setChats(chats));
@@ -98,16 +101,20 @@ const AllChats = () => {
   const [updateProspect, { isLoading: isUpdatingProspect }] = useUpdateProspectMutation();
   const [changeBlockStatus, { isLoading: isChangingBlockStatus }] = useChangeBlockStatusMutation();
   const { data } = useGetSpecficProspectQuery({});
+  const [deleteChats] = useDeleteChatsMutation();
 
   console.log(selectedProspect);
   const [takeOver, settakeOver] = useState(false);
   const [show, setShow] = useState(false);
   const [dialog, setDialog] = useState(false);
-  console.log(dialog);
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  console.log("select",selectedProspect)
   const lastOnlineStatus = getLastOnlineStatus(
     selectedProspect?.last_Online as Date
   );
+
+  const getDifference = getTimeDifference( selectedProspect?.last_Online as Date)
   const dispatch = useDispatch();
 
   const handleSendMessage = async () => {
@@ -283,7 +290,22 @@ const AllChats = () => {
     }
   };
 
-
+const handleDeleteChats=async(id: string)=>{
+  try {
+    const promise = deleteChats({prospect_id: id});
+    toast.promise(promise, {
+      loading: "Deleting...",
+      success: "Chats deleted successfully!",
+      error: (error: any) =>
+        error?.data?.message || "An unexpected error occurred.",
+    })
+    const data = await promise
+    dispatch(clearChats(id));
+    dispatch(clearlastChat(id));
+  } catch (error) {
+    console.log(error)
+  }
+}
 
   return (
     <>
@@ -326,10 +348,10 @@ const AllChats = () => {
                       {selectedProspect?.name || selectedProspect?.phoneNo}
                     </h3>
 
-                    <div className="flex gap-3  px-3 py-2 rounded-3xl items-center bg-[#A7B8D9]">
+                    <div className={`flex gap-3  px-3 py-2 rounded-3xl items-center bg-[#A7B8D9] ${!getDifference && "hidden"}`}>
                       <Hourglass className="sm:w-4 sm:h-4 w-3 h-3" />
                       <span className="sm:text-sm text-xs">
-                        {/* {timeUntil24Hours(prospectLastMessageTiming)} */}
+                      {getDifference}
                       </span>
                     </div>
                   </div>
@@ -463,7 +485,7 @@ const AllChats = () => {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <TemplateBuilder open={dialog} setOpen={setDialog} />
+                    <TemplateBuilder  />
                   </Button>
                   <Input
                     placeholder="Type a message..."
@@ -625,7 +647,7 @@ const AllChats = () => {
                   <Button
                     variant="ghost"
                     className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                  >
+                  onClick={()=>handleDeleteChats(selectedProspect?.id)} >
                     <Trash2 className="h-5 w-5 mr-2" />
                     Delete
                   </Button>

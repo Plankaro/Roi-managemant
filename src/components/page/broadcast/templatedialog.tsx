@@ -9,8 +9,12 @@ import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { useGetAllTemplatesQuery } from "@/store/features/apislice"
 import SelectedTemplateForm from "./selectedTemplate"
 
+interface DialogContentProps {
+  open: boolean
+  setOpen: (open: boolean) => void
+}
 
-export default function TemplateBuilder() {
+export default function TemplateBuilder({ open, setOpen }: DialogContentProps) {
   const { data: templates, isLoading } = useGetAllTemplatesQuery({})
   const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
   const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null)
@@ -36,7 +40,7 @@ export default function TemplateBuilder() {
   }, [searchQuery, templates])
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-[1300px] p-6 gap-6 bg-blue-50  h-[80vh] no-scrollbar overflow-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr] gap-10">
           {/* Select Template Section */}

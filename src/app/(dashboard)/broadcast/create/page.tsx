@@ -1,201 +1,296 @@
-"use client"
+"use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Upload } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState } from "react";
+import TemplateBuilder from "@/components/page/broadcast/templatedialog";
+import SelectContactDialog from "@/components/page/broadcast/selectcontactDialog";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import SelectTemplate from "@/components/page/broadcast/templates"
-import { ChevronRight, ChevronLeft } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import RecipientContents from "@/components/page/broadcast/recipient"
-import Settings from "@/components/page/broadcast/settings"
-import Schedule from "@/components/page/broadcast/schedule"
-import Finalize from "@/components/page/broadcast/finalize"
-import Link from "next/link"
 
-interface Step {
-  id: number
-  title: string
-}
+export default function BroadcastCampaign() {
+  const  [templateSelectionDialog,setTemplateSelectionDialog] = useState(false)
 
-const steps: Step[] = [
-  { id: 1, title: "Select Template" },
-  { id: 2, title: "Recipients & Contents" },
-  { id: 3, title: "Settings" },
-  { id: 4, title: "Schedule" },
-  { id: 5, title: "Finalize" },
-]
 
-export default function BroadcastHeader() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [completedSteps, setCompletedSteps] = useState<number[]>([])
 
-  const handleStepClick = (stepId: number) => {
-    if (stepId < currentStep || completedSteps.includes(stepId - 1) || stepId === 1) {
-      setCurrentStep(stepId)
-    }
-  }
-
-  const handleProceed = () => {
-    if (currentStep < steps.length) {
-      setCompletedSteps((prev) => [...prev, currentStep])
-      setCurrentStep((prev) => prev + 1)
-    }
-  }
-
-  const handleBackward = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1)
-    }
-  }
-
+ 
   return (
-    <>
-      <div className="w-full  py-3 sm:flex block items-center justify-between ">
-        <Link className=" font-semibold xl:text-2xl lg:text-xl md:text-lg text-base  text-white" href={"/broadcast/create"}>
-          Create Broadcast Campaign
-        </Link>
-
-        <div className="hidden xl:flex  items-center gap-2 flex-1 mx-8">
-          {steps.map((step, index) => (
-            <div key={step.id} className="flex items-center">
-              <button
-                onClick={() => handleStepClick(step.id)}
-                disabled={!completedSteps.includes(step.id - 1) && step.id !== 1 && step.id > currentStep}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-full",
-                  currentStep === step.id && "bg-[#D7D7D7] ",
-                  " transition-colors",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                )}
-              >
-                <span className={cn("text-sm text-white", currentStep === step.id && "text-black font-semibold")}>
-                  {step.title}
-                </span>
-                <div
-                  className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center text-xs",
-                    currentStep === step.id || completedSteps.includes(step.id)
-                      ? "bg-blue-600 text-white"
-                      : "border-2 bg-[#D7D7D7] text-black",
-                  )}
-                >
-                  {completedSteps.includes(step.id) ? (
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.6667 3.5L5.25 9.91667L2.33333 7"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  ) : (
-                    step.id
-                  )}
-                </div>
-              </button>
-              {index < steps.length - 1 && <div className="h-[2px] w-4 bg-gray-700 mx-2" />}
-            </div>
-          ))}
-        </div>
-
-        <div className="flex sm:w-auto w-full justify-end items-center gap-2">
-          <div className="text-white lg:hidde flex mr-9">STEP: {currentStep}/5</div>
-
-          <div className="md:hidden flex gap-2">
-            <Button
-              className=""
-              variant={"outline"}
-              size={"icon"}
-              onClick={handleBackward}
-              disabled={currentStep === 1}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-            <Button
-              className=""
-              variant={"outline"}
-              size={"icon"}
-              onClick={handleProceed}
-              disabled={currentStep === steps.length}
-            >
-              <ChevronRight className="h-6 w-6" />
-            </Button>
-          </div>
-          <Link href={"/broadcast"}>
+    <ScrollArea className="  text-white p-4 h-[90vh] ">
+      <div className=" mx-auto">
+        <header className="flex items-center justify-between mb-8">
+          <h1 className="text-xl font-semibold">Create Broadcast Campaign</h1>
+          <div className="flex gap-2">
             <Button
               variant="outline"
-              className="bg-[#1C1D36] text-white hover:text-slate-50 border-none hover:bg-[#2C2D46] md:block hidden"
+              className="bg-transparent border-primary py-3 px-7"
             >
               Exit
             </Button>
-          </Link>
+            <Button className="bg-blue-500 py-3 px-7">
+              Proceed
+            </Button>
+          </div>
+        </header>
 
-          <Button
-            onClick={handleProceed}
-            className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed md:block hidden"
-          >
-            Proceed
-          </Button>
-        </div>
-      </div>
-      <div className="flex gap-6 md:p-6  p-2 min-h-screen">
-        <div className="flex-1 flex gap-6 rounded-3xl h-[calc(100vh-4rem)]">
-          {currentStep === 1 && <SelectTemplate />}
-          {currentStep === 2 && <RecipientContents />}
-          {currentStep === 3 && <Settings />}
-          {currentStep === 4 && <Schedule />}
-          {currentStep === 5 && <Finalize />}
-        </div>
-        <div className="w-[400px] lg:block hidden">
-          <div className="sticky top-6">
-            <h2 className="text-xl font-semibold text-white mb-4">Preview</h2>
-            <div className="bg-[#1E2A47] rounded-2xl p-4 w-full">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-white text-lg font-semibold">Exclusive Offer On Product</h2>
+        <div className="space-y-8">
+          <div className=" flex justify-between gap-10 items-center">
+            <div className="basis-1/2 flex flex-col gap-5">
+            <div className="space-y-4">
+            <Label className="text-2xl ">
+                  BroadCast Name
+                </Label>
+              <Input
+                placeholder="Enter broadcast name"
+                className="bg-transparent border-gray-600 text-white p-6 rounded-3xl"
+              />
+              </div>
+              <div className="space-y-2 " >
+                <Label className="text-2xl text-white">
+                  Select Template <span className="text-red-500">*</span>
+                </Label>
+                <p className=" text-gray-400">
+                  Select a template for broadcast messages
+                </p>
+                <Button
+                 
+                  className="bg-transparent bg-blue-500 text-white hover:bg-blue-600"
+                  onClick={() => setTemplateSelectionDialog(true)}
+                >
+                  Select Template
+                </Button>
+                <TemplateBuilder open={templateSelectionDialog} setOpen={setTemplateSelectionDialog} />
+              </div>
+            </div>
+
+            <div className="basis-1/2 flex flex-col gap-5">
+              <div className="space-y-4">
+              <Label className="text-2xl ">
+                  Category
+                </Label>
+                <Select>
+                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white p-6 rounded-3xl">
+                    <SelectValue placeholder="Select a Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="category1">Category 1</SelectItem>
+                    <SelectItem value="category2">Category 2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 ">
+                <Label className=" text-white text-2xl">
+                  Recipients <span className="text-red-500">*</span>
+                </Label>
+                <p className=" text-gray-400">
+                  You can upload an Excel sheet or select a Shopify segment.
+                </p>
+                <SelectContactDialog>
+                <Button className="bg-blue-500 hover:bg-blue-500">
+                  <Upload className="w-4 h-4 mr-2" /> Upload Recipients
+                </Button>
+                </SelectContactDialog>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-2xl text-white">
+              Add Content <span className="text-red-500">*</span>
+            </h3>
+         
+            <div className="space-y-2">
+              <Label className="text-sm">Image</Label>
+              <p className=" text-gray-400">
+                Upload an image under 5 MB with a recommended aspect ratio of
+                1.91:1.
+              </p>
+              <Button className="bg-blue-500">
+                <Upload className="w-4 h-4 mr-2" /> Upload Image
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm">Body</Label>
+              <p className="text-xs text-gray-400\">
+                Enter the &lt;span className=&quot;text-gray-400&quot;&gt;{1}
+                &lt;/span&gt; parameter for your message.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">{`{1`}</span>
+                  <Checkbox className="border-gray-600" />
+                  <span className="text-sm text-gray-400">
+                    From Shopify Segment
+                  </span>
+                </div>
+                <Input
+                  placeholder="Enter the parameter for {{1}}"
+                  className="bg-transparent border-gray-600 text-white"
+                />
+                <Input
+                  placeholder="Alternative for {{1}}"
+                  className="bg-transparent border-gray-600 text-white"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm">CTA Button</Label>
+              <p className="text-xs text-gray-400">
+                Enter the URL for the CTA Button
+              </p>
+              <Input
+                placeholder="Enter the URL"
+                className="bg-transparent border-gray-600 text-white"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm text-gray-400">
+              Select reply action <span className="text-red-500">*</span>
+            </Label>
+            <p className="text-xs text-gray-400">
+              Auto-reply bot for responses. If the user replies within 72 hours
+              of getting the message.
+            </p>
+            <Select>
+              <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
+                <SelectValue placeholder="Transfer Bot" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="transfer">Transfer Bot</SelectItem>
+                <SelectItem value="auto-reply">Auto Reply</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">UTM Parameters</h3>
+              <p className="text-xs text-gray-400">
+                Link in this broadcast will include additional tracking
+                information called UTM parameters. This allows source tracking
+                within third party reporting tools such as Google Analytics
+              </p>
+              <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                + Add Parameters
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">
+                Audience Filtering Options
+              </h3>
+              <p className="text-xs text-gray-400">
+                An advance audience filtering options for an effective
+                broadcasting
+              </p>
+              <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                + Add Filter
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Messaging Limit</h3>
+            <p className="text-sm">
+              What to do when the messaging limit exceeds?
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="pause"
+                  className="border-gray-600"
+                  defaultChecked
+                />
+                <Label htmlFor="pause" className="text-sm">
+                  Pause Broadcast (recommended)
+                </Label>
+              </div>
+              <p className="text-xs text-gray-400 ml-6">
+                The broadcast will pause automatically and resume when the limit
+                resets.
+              </p>
+
+              <div className="flex items-center gap-2">
+                <Checkbox id="skip" className="border-gray-600" />
+                <Label htmlFor="skip" className="text-sm">
+                  Skip messaging limit check and try sending to all.
+                </Label>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Schedule</h3>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div>
+                <Label className="text-sm">Frequency</Label>
+                <Select>
+                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
+                    <SelectValue placeholder="Once" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="once">Once</SelectItem>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <ScrollArea className="bg-white rounded-lg p-3 h-[550px]">
-                <img
-                  src="https://images.unsplash.com/photo-1737223450924-5e1a0d5ab85f"
-                  alt="Product"
-                  className="aspect-square w-full max-h-60 object-cover rounded-lg mb-3"
-                />
+              <div>
+                <Label className="text-sm">Date (IST)</Label>
+                <Select>
+                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
+                    <SelectValue placeholder="Jan 24, 2025" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="jan24">Jan 24, 2025</SelectItem>
+                    <SelectItem value="jan25">Jan 25, 2025</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                <h3 className="text-gray-800 text-base font-medium mb-2">Exclusive Offer on [Product Name]!</h3>
-
-                <div className="space-y-2 text-sm">
-                  <p className="flex items-center gap-2">
-                    <span className="text-orange-500">🔥</span>
-                    <span className="font-medium">Grab It Before It&apos;s Gone!</span>
-                  </p>
-
-                  <p className="text-gray-700">Looking for [Product Name]? We&apos;ve got the best deal for you!</p>
-
-                  <p className="flex items-center gap-2">
-                    <span>⭐</span>
-                    <span>Discounted Price: [Price]</span>
-                    <span>📦</span>
-                    <span>Free Delivery</span>
-                  </p>
-
-                  <p className="text-gray-700">🛒 Order Now on [E-Commerce Website Name]!</p>
-
-                  <p className="text-gray-700">Message us on WhatsApp to get link to claim your offer.</p>
-
-                  <p className="flex items-center gap-2 text-gray-700">
-                    <span>📱</span>
-                    <span className="text-blue-600 underline cursor-pointer">
-                      Click Here to Chat Now [Insert WhatsApp Link]
-                    </span>
-                  </p>
-                </div>
-              </ScrollArea>
+              <div>
+                <Label className="text-sm">Time</Label>
+                <Select>
+                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
+                    <SelectValue placeholder="10:00 AM" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10am">10:00 AM</SelectItem>
+                    <SelectItem value="11am">11:00 AM</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Run test message</h3>
+            <div className="space-y-2">
+              <Label className="text-sm">Enter the mobile number</Label>
+              <Input
+                placeholder="+91 9876543212"
+                className="bg-transparent border-gray-600 text-white w-full md:w-72"
+              />
+            </div>
+            <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+              Send Text Message
+            </Button>
           </div>
         </div>
       </div>
-    </>
-  )
+    </ScrollArea>
+  );
 }
-

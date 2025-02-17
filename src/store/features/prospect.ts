@@ -46,14 +46,14 @@ interface ProspectState {
   prospects: Prospect[]; // List of all prospects
   selectedProspect: Prospect | null; // Holds the selected prospect
   openMenuModal: boolean;
-  lastchattime: string;
+
 }
 
 const initialState: ProspectState = {
   prospects: [],
   selectedProspect: null,
   openMenuModal: false,
-  lastchattime: "",
+
 };
 
 const ProspectSlice = createSlice({
@@ -115,9 +115,7 @@ const ProspectSlice = createSlice({
     },
 
     // Update the last chat time
-    updateLastChatTime: (state, action: PayloadAction<string>) => {
-      state.lastchattime = action.payload;
-    },
+   
     updateLastChat: (state, action: PayloadAction<Chat>) => {
       const incomingChat = action.payload;
       const prospect = find(state.prospects, { id: incomingChat.prospectId });
@@ -126,6 +124,13 @@ const ProspectSlice = createSlice({
         prospect.chats = [incomingChat];
       }
     },
+    clearlastChat:(state,action:PayloadAction<string>)=>{
+      const prospect = find(state.prospects, { id: action.payload });
+      if (prospect) {
+        // Replace the entire chats array with the incoming chat
+        prospect.chats = [];
+      }
+    }
     
   },
 });
@@ -136,8 +141,8 @@ export const {
   removeProspect,
   clearSelectedProspects,
   toggleMenuModal,
-  updateLastChatTime,
-  updateLastChat
+  updateLastChat,
+  clearlastChat
 } = ProspectSlice.actions;
 
 export default ProspectSlice.reducer;

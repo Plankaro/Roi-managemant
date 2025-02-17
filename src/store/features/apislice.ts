@@ -114,6 +114,22 @@ export const apiSlice = createApi({
         params: {prospect_id }, // Pass parameters here
       }),
     }),
+    deleteChats: builder.mutation<void, { prospect_id: string }>({
+      query: ({ prospect_id }) => ({
+        url: `chats`,
+        method: "DELETE",
+        params: { prospect_id }, // Pass parameters correctly
+      }),
+    }),
+    markasread:builder.mutation({
+      query: ({prospectId, body}) => ({
+        url: `/chats/${prospectId}`,
+        method: "PATCH",
+        body,
+        
+      }),
+    }),
+    
     sendText: builder.mutation({
       query: (sendChatDto) => ({
         url: '/chats/text',
@@ -169,6 +185,8 @@ export const {
   useGetProductsQuery,
   useCreateOrderMutation,
   useGetChatsQuery,
+  useMarkasreadMutation,
+  useDeleteChatsMutation,
   useSendTextMutation,
   useGetAllTemplatesQuery,
   useUploadFilesMutation,

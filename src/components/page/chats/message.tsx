@@ -16,7 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { IoIosDocument } from "react-icons/io";
 import { orderBy } from "lodash";
 import { Clock, Send, Check, CheckCircle2, AlertCircle } from "lucide-react";
-import { updateLastChatTime } from "@/store/features/prospect";
+import { updateLastChat } from "@/store/features/prospect";
+import { getStatusIcon } from "./getchatstatus";
 
 function MessagesSkeleton() {
   return (
@@ -86,6 +87,7 @@ const selectedChats = useSelector((state: RootState) =>
   
   )
 );
+
 
   
 
@@ -242,17 +244,7 @@ const selectedChats = useSelector((state: RootState) =>
                               ))}
                           </div>
                           <div className={`mt-2  w-full ${isMyMessage ? "flex" : "hidden"} justify-end text-[10px] items-center gap-2`} >
-                            {chat.Status === "pending" ? (
-                              <Clock className="h-4 w-4"/>
-                            ) : chat.Status === "sent" ? (
-                              <Send className="h-4 w-4"/>
-                            ) : chat.Status === "delivered" ? (
-                              <Check className="h-4 w-4"/>
-                            ) : chat.Status === "read" ? (
-                              <CheckCircle2 className="h-4 w-4"/>
-                            ) : chat.Status === "failed" ? (
-                              <AlertCircle className="h-4 w-4"/>
-                            ) : null}
+                       {getStatusIcon(chat.Status)}
                             {chat.Status}
                           </div>
                         </div>

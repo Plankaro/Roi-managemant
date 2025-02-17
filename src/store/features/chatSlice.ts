@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { find, uniqBy } from "lodash";
 
 // Define Chat Type
@@ -23,6 +24,7 @@ export type Chat = {
   Status: MessageStatus;
   prospectId: string; // Ensures each chat is linked to a prospect
 };
+
 
 // Define Enums
 export enum MessageStatus {
@@ -99,7 +101,9 @@ const chatSlice = createSlice({
     },
 
     clearChats: (state, action: PayloadAction<string>) => {
+      console.log("Clearing chats for prospect:", action.payload);
       const prospectChatGroup = find(state.chats, { prospectId: action.payload });
+      console.log("delete",prospectChatGroup);
       if (prospectChatGroup) {
         prospectChatGroup.chats = [];
       }

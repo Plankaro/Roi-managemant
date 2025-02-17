@@ -27,11 +27,10 @@ export default function SignUpPage() {
           
           
           const { data } = promise;
-          console.log("first_hit",data);
-          
+    
           if (data.email) {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/token-link`,{email:data.email});
-            console.log("second-hit",response)
+           await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/token-link`,{email:data.email});
+   
           }
          
           

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-
+import { useSession } from "next-auth/react";
 import Person from "@/components/icons/person";
 import PersonAlert from "@/components/icons/person-alert";
 import ScrollableContactDialog from "@/components/page/chats/contacts";
@@ -20,6 +20,9 @@ import FilterDropdown from "@/components/page/chats/filter-dropdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addProspect } from "@/store/features/prospect";
 import { useEffect, useState } from "react";
+import { format } from 'date-fns';
+import { getStatusIcon } from "@/components/page/chats/getchatstatus";
+
 
 
 export function ChatListSkeleton() {
@@ -47,10 +50,11 @@ export function ChatListSkeleton() {
 }
 
 const ChatLists = () => {
+  const session:any = useSession();
   const dispatch = useDispatch<AppDispatch>();
   const {data,isLoading} = useGetProspectQuery({})
   const [searchQuery, setSearchQuery] = useState("");
-
+  const user = session?.data?.user?.user
   const {selectedProspect,prospects} = useSelector((state: RootState) => state.Prospect);
   console.log(prospects)
 
@@ -108,15 +112,16 @@ const ChatLists = () => {
         </div>
       </div>
       {isLoading ? <ChatListSkeleton />:  <ScrollArea className="w-full no-scrollbar">
-        <div className="space-y-2 p-2 w-full">
+        <div className="space-y-2 p-1 w-full">
           {filteredProspects  && filteredProspects.map((contact: any) => {
+           console.log(user?.buisness?.whatsapp_mobile ,contact.chats[0]?.receiverPhoneNo)
          
             return(
               <button
               key={contact.id}
               className={cn(
-                " p-3 rounded-lg text-left transition-colors w-full overflow-y-auto",
-                selectedProspect?.id==contact.id ? "bg-primary text-white":"hover:bg-primary hover:text-white"
+                " p-3 rounded-md text-left transition-colors w-full overflow-y-auto",
+                selectedProspect?.id==contact.id ? "bg-primary text-white":"hover:bg-gray-900 hover:text-white"
               )}
               onClick={() => {
                 dispatch(selectProspect(contact));
@@ -146,12 +151,14 @@ const ChatLists = () => {
                       {contact.name || contact.phoneNo}
                     </p>
                     <span className="text-xs text-gray-400">
-                      {contact.message?.[0].created_at??""}
+                    {contact?.chats?.[0]?.createdAt && format(new Date(contact.chats[0].createdAt), 'hh:mm a')}
                     </span>
                   </div>
                   <div className="flex lg:gap-4 gap-2 items-center justify-between w-full">
-                    <p className="text-sm text-gray-400 line-clamp-1 mt-auto max-w-56">
-                      {contact.chats?.[0]?.body_text??"Send your first message"}
+                    <p className={`text-sm flex gap-3 items-center   mt-auto basis-3/4`}>
+                      
+                    <span className={`${user?.buisness?.whatsapp_mobile===contact.chats[0]?.receiverPhoneNo && "hidden"} text-white`}> {getStatusIcon(contact.chats?.[0]?.Status)} </span>
+                    <span className={`line-clamp-1 ${user?.buisness?.whatsapp_mobile===contact.chats[0]?.receiverPhoneNo && contact.chats?.[0]?.Status=="delivered" ? "font-black text-white":"text-gray-400"}`}>{contact.chats?.[0]?.body_text??"Send your first message"}</span>
                     </p>
 
                   {contact.assignedTo ? <Person /> : <PersonAlert />}

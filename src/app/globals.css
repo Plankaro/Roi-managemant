@@ -84,12 +84,7 @@ backdrop-filter: blur(10px);
 
 
 @layer utilities {
-  .border-gradiant{
-    /* border: 1px solid; 
-    border-image-source: linear-gradient(180deg, #1B2A48 0%, #4166AE 100%);
-    border-image-slice: 1;
-    border-radius: 20px !important; */
-  }
+
 
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
@@ -101,6 +96,13 @@ backdrop-filter: blur(10px);
   .no-scrollbar {
       -ms-overflow-style: none;  /* IE and Edge */
       scrollbar-width: none;  /* Firefox */
+}
+
+.border-gradient {
+  border: 2px solid ;
+  border-image-source: linear-gradient(180deg, #1B2A48 0%, #4166AE 100%);
+  border-image-slice: 1;
+  border-radius: 999px; 
 }
 
 }
