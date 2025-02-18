@@ -29,7 +29,7 @@ export default function BroadcastPage() {
         </div>
 
         {/* Broadcast Grid */}
-        <ScrollArea className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 h-[75vh] no-scrollbar overflow-y-auto">
+        <ScrollArea className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 h-[calc(100vh-270px)] no-scrollbar overflow-y-auto">
   {[...Array(8)].map((_, i) => (
     <BroadcastCard key={i} />
   ))}

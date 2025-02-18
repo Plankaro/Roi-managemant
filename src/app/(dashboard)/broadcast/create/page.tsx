@@ -15,6 +15,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import SelectContactDialog from "@/components/page/broadcast/selectcontactDialog";
+import { UTMParametersDialog } from "@/components/page/broadcast/utmparameters";
+import { AudienceFilteringDialog } from "@/components/page/broadcast/advancefiltering";
 
 
 export default function BroadcastCampaign() {
@@ -182,9 +184,11 @@ export default function BroadcastCampaign() {
                 information called UTM parameters. This allows source tracking
                 within third party reporting tools such as Google Analytics
               </p>
+              <UTMParametersDialog>
               <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
                 + Add Parameters
               </Button>
+              </UTMParametersDialog>
             </div>
 
             <div className="space-y-2">
@@ -195,9 +199,11 @@ export default function BroadcastCampaign() {
                 An advance audience filtering options for an effective
                 broadcasting
               </p>
+              <AudienceFilteringDialog>
               <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
                 + Add Filter
               </Button>
+              </AudienceFilteringDialog>
             </div>
           </div>
 

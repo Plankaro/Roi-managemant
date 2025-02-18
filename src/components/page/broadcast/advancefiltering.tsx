@@ -5,14 +5,11 @@ import { Label } from "@radix-ui/react-label";
 import { Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export function AudienceFilteringDialog() {
+export function AudienceFilteringDialog({children}: {children: React.ReactNode}) {
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <Button size="lg" variant="outline" className="gap-2">
-            <Filter className="w-5 h-5" />
-            Audience Filters
-          </Button>
+          {children}
         </DialogTrigger>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -81,7 +78,7 @@ export function AudienceFilteringDialog() {
     );
   }
 
-  function NumberInput({ value, onChange, min = 1, max = 999 }) {
+  function NumberInput({ value, onChange, min = 1, max = 999 }: { value: number; onChange: (value: number) => void; min?: number; max?: number }) {
     return (
       <div className="flex items-center space-x-1">
         <Button
