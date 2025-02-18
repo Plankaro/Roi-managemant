@@ -5,8 +5,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { PieChart, Pie, Cell, Label } from "recharts"
-import { BentoGrid } from "@/components/ui/bentogrid"
+import { BentoGrid, BentoGridItem } from "@/components/ui/bentogrid"
 import MessageStatus from "@/components/page/broadcast/messagestatus"
+import ProfitChart from "@/components/page/broadcast/profit"
+import Funnel from "@/components/page/broadcast/funnel"
+import PreviewComponent from "@/components/page/broadcast/previewComponent"
+import BroadcastAndRetries from "@/components/page/broadcast/Broadcastretries"
 
 const metrics = [
   { label: "Orders", value: "641" },
@@ -17,19 +21,12 @@ const metrics = [
   { label: "Replies", value: "12" },
 ]
 
-const deliveryData = [
-  { name: "Received", value: 1500, color: "#8884d8" },
-  { name: "Retry", value: 200, color: "#4B5563" },
-  { name: "Failed", value: 121, color: "#EF4444" },
-  { name: "Skipped", value: 100, color: "#2563EB" },
-]
+
 
 export default function BroadcastDetails() {
-  const [expandedCell, setExpandedCell] = useState<string | null>(null)
 
-  const handleCellClick = (cellId: string) => {
-    setExpandedCell(expandedCell === cellId ? null : cellId)
-  }
+
+
 
   return (
     <div className="min-h-screen bg-transparent p-6">
@@ -44,22 +41,53 @@ export default function BroadcastDetails() {
       </div>
 
       <ScrollArea className="h-[calc(100vh-160px)] bg-transparent">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <div className="grid sm:grid-cols-2 grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           {metrics.map((metric, index) => (
-            <Card key={index} className="border-primary bg-transparent">
-              <CardContent className="p-4">
+            <div key={index} className="border-primary border bg-transparent">
+              <div className="p-4">
                 <p className="text-sm text-gray-400">{metric.label}</p>
                 <p className="text-lg font-semibold mt-1 text-white">{metric.value}</p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
+        <BentoGrid className="gap-3 px-3">
+  {gridComponents.map((gridComponent, i) => (
+    <BentoGridItem
+      key={i}
+      className={`
+        /* Base / Medium screens */
+      
 
-        <MessageStatus/>
+
+        ${i === 0 ? "" : ""} 
+        ${i === 1 ? "" : ""} 
+        ${i === 2 ? "" : ""} 
+        ${i === 3 ? "" : ""} 
+        ${i === 4 ? "" : ""}
+
+       
+        ${i === 0 ? "xl:col-span-3 xl:row-span-2 xl:order-1 lg:col-span-3 lg:row-span-2" : ""}
+        ${i === 1 ? "xl:col-span-2 xl:row-span-1 xl:order-2 lg:col-span-5 lg:row-span-1" : ""}
+        ${i === 2 ? "xl:col-span-3 xl:row-span-1 xl:order-3 lg:col-span-5 lg:row-span-1" : ""}
+        ${i === 3 ? "xl:col-span-5 xl:row-span-4 xl:order-4 lg:order-5 lg:col-span-5 lg:row-span-4 " : ""}
+        ${i === 4 ? "xl:col-span-3 xl:row-span-3 xl:order-5 lg:col-span-3 lg:row-span-3 " : ""}
+      `}
+    >
+      {gridComponent}
+    </BentoGridItem>
+  ))}
+</BentoGrid>
       </ScrollArea>
     </div>
   )
 }
-
+const gridComponents = [
+  <MessageStatus key="message-status" />,
+  <ProfitChart key="profit-chart" />,
+  <Funnel key="funnel" />,
+  <PreviewComponent key="preview-component" />,
+  <BroadcastAndRetries key="broadcast-retries" />
+];
 
 
