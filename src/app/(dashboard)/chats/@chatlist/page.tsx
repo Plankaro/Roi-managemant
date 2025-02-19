@@ -78,7 +78,7 @@ const ChatLists = () => {
 
   console.log(selectedProspect)
   return (
-    <div className={`md:max-w-md md:flex   ${selectedProspect ? "hidden" : "flex"} w-full border rounded-[20px] xl:basis-2/5 md:basis-4/12 border-primary backdrop-blur-xl flex-col h-full overflow-hidden  `}>
+    <div className={`md:max-w-md md:flex bg-backgroundColor  ${selectedProspect ? "hidden" : "flex"} w-full border rounded-[20px] xl:basis-2/5 md:basis-4/12 border-primary backdrop-blur-xl flex-col h-full overflow-hidden  `}>
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white">All Chats</h2>

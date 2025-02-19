@@ -149,7 +149,7 @@ const selectedChats = useSelector((state: RootState) =>
       {isLoading ? (
         <MessagesSkeleton />
       ) : (
-        <ScrollArea className="flex-1 pt-20 pb-4">
+        <ScrollArea className="flex-1 pt-20 pb-4 bg-backgroundColor">
           <div className="space-y-4 p-4">
             {selectedChats &&
               selectedChats.length > 0 &&

@@ -83,6 +83,7 @@ export default {
     				'800': '#7f0f13',
     				'900': '#610b0f'
     			},
+				backgroundColor:"#0D0D0D4D",
     			white: '#ffffff',
     			black: '#000000',
     			sidebar: {

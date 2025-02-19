@@ -6,14 +6,14 @@ import { FlameIcon as Fire, MessageSquare } from "lucide-react"
 export default function BroadcastDashboard() {
   return (
     <div className=" w-full">
-      <Card className="  text-white bg-transparent border-primary border p-6">
+      <Card className="  text-white bg-transparent border-primary border sm:p-6 p-2">
         {/* Estimated Spend Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-2xl font-bold">Estimated Spend</h2>
-            <span className="text-2xl font-bold">₹5000</span>
+            <h2 className="md:text-2xl text-base font-bold">Estimated Spend</h2>
+            <span className="md:text-2xl text-base font-bold flex gap-3"><span>₹</span>5000</span>
           </div>
-          <p className="text-sm text-muted-foreground">Spend is calculated according to recipients country code</p>
+          <p className="md:text-sm text-xs stext-muted-foreground">Spend is calculated according to recipients country code</p>
         </div>
         <hr  className="my-3"/>
 
@@ -21,7 +21,7 @@ export default function BroadcastDashboard() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Information Section */}
           <div>
-            <h2 className="text-2xl font-bold mb-6">Information</h2>
+            <h2 className="md:text-2xl sm:text-xl text-lg font-bold mb-6">Information</h2>
             <div className="space-y-4">
               <InfoRow label="Template Name" value="ABC broadcast" />
               <InfoRow label="Tags" value="No tags added" />
@@ -73,13 +73,13 @@ export default function BroadcastDashboard() {
     </div>
   )
 }
-
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-muted-foreground min-w-[140px]">{label}</span>
-      <span>: {value}</span>
+      <span className="text-muted-foreground min-w-[140px] md:text-base sm:text-sm text-xs">
+        {label}
+      </span>
+      <span className="md:text-base sm:text-sm text-xs flex-1 break-words">: {value}</span>
     </div>
-  )
+  );
 }
-

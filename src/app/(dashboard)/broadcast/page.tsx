@@ -10,12 +10,13 @@ import Link from "next/link";
 export default function BroadcastPage() {
   return (
     <div className=" ">
-      <div className="container mx-auto p-4 space-y-6">
+      <div className=" mx-auto p-4 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white">Broadcast</h1>
           <Button className="bg-blue-600 hover:bg-blue-700">
-            + Broadcast Campaigns
+            +
+            <span className="md:block hidden"> Broadcast Campaigns</span>
           </Button>
         </div>
 
@@ -42,8 +43,8 @@ export default function BroadcastPage() {
 function BroadcastCard() {
   return (
   <Link href={"/broadcast/1"}>
-    <Card className="bg-[#19191980]  border-primary text-white p-4">
-      <CardContent className="p-4 space-y-4">
+    <Card className="bg-[#19191980]  border-primary text-white md:p-4 p-2">
+      <CardContent className=" md:p-4 p-2 space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">Title of broadcast</h3>

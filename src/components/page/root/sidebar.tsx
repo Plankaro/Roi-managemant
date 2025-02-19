@@ -5,7 +5,7 @@ import { AIBuilder } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import {
   BetweenHorizonalEnd,
-  Database,
+
   LineChart,
   LogOut,
   MessageSquare,
@@ -14,6 +14,7 @@ import {
 
   X,
 } from "lucide-react";
+import { RiAccountPinBoxFill } from "react-icons/ri";
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
@@ -32,7 +33,7 @@ export const sidebarItems = [
   { icon: BetweenHorizonalEnd, label: "Broadcast", slug: "/broadcast" },
   { icon: AIBuilder, label: "AI Builder", slug: "/ai-builder" },
   { icon: LineChart, label: "Analytics", slug: "/analytics" },
-  { icon: Database, label: "Data Integration", slug: "/data-integration" },
+  { icon: RiAccountPinBoxFill, label: "Prospects", slug: "/prospects" },
   { icon: Users, label: "Agents", slug: "/agents" },
 ];
 
@@ -45,15 +46,15 @@ const Sidebar = () => {
   const dispatch = useDispatch();
 
   return (
-    <>
+  
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-navy-900 p-3 !rounded-r-[20px] flex flex-col border border-primary backdrop-blur-3xl transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-40 md:bg-backgroundColor bg-primary   overflow-y-scroll  no-scrollbar  p-3 md:rounded-lg flex flex-col border border-primary transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "md:translate-x-0 md:static md:w-auto"
+          "md:translate-x-0 md:static  xl:min-w-[230px]"
         )}
       >
-        <nav className="space-y-2 flex-1">
+        <nav className="space-y-2 flex-1  ">
           <div className="flex m-2 justify-between items-center">
             <Logo width={120} height={58} className="md:hidden inline" />
 
@@ -115,7 +116,7 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
-    </>
+
   );
 };
 

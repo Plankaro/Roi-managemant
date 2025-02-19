@@ -92,7 +92,7 @@ export default function MessageStatus() {
             {totalMessages.toLocaleString()} <span className="text-sm font-normal text-zinc-400">messages sent</span>
           </p>
         </CardHeader>
-        <CardContent className="space-y-8">
+        <CardContent className="space-y-8 md:p-6 p-1">
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 min-h-[200px]">
             <div className="relative w-full h-full min-h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -113,7 +113,7 @@ export default function MessageStatus() {
             </div>
             <div className="flex flex-col gap-4 justify-center">
               {chartData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-2 md:ml-0 ml-4">
                   <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.fill }} />
                   <span className="text-sm text-zinc-400">{item.name}</span>
                 </div>
@@ -123,8 +123,8 @@ export default function MessageStatus() {
 
           <Tabs defaultValue="failed" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-transparent">
-              <TabsTrigger value="failed">Failed Reasons</TabsTrigger>
-              <TabsTrigger value="skipped">Skipped Reasons</TabsTrigger>
+              <TabsTrigger value="failed" className="text-xs sm:text-base">Failed Reasons</TabsTrigger>
+              <TabsTrigger value="skipped" className="text-xs sm:text-base">Skipped Reasons</TabsTrigger>
             </TabsList>
             <TabsContent value="failed">
               <ScrollArea className="h-[200px] w-full border-none p-4 no-scrollbar">

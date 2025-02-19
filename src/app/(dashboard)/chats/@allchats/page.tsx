@@ -562,7 +562,7 @@ const handleDeleteChats=async(id: string)=>{
                 </div>
 
                 {/* Contact Info */}
-                <div className="space-y-4">
+                <div className="space-y-4 ">
            
                     <div
                    

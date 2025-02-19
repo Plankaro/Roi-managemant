@@ -90,18 +90,18 @@ export default {
         }),
     ],
     callbacks: {
-        authorized({ request: { nextUrl }, auth }) {
-            const isLoggedIn = !!auth?.user;
-            const { pathname } = nextUrl;
+        // authorized({ request: { nextUrl }, auth }) {
+        //     const isLoggedIn = !!auth?.user;
+        //     const { pathname } = nextUrl;
             
-            // Allow any route that starts with one of the auth route prefixes.
-            if (authRoute.some((route) => pathname.startsWith(route))) {
-              return true;
-            }
+        //     // Allow any route that starts with one of the auth route prefixes.
+        //     if (authRoute.some((route) => pathname.startsWith(route))) {
+        //       return true;
+        //     }
             
-            // For all other routes, require the user to be logged in.
-            return isLoggedIn || Response.redirect(new URL('/sign-in', nextUrl));
-          },
+        //     // For all other routes, require the user to be logged in.
+        //     return isLoggedIn || Response.redirect(new URL('/sign-in', nextUrl));
+        //   },
         jwt: async ({ token, account, user }: any) => {
        
             if (token.access_token) {
