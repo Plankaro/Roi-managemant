@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,19 +13,98 @@ import {
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import SelectContactDialog from "@/components/page/broadcast/selectcontactDialog";
 import { UTMParametersDialog } from "@/components/page/broadcast/utmparameters";
 import { AudienceFilteringDialog } from "@/components/page/broadcast/advancefiltering";
+import AddContentForm from "@/components/page/broadcast/addcontentForm";
 
 
-export default function BroadcastCampaign() {
+export default function CreateBroadcastCampaign() {
   const  [templateSelectionDialog,setTemplateSelectionDialog] = useState(false)
+  const [selectTemplate, setselectTemplate] = useState<any>(null);
+  const [selectContacts, setSelectedContacts] = useState(null)
+  const [formData, setFormData] = useState<{
+      header: { type: string; value: string; isEditable: boolean }
+      body: { parameter_name: string; value: string }[]
+      buttons: { type: string; value: string,isEditable: boolean }[]
+    }>({
+      header: { type: "", value: "", isEditable: false },
+      body: [],
+      buttons: [],
+    })
 
 
+console.log(selectContacts)
 
+  useEffect(() => {
+    if (selectTemplate) {
+      const newFormData = {
+        header: { type: "", value: "", isEditable: false },
+        body: [] as { parameter_name: string; value: string }[],
+        buttons: [] as { type: string; value: string ;isEditable: boolean}[],
+      }
+
+      selectTemplate.components.forEach((component:any) => {
+        if (component.type === "HEADER") {
+          newFormData.header.type = component.format || ""
+          if (
+            ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
+            component.example?.header_handle
+          ) {
+            newFormData.header.value = component.example.header_handle[0]
+            newFormData.header.isEditable = true
+          } else if (component.format === "TEXT") {
+            if (
+              selectTemplate.parameter_format === "POSITIONAL" &&
+              component.example?.header_text
+            ) {
+              newFormData.header.value = component.example.header_text[0]
+              newFormData.header.isEditable = true
+            } else if (
+              selectTemplate.parameter_format === "NAMED" &&
+              component.example?.header_text_named_params
+            ) {
+              newFormData.header.value = component.example.header_text_named_params[0].example
+              newFormData.header.isEditable = true
+            } else {
+              newFormData.header.value = component.text || ""
+              newFormData.header.isEditable = false
+            }
+          }
+        } else if (component.type === "BODY") {
+          if (
+            selectTemplate.parameter_format === "POSITIONAL" &&
+            component.example?.body_text
+          ) {
+            newFormData.body = component.example.body_text[0].map((value:any, index:any) => ({
+              parameter_name: `{{${index + 1}}}`,
+              value,
+            }))
+          } else if (
+            selectTemplate.parameter_format === "NAMED" &&
+            component.example?.body_text_named_params
+          ) {
+            newFormData.body = component.example.body_text_named_params.map((param:any) => ({
+              parameter_name: `{{${param.param_name}}}`,
+              value: param.example,
+            }))
+          }
+        } else if (component.type === "BUTTONS" && component.buttons) {
+          newFormData.buttons = component.buttons.map((button:any) => ({
+            type: button.type,
+            value: button.type === "URL" ? button.url || "" : button.example?.[0] || "",
+            isEditable: /{{.+?}}/.test(button.type === "URL" ? button.url || "" : button.example?.[0] || "")
+          }))
+        }
+      })
+
+      setFormData(newFormData)
+    }
+  }, [selectTemplate])
  
+  console.log(formData)
   return (
     <ScrollArea className="  text-white p-4 h-[90vh] ">
       <div className=" mx-auto">
@@ -69,7 +149,7 @@ export default function BroadcastCampaign() {
                 >
                   Select Template
                 </Button>
-                <TemplateBuilder open={templateSelectionDialog} setOpen={setTemplateSelectionDialog} />
+                <TemplateBuilder open={templateSelectionDialog} setOpen={setTemplateSelectionDialog} selectedTemplate ={selectTemplate} setSelectedTemplate={setselectTemplate} />
               </div>
             </div>
 
@@ -95,7 +175,7 @@ export default function BroadcastCampaign() {
                 <p className=" text-gray-400">
                   You can upload an Excel sheet or select a Shopify segment.
                 </p>
-                <SelectContactDialog>
+                <SelectContactDialog selectContacts={selectContacts} setSelectedContacts={setSelectedContacts}>
                 <Button className="bg-blue-500 hover:bg-blue-500">
                   <Upload className="w-4 h-4 mr-2" /> Upload Recipients
                 </Button>
@@ -109,52 +189,9 @@ export default function BroadcastCampaign() {
               Add Content <span className="text-red-500">*</span>
             </h3>
          
-            <div className="space-y-2">
-              <Label className="text-sm">Image</Label>
-              <p className=" text-gray-400">
-                Upload an image under 5 MB with a recommended aspect ratio of
-                1.91:1.
-              </p>
-              <Button className="bg-blue-500">
-                <Upload className="w-4 h-4 mr-2" /> Upload Image
-              </Button>
-            </div>
+          
 
-            <div className="space-y-2">
-              <Label className="text-sm">Body</Label>
-              <p className="text-xs text-gray-400\">
-                Enter the &lt;span className=&quot;text-gray-400&quot;&gt;{1}
-                &lt;/span&gt; parameter for your message.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">{`{1`}</span>
-                  <Checkbox className="border-gray-600" />
-                  <span className="text-sm text-gray-400">
-                    From Shopify Segment
-                  </span>
-                </div>
-                <Input
-                  placeholder="Enter the parameter for {{1}}"
-                  className="bg-transparent border-gray-600 text-white"
-                />
-                <Input
-                  placeholder="Alternative for {{1}}"
-                  className="bg-transparent border-gray-600 text-white"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm">CTA Button</Label>
-              <p className="text-xs text-gray-400">
-                Enter the URL for the CTA Button
-              </p>
-              <Input
-                placeholder="Enter the URL"
-                className="bg-transparent border-gray-600 text-white"
-              />
-            </div>
+            <AddContentForm selectedContact={selectContacts} selectedTemplate={selectTemplate} formData={formData} setFormData={setFormData}/>
           </div>
 
           <div className="space-y-2">

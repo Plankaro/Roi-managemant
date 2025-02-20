@@ -1,10 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
-import { PieChart, Pie, Cell, Label } from "recharts"
 import { BentoGrid, BentoGridItem } from "@/components/ui/bentogrid"
 import MessageStatus from "@/components/page/broadcast/messagestatus"
 import ProfitChart from "@/components/page/broadcast/profit"
@@ -29,7 +25,7 @@ export default function BroadcastDetails() {
 
 
   return (
-    <div className=" bg-transparent md:p-6 p-1">
+    <div className=" bg-transparent  p-1">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-white">Broadcast- All Product of the month</h1>
         <div className="flex gap-2">

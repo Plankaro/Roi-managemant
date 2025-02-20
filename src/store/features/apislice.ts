@@ -129,6 +129,7 @@ export const apiSlice = createApi({
         
       }),
     }),
+
     
     sendText: builder.mutation({
       query: (sendChatDto) => ({
@@ -165,6 +166,12 @@ export const apiSlice = createApi({
         method: "POST",
         body: formData,
       }),
+    }),
+    getSegments: builder.query({
+      query: () => ({
+        url: "/customers/segments",
+        method: "GET",
+      }),
     })
 
   }),
@@ -192,5 +199,6 @@ export const {
   useUploadFilesMutation,
   useSendTemplatesMutation,
   useSendMediaMutation,
+  useGetSegmentsQuery,
 
 } = apiSlice;
