@@ -485,7 +485,7 @@ const handleDeleteChats=async(id: string)=>{
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <TemplateBuilder  />
+                    <TemplateBuilder   open={dialog} setOpen={setDialog}/>
                   </Button>
                   <Input
                     placeholder="Type a message..."

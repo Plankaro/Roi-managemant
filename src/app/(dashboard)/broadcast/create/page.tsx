@@ -19,58 +19,85 @@ import SelectContactDialog from "@/components/page/broadcast/selectcontactDialog
 import { UTMParametersDialog } from "@/components/page/broadcast/utmparameters";
 import { AudienceFilteringDialog } from "@/components/page/broadcast/advancefiltering";
 import AddContentForm from "@/components/page/broadcast/addcontentForm";
+import ScheduleBroadcast from "@/components/page/broadcast/schedule_broadcast";
 
 
 export default function CreateBroadcastCampaign() {
-  const  [templateSelectionDialog,setTemplateSelectionDialog] = useState(false)
+  const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [selectTemplate, setselectTemplate] = useState<any>(null);
-  const [selectContacts, setSelectedContacts] = useState(null)
+  const [selectContacts, setSelectedContacts] = useState(null);
   const [formData, setFormData] = useState<{
-      header: { type: string; value: string; isEditable: boolean }
-      body: { parameter_name: string; value: string }[]
-      buttons: { type: string; value: string,isEditable: boolean }[]
-    }>({
-      header: { type: "", value: "", isEditable: false },
-      body: [],
-      buttons: [],
-    })
+    header: { type: string; value: string; isEditable: boolean };
+    body: { parameter_name: string; value: string }[];
+    buttons: { type: string; value: string; isEditable: boolean }[];
+  }>({
+    header: { type: "", value: "", isEditable: false },
+    body: [],
+    buttons: [],
+  });
 
-
-console.log(selectContacts)
+  console.log(selectContacts);
 
   useEffect(() => {
     if (selectTemplate) {
       const newFormData = {
-        header: { type: "", value: "", isEditable: false },
-        body: [] as { parameter_name: string; value: string }[],
-        buttons: [] as { type: string; value: string ;isEditable: boolean}[],
-      }
+        header: {
+          type: "",
+          value: "",
+          isEditable: false,
+          fromsegment: false,
+          segmentname: "",
+          segmenttype: "",
+          segmentAltValue: "",
+        },
+        body: [] as {
+          parameter_name: string;
+          value: string;
+          fromsegment: boolean;
+          segmentname: string;
+          segmenttype: string;
+          segmentAltValue: string;
+        }[],
+        buttons: [] as { type: string; value: string; isEditable: boolean }[],
+      };
 
-      selectTemplate.components.forEach((component:any) => {
+      selectTemplate.components.forEach((component: any) => {
         if (component.type === "HEADER") {
-          newFormData.header.type = component.format || ""
+          newFormData.header.type = component.format || "";
           if (
             ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
             component.example?.header_handle
           ) {
-            newFormData.header.value = component.example.header_handle[0]
-            newFormData.header.isEditable = true
+            newFormData.header.value = "";
+            newFormData.header.isEditable = true;
           } else if (component.format === "TEXT") {
             if (
               selectTemplate.parameter_format === "POSITIONAL" &&
               component.example?.header_text
             ) {
-              newFormData.header.value = component.example.header_text[0]
-              newFormData.header.isEditable = true
+              newFormData.header.value = "";
+              newFormData.header.isEditable = true;
+              newFormData.header.fromsegment = false;
+              newFormData.header.segmentname = "";
+              newFormData.header.segmenttype = "";
+              newFormData.header.segmentAltValue = "";
             } else if (
               selectTemplate.parameter_format === "NAMED" &&
               component.example?.header_text_named_params
             ) {
-              newFormData.header.value = component.example.header_text_named_params[0].example
-              newFormData.header.isEditable = true
+              newFormData.header.value = "";
+              newFormData.header.isEditable = true;
+              newFormData.header.fromsegment = false;
+              newFormData.header.segmentname = "";
+              newFormData.header.segmenttype = "";
+              newFormData.header.segmentAltValue = "";
             } else {
-              newFormData.header.value = component.text || ""
-              newFormData.header.isEditable = false
+              newFormData.header.value = component.text || "";
+              newFormData.header.isEditable = false;
+              newFormData.header.fromsegment = false;
+              newFormData.header.segmentname = "";
+              newFormData.header.segmenttype = "";
+              newFormData.header.segmentAltValue = "";
             }
           }
         } else if (component.type === "BODY") {
@@ -78,33 +105,49 @@ console.log(selectContacts)
             selectTemplate.parameter_format === "POSITIONAL" &&
             component.example?.body_text
           ) {
-            newFormData.body = component.example.body_text[0].map((value:any, index:any) => ({
-              parameter_name: `{{${index + 1}}}`,
-              value,
-            }))
+            newFormData.body = component.example.body_text[0].map(
+              (value: any, index: any) => ({
+                parameter_name: `{{${index + 1}}}`,
+                value: "",
+                fromsegment: false,
+                segmentname: "",
+                segmenttype: "",
+                segmentAltValue: "",
+              })
+            );
           } else if (
             selectTemplate.parameter_format === "NAMED" &&
             component.example?.body_text_named_params
           ) {
-            newFormData.body = component.example.body_text_named_params.map((param:any) => ({
-              parameter_name: `{{${param.param_name}}}`,
-              value: param.example,
-            }))
+            newFormData.body = component.example.body_text_named_params.map(
+              (param: any) => ({
+                parameter_name: `{{${param.param_name}}}`,
+                value: "",
+                fromsegment: false,
+                segmentname: "",
+                segmenttype: "",
+                segmentAltValue: "",
+              })
+            );
           }
         } else if (component.type === "BUTTONS" && component.buttons) {
-          newFormData.buttons = component.buttons.map((button:any) => ({
+          newFormData.buttons = component.buttons.map((button: any) => ({
             type: button.type,
-            value: button.type === "URL" ? button.url || "" : button.example?.[0] || "",
-            isEditable: /{{.+?}}/.test(button.type === "URL" ? button.url || "" : button.example?.[0] || "")
-          }))
+            value: "",
+            isEditable: /{{.+?}}/.test(
+              button.type === "URL"
+                ? button.url || ""
+                : button.example?.[0] || ""
+            ),
+          }));
         }
-      })
+      });
 
-      setFormData(newFormData)
+      setFormData(newFormData);
     }
-  }, [selectTemplate])
- 
-  console.log(formData)
+  }, [selectTemplate]);
+
+  console.log(formData);
   return (
     <ScrollArea className="  text-white p-4 h-[90vh] ">
       <div className=" mx-auto">
@@ -117,25 +160,21 @@ console.log(selectContacts)
             >
               Exit
             </Button>
-            <Button className="bg-blue-500 py-3 px-7">
-              Proceed
-            </Button>
+            <Button className="bg-blue-500 py-3 px-7">Proceed</Button>
           </div>
         </header>
 
         <div className="space-y-8">
           <div className=" flex justify-between gap-10 items-center">
             <div className="basis-1/2 flex flex-col gap-5">
-            <div className="space-y-4">
-            <Label className="text-2xl ">
-                  BroadCast Name
-                </Label>
-              <Input
-                placeholder="Enter broadcast name"
-                className="bg-transparent border-gray-600 text-white p-6 rounded-3xl"
-              />
+              <div className="space-y-4">
+                <Label className="text-2xl ">BroadCast Name</Label>
+                <Input
+                  placeholder="Enter broadcast name"
+                  className="bg-transparent border-gray-600 text-white p-6 rounded-3xl"
+                />
               </div>
-              <div className="space-y-2 " >
+              <div className="space-y-2 ">
                 <Label className="text-2xl text-white">
                   Select Template <span className="text-red-500">*</span>
                 </Label>
@@ -143,21 +182,23 @@ console.log(selectContacts)
                   Select a template for broadcast messages
                 </p>
                 <Button
-                 
                   className="bg-transparent bg-blue-500 text-white hover:bg-blue-600"
                   onClick={() => setTemplateSelectionDialog(true)}
                 >
                   Select Template
                 </Button>
-                <TemplateBuilder open={templateSelectionDialog} setOpen={setTemplateSelectionDialog} selectedTemplate ={selectTemplate} setSelectedTemplate={setselectTemplate} />
+                <TemplateBuilder
+                  open={templateSelectionDialog}
+                  setOpen={setTemplateSelectionDialog}
+                  selectedTemplate={selectTemplate}
+                  setSelectedTemplate={setselectTemplate}
+                />
               </div>
             </div>
 
             <div className="basis-1/2 flex flex-col gap-5">
               <div className="space-y-4">
-              <Label className="text-2xl ">
-                  Category
-                </Label>
+                <Label className="text-2xl ">Category</Label>
                 <Select>
                   <SelectTrigger className="w-full bg-transparent border-gray-600 text-white p-6 rounded-3xl">
                     <SelectValue placeholder="Select a Category" />
@@ -175,10 +216,13 @@ console.log(selectContacts)
                 <p className=" text-gray-400">
                   You can upload an Excel sheet or select a Shopify segment.
                 </p>
-                <SelectContactDialog selectContacts={selectContacts} setSelectedContacts={setSelectedContacts}>
-                <Button className="bg-blue-500 hover:bg-blue-500">
-                  <Upload className="w-4 h-4 mr-2" /> Upload Recipients
-                </Button>
+                <SelectContactDialog
+                  selectContacts={selectContacts}
+                  setSelectedContacts={setSelectedContacts}
+                >
+                  <Button className="bg-blue-500 hover:bg-blue-500">
+                    <Upload className="w-4 h-4 mr-2" /> Upload Recipients
+                  </Button>
                 </SelectContactDialog>
               </div>
             </div>
@@ -188,10 +232,13 @@ console.log(selectContacts)
             <h3 className="text-2xl text-white">
               Add Content <span className="text-red-500">*</span>
             </h3>
-         
-          
 
-            <AddContentForm selectedContact={selectContacts} selectedTemplate={selectTemplate} formData={formData} setFormData={setFormData}/>
+            <AddContentForm
+              selectedContact={selectContacts}
+              selectedTemplate={selectTemplate}
+              formData={formData}
+              setFormData={setFormData}
+            />
           </div>
 
           <div className="space-y-2">
@@ -221,10 +268,11 @@ console.log(selectContacts)
                 information called UTM parameters. This allows source tracking
                 within third party reporting tools such as Google Analytics
               </p>
+              {}
               <UTMParametersDialog>
-              <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
-                + Add Parameters
-              </Button>
+                <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                  + Add Parameters
+                </Button>
               </UTMParametersDialog>
             </div>
 
@@ -237,9 +285,9 @@ console.log(selectContacts)
                 broadcasting
               </p>
               <AudienceFilteringDialog>
-              <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
-                + Add Filter
-              </Button>
+                <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                  + Add Filter
+                </Button>
               </AudienceFilteringDialog>
             </div>
           </div>
@@ -275,48 +323,7 @@ console.log(selectContacts)
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Schedule</h3>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <Label className="text-sm">Frequency</Label>
-                <Select>
-                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
-                    <SelectValue placeholder="Once" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="once">Once</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm">Date (IST)</Label>
-                <Select>
-                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
-                    <SelectValue placeholder="Jan 24, 2025" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="jan24">Jan 24, 2025</SelectItem>
-                    <SelectItem value="jan25">Jan 25, 2025</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-sm">Time</Label>
-                <Select>
-                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
-                    <SelectValue placeholder="10:00 AM" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10am">10:00 AM</SelectItem>
-                    <SelectItem value="11am">11:00 AM</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          <ScheduleBroadcast/>
           </div>
 
           <div className="space-y-4">
