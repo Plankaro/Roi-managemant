@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Select,
   SelectContent,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "react-hot-toast"
 import { useUploadFilesMutation } from "@/store/features/apislice";
+
 
 function AddContentForm({
   selectedContact,
@@ -29,9 +30,122 @@ function AddContentForm({
   setFormData: (data: any) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [uploadFiles, { isLoading: isuploadingfile }] = useUploadFilesMutation()
+  const [uploadFiles] = useUploadFilesMutation()
+
+ 
+  useEffect(() => {
+   
+    if (selectedTemplate) {
+      const newFormData = {
+        header: {
+          type: "",
+          value: "",
+          isEditable: false,
+          fromsegment: false,
+          segmentname: "",
+          segmenttype: "",
+          segmentAltValue: "",
+        },
+        body: [] as {
+          parameter_name: string;
+          value: string;
+          fromsegment: boolean;
+          segmentname: string;
+          segmenttype: string;
+          segmentAltValue: string;
+        }[],
+        buttons: [] as { type: string; value: string; isEditable: boolean }[],
+      };
+
+      selectedTemplate.components.forEach((component: any) => {
+        if (component.type === "HEADER") {
+          newFormData.header.type = component.format || "";
+          if (
+            ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
+            component.example?.header_handle
+          ) {
+            newFormData.header.value = "";
+            newFormData.header.isEditable = true;
+          } else if (component.format === "TEXT") {
+            if (
+              selectedTemplate.parameter_format === "POSITIONAL" &&
+              component.example?.header_text
+            ) {
+              newFormData.header.value = "";
+              newFormData.header.isEditable = true;
+              newFormData.header.fromsegment = false;
+              newFormData.header.segmentname = "";
+              newFormData.header.segmenttype = "";
+              newFormData.header.segmentAltValue = "";
+            } else if (
+              selectedTemplate.parameter_format === "NAMED" &&
+              component.example?.header_text_named_params
+            ) {
+              newFormData.header.value = "";
+              newFormData.header.isEditable = true;
+              newFormData.header.fromsegment = false;
+              newFormData.header.segmentname = "";
+              newFormData.header.segmenttype = "";
+              newFormData.header.segmentAltValue = "";
+            } else {
+              newFormData.header.value = component.text || "";
+              newFormData.header.isEditable = false;
+              newFormData.header.fromsegment = false;
+              newFormData.header.segmentname = "";
+              newFormData.header.segmenttype = "";
+              newFormData.header.segmentAltValue = "";
+            }
+          }
+        } else if (component.type === "BODY") {
+          if (
+            selectedTemplate.parameter_format === "POSITIONAL" &&
+            component.example?.body_text
+          ) {
+            newFormData.body = component.example.body_text[0].map(
+              (value: any, index: any) => ({
+                parameter_name: `{{${index + 1}}}`,
+                value: "",
+                fromsegment: false,
+                segmentname: "",
+                segmenttype: "",
+                segmentAltValue: "",
+              })
+            );
+          } else if (
+            selectedTemplate.parameter_format === "NAMED" &&
+            component.example?.body_text_named_params
+          ) {
+            newFormData.body = component.example.body_text_named_params.map(
+              (param: any) => ({
+                parameter_name: `{{${param.param_name}}}`,
+                value: "",
+                fromsegment: false,
+                segmentname: "",
+                segmenttype: "",
+                segmentAltValue: "",
+              })
+            );
+          }
+        } else if (component.type === "BUTTONS" && component.buttons) {
+          newFormData.buttons = component.buttons.map((button: any) => ({
+            type: button.type,
+            value: "",
+            isEditable: /{{.+?}}/.test(
+              button.type === "URL"
+                ? button.url || ""
+                : button.example?.[0] || ""
+            ),
+          }));
+        }
+      });
+
+      setFormData(newFormData);
+    }
+  }, [selectedTemplate]);
+
   const hasEditableParts = () => {
     if (!selectedTemplate) return false;
+
 
     
 
@@ -104,7 +218,7 @@ function AddContentForm({
     const file = event.target.files?.[0]
  
     if (file) {
-      console.log(file.size)
+      
       if(file.size>5*1024*1024) {
         toast.error("File size should be less than 5MB")
         return
@@ -142,7 +256,7 @@ function AddContentForm({
       ? Object.keys(selectedContact?.data[0])
       : ["First Name", "Last Name", "Display Name", "Phone", "Email"];
 
-  console.log(handledropdownItems);
+
   if (!selectedTemplate || !selectedContact) {
     return <div>You need to select a template and contacts to acess this</div>;
   }

@@ -1,152 +1,109 @@
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+"use client"
 
-interface UTMParameter {
-  key: string;
-  label: string;
-  enabled: boolean;
-  value: string;
-  placeholder: string;
-}
+import type React from "react"
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import type { z } from "zod"
+import { utmParametersSchema } from "@/zod/broadcast/form"
 
-const initialUTMParameters: UTMParameter[] = [
-  {
-    key: "utm_source",
+type UTMParameters = z.infer<typeof utmParametersSchema>
+
+const utmLabelsAndPlaceholders = {
+  utm_source: {
     label: "UTM source (The referrer – eg: Google, Newsletter)",
-    enabled: false,
-    value: "roi_magnet",
-    placeholder: "ROI Magnet",
+    placeholder: "Enter your utm source",
   },
-  {
-    key: "utm_medium",
+  utm_medium: {
     label: "UTM medium (Marketing medium – eg: cpc, banner, email)",
-    enabled: false,
-    value: "whatsapp",
-    placeholder: "Whatsapp",
+    placeholder: "Enter your utm medium",
   },
-  {
-    key: "utm_campaign",
-    label:
-      "UTM campaign name (Product, promo code or slogan – eg: spring_sale)",
-    enabled: false,
-    value: "test_campaign",
-    placeholder: "ABC Broadcast",
+  utm_campaign: {
+    label: "UTM campaign name (Product, promo code or slogan – eg: spring_sale)",
+    placeholder: "Enter your utm campaign",
   },
-  {
-    key: "utm_id",
+  utm_id: {
     label: "UTM ID (The ads campaign ID)",
-    enabled: false,
-    value: "",
     placeholder: "",
   },
-  {
-    key: "utm_term",
+  utm_term: {
     label: "UTM term (Identify the paid keywords)",
-    enabled: false,
-    value: "",
     placeholder: "",
   },
-];
+}
 
 interface UTMParametersDialogProps {
-  children: React.ReactNode;
+  children: React.ReactNode
+  utmParameters: UTMParameters
+  setUtmParameters: React.Dispatch<React.SetStateAction<UTMParameters>>
 }
 
-export function UTMParametersDialog({ children }: UTMParametersDialogProps) {
-  const [utmParameters, setUtmParameters] = useState<UTMParameter[]>(
-    initialUTMParameters
-  );
+export function UTMParametersDialog({ children, utmParameters, setUtmParameters }: UTMParametersDialogProps) {
+  const handleCheckboxChange = (key: keyof UTMParameters, checked: boolean) => {
+    setUtmParameters((prev) => ({
+      ...prev,
+      [key]:
+        typeof prev[key] === "boolean"
+          ? checked
+          : { ...prev[key], enabled: checked, value: checked ? (prev[key] as { value: string }).value : "" },
+    }))
+  }
 
-  const handleCheckboxChange = (index: number, checked: boolean) => {
-    const newParams = [...utmParameters];
-    newParams[index].enabled = checked;
-    // Clear value if unchecked
-    if (!checked) {
-      newParams[index].value = "";
-    }
-    setUtmParameters(newParams);
-  };
+  const handleInputChange = (key: keyof UTMParameters, rawValue: string) => {
+    const transformedValue = rawValue.toLowerCase().replace(/\s+/g, "_")
+    setUtmParameters((prev) => ({
+      ...prev,
+      [key]: { ...(prev[key] as { enabled: boolean; value: string }), value: transformedValue },
+    }))
+  }
 
-  const handleInputChange = (index: number, rawValue: string) => {
-    // Transform: replace spaces with underscores and convert to lowercase
-    const transformedValue = rawValue.toLowerCase().replace(/\s+/g, "_");
-    const newParams = [...utmParameters];
-    newParams[index].value = transformedValue;
-    setUtmParameters(newParams);
-  };
+  // Compute preview URL
+  const activeParams = Object.entries(utmParameters)
+    .filter(([key, value]) => typeof value === "object" && value.enabled && value.value && value.value.trim() !== "")
+    .map(([key, value]) => `${key}=${encodeURIComponent((value as { value: string }).value)}`)
 
-  // Compute preview URL: append enabled parameters with a nonempty value.
-  const activeParams = utmParameters.filter(
-    (p) => p.enabled && p.value.trim() !== ""
-  );
-  const previewURL =
-    "{your_link}" +
-    (activeParams.length > 0
-      ? "?" +
-        activeParams
-          .map((p) => `${p.key}=${encodeURIComponent(p.value)}`)
-          .join("&")
-      : "");
+  const previewURL = "{your_link}" + (activeParams.length > 0 ? "?" + activeParams.join("&") : "")
 
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-4xl bg-blue-50">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            UTM Parameters
-          </DialogTitle>
+          <DialogTitle className="text-2xl font-bold">UTM Parameters</DialogTitle>
         </DialogHeader>
 
         <div className="mt-4 space-y-6 w-full">
           <div>
             <h3 className="text-lg font-semibold mb-2">Preview</h3>
-            <div className="max-w-3xl p-3 bg-transparent rounded-lg border break-words ">
-              {previewURL}
-            </div>
+            <div className="max-w-3xl p-3 bg-transparent rounded-lg border break-words">{previewURL}</div>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-4">
-              UTM Parameter Settings
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">UTM Parameter Settings</h3>
             <div className="space-y-4">
-              {utmParameters.map((param, index) => (
-                <div
-                  key={param.key}
-                  className="flex items-start space-x-3 w-full"
-                >
+              {(Object.keys(utmParameters) as Array<keyof UTMParameters>).map((key) => (
+                <div key={key} className="flex items-start space-x-3 w-full">
                   <Checkbox
-                    id={param.key}
+                    id={key}
                     variant="blue"
-                    checked={param.enabled}
-                    onCheckedChange={(checked: boolean) =>
-                      handleCheckboxChange(index, checked)
+                    checked={
+                      typeof utmParameters[key] === "boolean"
+                        ? (utmParameters[key] as boolean)
+                        : (utmParameters[key] as { enabled: boolean }).enabled
                     }
+                    onCheckedChange={(checked: boolean) => handleCheckboxChange(key, checked)}
                   />
                   <div className="space-y-1.5 w-full">
-                    <Label htmlFor={param.key} className="text-base">
-                      {param.label}
+                    <Label htmlFor={key} className="text-base">
+                      {utmLabelsAndPlaceholders[key].label}
                     </Label>
-                    {["utm_id", "utm_term"].includes(param.key) ? (
-                      <></>
-                    ) : (
+                    {!["utm_id", "utm_term"].includes(key) && (
                       <Input
-                        placeholder={param.placeholder || "Enter value"}
-                        value={param.value}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          handleInputChange(index, e.target.value)
-                        }
+                        placeholder={utmLabelsAndPlaceholders[key].placeholder}
+                        value={(utmParameters[key] as { value: string }).value}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(key, e.target.value)}
                         className="border-blue-500 focus:ring-blue-500 w-full"
                       />
                     )}
@@ -165,5 +122,6 @@ export function UTMParametersDialog({ children }: UTMParametersDialogProps) {
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
+

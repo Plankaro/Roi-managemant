@@ -2,24 +2,26 @@
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Checkbox } from "@/components/ui/checkbox";
-
-function ScheduleBroadcast() {
-  const [schedule, setSchedule] = useState({
-    schedule: false,
-    date: new Date(), // Fixed key name (lowercase "date")
-    time: format(new Date(), "hh:mm a"), // Fixed key name (lowercase "time")
-  });
-
+import z from "zod";
+import { scheduleSchema } from "@/zod/broadcast/form";function ScheduleBroadcast({
+  schedule,
+  setSchedule,
+}: {
+  schedule: z.infer<typeof scheduleSchema>;
+  setSchedule: React.Dispatch<React.SetStateAction<z.infer<typeof scheduleSchema>>>;
+}) {
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
-
-  console.log(schedule);
 
   const handleDateChange = (selectedDate: any) => {
     if (!selectedDate) return; // Prevent errors on null/undefined selection
@@ -75,7 +77,9 @@ function ScheduleBroadcast() {
                 disabled={!schedule.schedule}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {schedule.date ? format(schedule.date, "MMM dd, yyyy") : "Select date"}
+                {schedule.date
+                  ? format(schedule.date, "MMM dd, yyyy")
+                  : "Select date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 border-none" align="start">

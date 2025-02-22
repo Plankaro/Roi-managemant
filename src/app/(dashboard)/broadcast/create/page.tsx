@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
@@ -20,327 +21,408 @@ import { UTMParametersDialog } from "@/components/page/broadcast/utmparameters";
 import { AudienceFilteringDialog } from "@/components/page/broadcast/advancefiltering";
 import AddContentForm from "@/components/page/broadcast/addcontentForm";
 import ScheduleBroadcast from "@/components/page/broadcast/schedule_broadcast";
-
+import { formSchema } from "@/zod/broadcast/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { format } from "date-fns";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function CreateBroadcastCampaign() {
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
-  const [selectTemplate, setselectTemplate] = useState<any>(null);
-  const [selectContacts, setSelectedContacts] = useState(null);
-  const [formData, setFormData] = useState<{
-    header: { type: string; value: string; isEditable: boolean };
-    body: { parameter_name: string; value: string }[];
-    buttons: { type: string; value: string; isEditable: boolean }[];
-  }>({
-    header: { type: "", value: "", isEditable: false },
-    body: [],
-    buttons: [],
-  });
 
-  console.log(selectContacts);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      type: "",
+      template: undefined,
+      contact: null,
 
-  useEffect(() => {
-    if (selectTemplate) {
-      const newFormData = {
-        header: {
-          type: "",
-          value: "",
-          isEditable: false,
-          fromsegment: false,
-          segmentname: "",
-          segmenttype: "",
-          segmentAltValue: "",
+      utmParameters: {
+        utm_source: {
+          enabled: false,
+          value: "roi_magnet",
         },
-        body: [] as {
-          parameter_name: string;
-          value: string;
-          fromsegment: boolean;
-          segmentname: string;
-          segmenttype: string;
-          segmentAltValue: string;
-        }[],
-        buttons: [] as { type: string; value: string; isEditable: boolean }[],
-      };
+        utm_medium: {
+          enabled: false,
+          value: "whatsapp",
+        },
+        utm_campaign: {
+          enabled: false,
+          value: "test_campaign",
+        },
+        utm_id: false,
+        utm_term: false,
+      },
+      advanceFilters: {
+        skipInactiveContacts: {
+          enabled: false,
+          days: 15,
+        },
+        limitMarketingMessages: {
+          enabled: false,
+          maxMessages: 2,
+          timeRange: 24,
+          timeUnit: "hours",
+        },
+        avoidDuplicateContacts: {
+          enabled: false,
+        },
+      },
+      schedule: {
+        schedule: false,
+        date: new Date(),
+        time: format(new Date(), "hh:mm a"),
+      },
+      onlimitexced: "pause",
+    },
+  });
+  const selectedContacts = form.watch("contact");
+  const selectedTemplate = form.watch("template");
 
-      selectTemplate.components.forEach((component: any) => {
-        if (component.type === "HEADER") {
-          newFormData.header.type = component.format || "";
-          if (
-            ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
-            component.example?.header_handle
-          ) {
-            newFormData.header.value = "";
-            newFormData.header.isEditable = true;
-          } else if (component.format === "TEXT") {
-            if (
-              selectTemplate.parameter_format === "POSITIONAL" &&
-              component.example?.header_text
-            ) {
-              newFormData.header.value = "";
-              newFormData.header.isEditable = true;
-              newFormData.header.fromsegment = false;
-              newFormData.header.segmentname = "";
-              newFormData.header.segmenttype = "";
-              newFormData.header.segmentAltValue = "";
-            } else if (
-              selectTemplate.parameter_format === "NAMED" &&
-              component.example?.header_text_named_params
-            ) {
-              newFormData.header.value = "";
-              newFormData.header.isEditable = true;
-              newFormData.header.fromsegment = false;
-              newFormData.header.segmentname = "";
-              newFormData.header.segmenttype = "";
-              newFormData.header.segmentAltValue = "";
-            } else {
-              newFormData.header.value = component.text || "";
-              newFormData.header.isEditable = false;
-              newFormData.header.fromsegment = false;
-              newFormData.header.segmentname = "";
-              newFormData.header.segmenttype = "";
-              newFormData.header.segmentAltValue = "";
-            }
-          }
-        } else if (component.type === "BODY") {
-          if (
-            selectTemplate.parameter_format === "POSITIONAL" &&
-            component.example?.body_text
-          ) {
-            newFormData.body = component.example.body_text[0].map(
-              (value: any, index: any) => ({
-                parameter_name: `{{${index + 1}}}`,
-                value: "",
-                fromsegment: false,
-                segmentname: "",
-                segmenttype: "",
-                segmentAltValue: "",
-              })
-            );
-          } else if (
-            selectTemplate.parameter_format === "NAMED" &&
-            component.example?.body_text_named_params
-          ) {
-            newFormData.body = component.example.body_text_named_params.map(
-              (param: any) => ({
-                parameter_name: `{{${param.param_name}}}`,
-                value: "",
-                fromsegment: false,
-                segmentname: "",
-                segmenttype: "",
-                segmentAltValue: "",
-              })
-            );
-          }
-        } else if (component.type === "BUTTONS" && component.buttons) {
-          newFormData.buttons = component.buttons.map((button: any) => ({
-            type: button.type,
-            value: "",
-            isEditable: /{{.+?}}/.test(
-              button.type === "URL"
-                ? button.url || ""
-                : button.example?.[0] || ""
-            ),
-          }));
-        }
-      });
 
-      setFormData(newFormData);
-    }
-  }, [selectTemplate]);
 
-  console.log(formData);
+  const onSubmit = (data: any) => {
+    console.log(data);
+  
+  };
+  const onError = (errors: any) => {
+    console.log("Validation errors:", errors);
+  };
+
   return (
     <ScrollArea className="  text-white p-4 h-[90vh] ">
-      <div className=" mx-auto">
-        <header className="flex items-center justify-between mb-8">
-          <h1 className="text-xl font-semibold">Create Broadcast Campaign</h1>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="bg-transparent border-primary py-3 px-7"
-            >
-              Exit
-            </Button>
-            <Button className="bg-blue-500 py-3 px-7">Proceed</Button>
-          </div>
-        </header>
+      <Form {...form}>
+        <form className=" mx-auto" onSubmit={form.handleSubmit(onSubmit, onError)}>
+          <header className="flex items-center justify-between mb-8">
+            <h1 className="text-xl font-semibold">Create Broadcast Campaign</h1>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="bg-transparent border-primary py-3 px-7"
+              >
+                Exit
+              </Button>
+              <Button className="bg-blue-500 py-3 px-7">Proceed</Button>
+            </div>
+          </header>
 
-        <div className="space-y-8">
-          <div className=" flex justify-between gap-10 items-center">
-            <div className="basis-1/2 flex flex-col gap-5">
-              <div className="space-y-4">
-                <Label className="text-2xl ">BroadCast Name</Label>
-                <Input
-                  placeholder="Enter broadcast name"
-                  className="bg-transparent border-gray-600 text-white p-6 rounded-3xl"
-                />
+          <div className="space-y-8">
+            <div className=" flex justify-between gap-10 items-center">
+              <div className="basis-1/2 flex flex-col gap-5">
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field, fieldState }) => (
+                      <FormItem className="py-2">
+                        <FormLabel className="text-2xl">
+                          BroadCast Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Enter broadcast name"
+                            className="bg-transparent border-gray-600 text-white p-6 rounded-3xl"
+                          />
+                        </FormControl>
+                        <FormMessage>{fieldState.error?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="space-y-2 ">
+                  <FormField
+                    control={form.control}
+                    name="template"
+                    render={({ field, fieldState }) => (
+                      <FormItem className="py-2 text-2xl text-white">
+                        Select Template <span className="text-red-500">*</span>
+                        <FormDescription className="text-gray-400">
+                          Select a template for broadcast messages
+                        </FormDescription>
+                        <FormControl>
+                          <div>
+                            <Button
+                              className="bg-transparent bg-blue-500 text-white hover:bg-blue-600"
+                              onClick={() => setTemplateSelectionDialog(true)}
+                            >
+                              Select Template
+                            </Button>
+                            <TemplateBuilder
+                              open={templateSelectionDialog}
+                              setOpen={setTemplateSelectionDialog}
+                              selectedTemplate={field.value}
+                              setSelectedTemplate={field.onChange}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage>{fieldState.error?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-              <div className="space-y-2 ">
-                <Label className="text-2xl text-white">
-                  Select Template <span className="text-red-500">*</span>
-                </Label>
-                <p className=" text-gray-400">
-                  Select a template for broadcast messages
-                </p>
-                <Button
-                  className="bg-transparent bg-blue-500 text-white hover:bg-blue-600"
-                  onClick={() => setTemplateSelectionDialog(true)}
-                >
-                  Select Template
-                </Button>
-                <TemplateBuilder
-                  open={templateSelectionDialog}
-                  setOpen={setTemplateSelectionDialog}
-                  selectedTemplate={selectTemplate}
-                  setSelectedTemplate={setselectTemplate}
-                />
+
+              <div className="basis-1/2 flex flex-col gap-5">
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field, fieldState }) => (
+                      <FormItem className="py-2">
+                        <FormLabel className="text-2xl">
+                          Select a Category
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger className="w-full bg-transparent border-gray-600 text-white p-6 rounded-3xl">
+                              <SelectValue placeholder="Select a Category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="promotional">
+                                Promotional
+                              </SelectItem>
+                              <SelectItem value="transactional">
+                                Transactional
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage>{fieldState.error?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="space-y-2 ">
+                  <FormField
+                    control={form.control}
+                    name="contact"
+                    render={({ field, fieldState }) => (
+                      <FormItem className="py-2">
+                        <FormLabel className="text-white text-2xl">
+                          {" "}
+                          Recipients <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormDescription className="text-gray-400">
+                          {" "}
+                          You can upload an Excel sheet or select a Shopify
+                          segment.
+                        </FormDescription>
+                        <FormControl>
+                          <SelectContactDialog
+                            selectContacts={field.value}
+                            setSelectedContacts={field.onChange}
+                          >
+                            <Button className="bg-blue-500 hover:bg-blue-500">
+                              <Upload className="w-4 h-4 mr-2" /> Upload
+                              Recipients
+                            </Button>
+                          </SelectContactDialog>
+                        </FormControl>
+                        <FormMessage>{fieldState.error?.message}</FormMessage>
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="basis-1/2 flex flex-col gap-5">
-              <div className="space-y-4">
-                <Label className="text-2xl ">Category</Label>
-                <Select>
-                  <SelectTrigger className="w-full bg-transparent border-gray-600 text-white p-6 rounded-3xl">
-                    <SelectValue placeholder="Select a Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="category1">Category 1</SelectItem>
-                    <SelectItem value="category2">Category 2</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2 ">
-                <Label className=" text-white text-2xl">
-                  Recipients <span className="text-red-500">*</span>
-                </Label>
-                <p className=" text-gray-400">
-                  You can upload an Excel sheet or select a Shopify segment.
-                </p>
-                <SelectContactDialog
-                  selectContacts={selectContacts}
-                  setSelectedContacts={setSelectedContacts}
-                >
-                  <Button className="bg-blue-500 hover:bg-blue-500">
-                    <Upload className="w-4 h-4 mr-2" /> Upload Recipients
-                  </Button>
-                </SelectContactDialog>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-2xl text-white">
-              Add Content <span className="text-red-500">*</span>
-            </h3>
-
-            <AddContentForm
-              selectedContact={selectContacts}
-              selectedTemplate={selectTemplate}
-              formData={formData}
-              setFormData={setFormData}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-sm text-gray-400">
-              Select reply action <span className="text-red-500">*</span>
-            </Label>
-            <p className="text-xs text-gray-400">
-              Auto-reply bot for responses. If the user replies within 72 hours
-              of getting the message.
-            </p>
-            <Select>
-              <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
-                <SelectValue placeholder="Transfer Bot" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="transfer">Transfer Bot</SelectItem>
-                <SelectItem value="auto-reply">Auto Reply</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">UTM Parameters</h3>
-              <p className="text-xs text-gray-400">
-                Link in this broadcast will include additional tracking
-                information called UTM parameters. This allows source tracking
-                within third party reporting tools such as Google Analytics
-              </p>
-              {}
-              <UTMParametersDialog>
-                <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
-                  + Add Parameters
-                </Button>
-              </UTMParametersDialog>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">
-                Audience Filtering Options
-              </h3>
-              <p className="text-xs text-gray-400">
-                An advance audience filtering options for an effective
-                broadcasting
-              </p>
-              <AudienceFilteringDialog>
-                <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
-                  + Add Filter
-                </Button>
-              </AudienceFilteringDialog>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium">Messaging Limit</h3>
-            <p className="text-sm">
-              What to do when the messaging limit exceeds?
-            </p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="pause"
-                  className="border-gray-600"
-                  defaultChecked
-                />
-                <Label htmlFor="pause" className="text-sm">
-                  Pause Broadcast (recommended)
-                </Label>
-              </div>
-              <p className="text-xs text-gray-400 ml-6">
-                The broadcast will pause automatically and resume when the limit
-                resets.
-              </p>
-
-              <div className="flex items-center gap-2">
-                <Checkbox id="skip" className="border-gray-600" />
-                <Label htmlFor="skip" className="text-sm">
-                  Skip messaging limit check and try sending to all.
-                </Label>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-          <ScheduleBroadcast/>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium">Run test message</h3>
-            <div className="space-y-2">
-              <Label className="text-sm">Enter the mobile number</Label>
-              <Input
-                placeholder="+91 9876543212"
-                className="bg-transparent border-gray-600 text-white w-full md:w-72"
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="templateForm"
+                render={({ field, fieldState }) => (
+                  <FormItem className="py-2">
+                    <FormLabel className="text-2xl text-white">
+                      Add Content <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <AddContentForm
+                        selectedContact={selectedContacts}
+                        selectedTemplate={selectedTemplate}
+                        formData={field.value}
+                        setFormData={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
               />
             </div>
-            <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
-              Send Text Message
-            </Button>
+
+            <div className="space-y-2">
+              <Label className="text-sm text-gray-400">
+                Select reply action <span className="text-red-500">*</span>
+              </Label>
+              <p className="text-xs text-gray-400">
+                Auto-reply bot for responses. If the user replies within 72
+                hours of getting the message.
+              </p>
+              <Select>
+                <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
+                  <SelectValue placeholder="Transfer Bot" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="transfer">Transfer Bot</SelectItem>
+                  <SelectItem value="auto-reply">Auto Reply</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <FormField
+                control={form.control}
+                name="utmParameters"
+                render={({ field, fieldState }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-sm font-medium">
+                      UTM Parameters <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormDescription className="text-xs text-gray-400">
+                      Link in this broadcast will include additional tracking
+                      information called UTM parameters. This allows source
+                      tracking within third party reporting tools such as Google
+                      Analytics
+                    </FormDescription>
+                    <FormControl>
+                      <UTMParametersDialog
+                        utmParameters={field.value}
+                        setUtmParameters={field.onChange}
+                      >
+                        <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                          + Add Parameters
+                        </Button>
+                      </UTMParametersDialog>
+                    </FormControl>
+                    <FormMessage>{fieldState.error?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="advanceFilters"
+                render={({ field, fieldState }) => (
+                  <FormItem className="py-2">
+                    <FormLabel className="text-sm font-medium">
+                      Audience Filtering Options
+                    </FormLabel>
+                    <FormDescription>
+                      An advance audience filtering options for an effective
+                      broadcasting
+                    </FormDescription>
+                    <FormControl>
+                      <AudienceFilteringDialog
+                        filters={field.value}
+                        setFilters={field.onChange}
+                      >
+                        <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                          + Add Filter
+                        </Button>
+                      </AudienceFilteringDialog>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="onlimitexced"
+              render={({ field, fieldState }) => (
+                <FormItem className="py-2">
+                  <FormLabel className="text-sm font-medium">
+                    Messaging Limit
+                  </FormLabel>
+                  <FormDescription className="text-sm">
+                    What to do when the messaging limit exceeds?
+                  </FormDescription>
+                  <FormControl>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="pause"
+                          className="border-gray-600"
+                          checked={field.value === "pause"}
+                          onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                              field.onChange("pause");
+                            }
+                          }}
+                        />
+                        <Label htmlFor="pause" className="text-sm">
+                          Pause Broadcast (recommended)
+                        </Label>
+                      </div>
+                      <p className="text-xs text-gray-400 ml-6">
+                        The broadcast will pause automatically and resume when
+                        the limit resets.
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="skip"
+                          className="border-gray-600"
+                          checked={field.value === "skip"}
+                          onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                              field.onChange("skip");
+                            }
+                          }}
+                        />
+                        <Label htmlFor="skip" className="text-sm">
+                          Skip messaging limit check and try sending to all.
+                        </Label>
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-4">
+            <FormField
+                control={form.control}
+                name="schedule"
+                render={({ field, fieldState }) => (
+                  <FormItem className="py-2">
+                    <FormControl>
+                    <ScheduleBroadcast schedule={field.value} setSchedule={field.onChange}/>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Run test message</h3>
+              <div className="space-y-2">
+                <Label className="text-sm">Enter the mobile number</Label>
+                <Input
+                  placeholder="+91 9876543212"
+                  className="bg-transparent border-gray-600 text-white w-full md:w-72"
+                />
+              </div>
+              <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                Send Text Message
+              </Button>
+            </div>
           </div>
-        </div>
-      </div>
+        </form>
+      </Form>
     </ScrollArea>
   );
 }

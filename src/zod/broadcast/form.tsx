@@ -1,0 +1,233 @@
+import { z } from "zod";
+
+const utmParameterSchema = z
+  .object({
+    enabled: z.boolean(),
+    value: z.string().min(1, "Value is required").optional(),
+  })
+  .refine((data) => !data.enabled || (data.enabled && data.value), {
+    message: "Value is required when enabled is true",
+    path: ["value"], // This ensures the error message appears on the correct field
+  });
+
+export const utmParametersSchema = z.object({
+  utm_source: utmParameterSchema,
+  utm_medium: utmParameterSchema,
+  utm_campaign: utmParameterSchema,
+  utm_id: z.boolean(),
+  utm_term: z.boolean(),
+});
+
+export const advanceFiltersSchema = z.object({
+  skipInactiveContacts: z
+    .object({
+      enabled: z.boolean(),
+      days: z.coerce.number().min(1, "Days must be greater than 0").optional(),
+    })
+    .refine(
+      (data) => !data.enabled || (data.enabled && data.days !== undefined),
+      {
+        message: "Days is required when enabled",
+        path: ["days"],
+      }
+    ),
+
+  limitMarketingMessages: z
+    .object({
+      enabled: z.boolean(),
+      maxMessages: z.coerce
+        .number()
+        .min(1, "At least 1 message required")
+        .optional(),
+      timeRange: z.coerce
+        .number()
+        .min(1, "Time range must be valid")
+        .optional(),
+      timeUnit: z.string().min(1, "Time unit is required").optional(),
+    })
+    .refine(
+      (data) =>
+        !data.enabled ||
+        (data.enabled &&
+          data.maxMessages !== undefined &&
+          data.timeRange !== undefined &&
+          data.timeUnit !== undefined),
+      {
+        message: "All fields are required when enabled",
+        path: ["maxMessages"], // Attach the error to one of the fields
+      }
+    ),
+
+  avoidDuplicateContacts: z.object({
+    enabled: z.boolean(),
+  }),
+});
+
+export const scheduleSchema = z
+  .object({
+    schedule: z.boolean(),
+    date: z.coerce.date().optional(),
+    time: z
+      .string()
+      .min(1, "Time is required when schedule is true")
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.schedule) return true; // If `schedule` is false, no validation needed
+
+      return data.date || data.time; // At least one of them should be provided
+    },
+    {
+      message: "Either date or time is required when schedule is true",
+      path: ["date"], // Attach error to `date`, but it applies to both fields
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.schedule) return true; // If `schedule` is false, no validation needed
+
+      return data.date && data.time; // Both date and time should be provided
+    },
+    {
+      message: "Both date and time are required when schedule is true",
+      path: ["time"], // Attach error to `time`, but applies to both
+    }
+  );
+
+const Templateschema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    parameter_format: z.string().min(1, "Parameter format is required"),
+    components: z.array(z.any()), // Components must be an array
+    language: z.string().min(1, "Language is required"),
+    status: z.string().min(1, "Status is required"),
+    category: z.string().min(1, "Category is required"),
+    id: z.string().min(1, "ID is required"),
+  })
+  .nullable() // Allows null initially
+  .refine((data) => data !== null, {
+    message: "Object is required",
+    path: [],
+  });
+
+
+  const headerSchema = z
+  .object({
+    type: z.string().min(1, "Type is required"),
+    value: z.string().min(1, "Value is required"),
+    isEditable: z.boolean(),
+    fromsegment: z.boolean(),
+    segmentname: z.string(), 
+    segmenttype: z.string(),
+    segmentAltValue: z.string(),
+  }).optional()
+  .superRefine((data, ctx) => {
+    if (data?.fromsegment) {
+      if (!data.segmentname.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Segment Name is required when fromsegment is true",
+          path: ["segmentname"],
+        });
+      }
+      if (!data.segmenttype.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Segment Type is required when fromsegment is true",
+          path: ["segmenttype"],
+        });
+      }
+      if (!data.segmentAltValue.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Segment Alt Value is required when fromsegment is true",
+          path: ["segmentAltValue"],
+        });
+      }
+    }
+  });
+
+const bodyItemSchema = z
+  .object({
+    parameter_name: z.string().min(1, "Parameter name is required"),
+    value: z.string().min(1, "Value is required"),
+    fromsegment: z.boolean(),
+    segmentname: z.string(),
+    segmenttype: z.string(),
+    segmentAltValue: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.fromsegment) {
+      if (!data.segmentname.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Segment Name is required when fromsegment is true",
+          path: ["segmentname"],
+        });
+      }
+      if (!data.segmenttype.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Segment Type is required when fromsegment is true",
+          path: ["segmenttype"],
+        });
+      }
+      if (!data.segmentAltValue.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Segment Alt Value is required when fromsegment is true",
+          path: ["segmentAltValue"],
+        });
+      }
+    }
+  });
+
+const buttonSchema = z.object({
+  type: z.string().min(1, "Button type is required"),
+  value: z.string().min(1, "Button value is required"),
+  isEditable: z.boolean(),
+});
+
+export const TemplateFormSchema = z.object({
+  header: headerSchema,
+  body: z.array(bodyItemSchema),
+  buttons: z.array(buttonSchema),
+});
+
+export const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  type: z.string().min(1, "Type is required"),
+  template: Templateschema,
+  templateForm: TemplateFormSchema,
+  contact: z.any(),
+  utmParameters: utmParametersSchema,
+  advanceFilters: advanceFiltersSchema,
+  onlimitexced:z.enum(["pause", "skip"]).default("pause"),
+  schedule: z.any(),
+});
+
+export type TemplateFormData = {
+  header: {
+    type: string;
+    value: string;
+    isEditable: boolean;
+    fromsegment: boolean;
+    segmentname: string;
+    segmenttype: string;
+    segmentAltValue: string;
+  };
+  body: {
+    parameter_name: string;
+    value: string;
+    fromsegment: boolean;
+    segmentname: string;
+    segmenttype: string;
+    segmentAltValue: string;
+  }[];
+  buttons: {
+    type: string;
+    value: string;
+    isEditable: boolean;
+  }[];
+};

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card } from "@/components/ui/card";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { Bar, BarChart, ResponsiveContainer,  YAxis, Tooltip } from "recharts";
 
 const data = [
   {
@@ -20,7 +21,7 @@ const data = [
   }
 ];
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload}: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/20">
