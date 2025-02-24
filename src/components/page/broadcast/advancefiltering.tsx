@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { advanceFiltersSchema } from "@/zod/broadcast/form";
 import { z } from "zod";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export function AudienceFilteringDialog({
   children,
@@ -33,7 +34,6 @@ export function AudienceFilteringDialog({
     React.SetStateAction<z.infer<typeof advanceFiltersSchema>>
   >;
 }) {
-  
   const NumberInput = ({
     value,
     onChange,
@@ -80,34 +80,35 @@ export function AudienceFilteringDialog({
               <Checkbox
                 variant="blue"
                 checked={filters.skipInactiveContacts.enabled}
-                onCheckedChange={(checked) =>
-                  setFilters((prev) => ({
-                    ...prev,
+                onCheckedChange={(checked) => {
+                  const newFilters = {
+                    ...filters,
                     skipInactiveContacts: {
-                      ...prev.skipInactiveContacts,
+                      ...filters.skipInactiveContacts,
                       enabled: checked as boolean,
                     },
-                  }))
-                }
+                  };
+                  setFilters(newFilters);
+                }}
                 className="mt-1"
               />
               <div className="flex-1">
                 <Label className="text-gray-600">
-                  Skip contacts who haven&apos;t engaged with WhatsApp in the
-                  last:
+                  Skip contacts who haven&apos;t engaged with WhatsApp in the last:
                 </Label>
                 <div className="flex items-center space-x-2 mt-2">
                   <NumberInput
                     value={filters.skipInactiveContacts.days || 0}
-                    onChange={(val) =>
-                      setFilters((prev) => ({
-                        ...prev,
+                    onChange={(val) => {
+                      const newFilters = {
+                        ...filters,
                         skipInactiveContacts: {
-                          ...prev.skipInactiveContacts,
+                          ...filters.skipInactiveContacts,
                           days: val,
                         },
-                      }))
-                    }
+                      };
+                      setFilters(newFilters);
+                    }}
                   />
                   <span className="text-gray-600">days</span>
                 </div>
@@ -122,15 +123,16 @@ export function AudienceFilteringDialog({
               <Checkbox
                 variant="blue"
                 checked={filters.limitMarketingMessages.enabled}
-                onCheckedChange={(checked) =>
-                  setFilters((prev) => ({
-                    ...prev,
+                onCheckedChange={(checked) => {
+                  const newFilters = {
+                    ...filters,
                     limitMarketingMessages: {
-                      ...prev.limitMarketingMessages,
+                      ...filters.limitMarketingMessages,
                       enabled: checked as boolean,
                     },
-                  }))
-                }
+                  };
+                  setFilters(newFilters);
+                }}
                 className="mt-1"
               />
               <div className="flex-1">
@@ -140,40 +142,43 @@ export function AudienceFilteringDialog({
                 <div className="flex items-center space-x-2 mt-2">
                   <NumberInput
                     value={filters.limitMarketingMessages.maxMessages || 0}
-                    onChange={(val) =>
-                      setFilters((prev) => ({
-                        ...prev,
+                    onChange={(val) => {
+                      const newFilters = {
+                        ...filters,
                         limitMarketingMessages: {
-                          ...prev.limitMarketingMessages,
+                          ...filters.limitMarketingMessages,
                           maxMessages: val,
                         },
-                      }))
-                    }
+                      };
+                      setFilters(newFilters);
+                    }}
                   />
                   <span className="text-gray-600">messages in the last</span>
                   <NumberInput
                     value={filters.limitMarketingMessages.timeRange || 0}
-                    onChange={(val) =>
-                      setFilters((prev) => ({
-                        ...prev,
+                    onChange={(val) => {
+                      const newFilters = {
+                        ...filters,
                         limitMarketingMessages: {
-                          ...prev.limitMarketingMessages,
+                          ...filters.limitMarketingMessages,
                           timeRange: val,
                         },
-                      }))
-                    }
+                      };
+                      setFilters(newFilters);
+                    }}
                   />
                   <Select
                     value={filters.limitMarketingMessages.timeUnit}
-                    onValueChange={(val) =>
-                      setFilters((prev) => ({
-                        ...prev,
+                    onValueChange={(val) => {
+                      const newFilters = {
+                        ...filters,
                         limitMarketingMessages: {
-                          ...prev.limitMarketingMessages,
+                          ...filters.limitMarketingMessages,
                           timeUnit: val,
                         },
-                      }))
-                    }
+                      };
+                      setFilters(newFilters);
+                    }}
                   >
                     <SelectTrigger className="w-[110px] bg-[#EEF2FF] border-0 rounded-full">
                       <SelectValue />
@@ -196,15 +201,16 @@ export function AudienceFilteringDialog({
               <Checkbox
                 variant="blue"
                 checked={filters.avoidDuplicateContacts.enabled}
-                onCheckedChange={(checked) =>
-                  setFilters((prev) => ({
-                    ...prev,
+                onCheckedChange={(checked) => {
+                  const newFilters = {
+                    ...filters,
                     avoidDuplicateContacts: {
-                      ...prev.avoidDuplicateContacts,
+                      ...filters.avoidDuplicateContacts,
                       enabled: checked as boolean,
                     },
-                  }))
-                }
+                  };
+                  setFilters(newFilters);
+                }}
               />
               <Label className="text-gray-600">
                 Skip if duplicate contacts are found.
@@ -214,14 +220,11 @@ export function AudienceFilteringDialog({
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <DialogTrigger asChild>
-            <Button variant="outline" className="rounded-full px-8">
-              Exit
+          <DialogClose asChild>
+            <Button className="bg-blue-500 hover:bg-blue-600 rounded-full px-8">
+              Proceed
             </Button>
-          </DialogTrigger>
-          <Button className="bg-blue-500 hover:bg-blue-600 rounded-full px-8">
-            Proceed
-          </Button>
+          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>

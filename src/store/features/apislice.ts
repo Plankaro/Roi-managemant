@@ -172,7 +172,15 @@ export const apiSlice = createApi({
         url: "/customers/segments",
         method: "GET",
       }),
-    })
+    }),
+    createBroadcast:builder.mutation({
+      query: (body) => ({
+        url: "/broadcast",
+        method: "POST",
+        body,
+      }),
+    }),
+
 
   }),
 });
@@ -200,5 +208,6 @@ export const {
   useSendTemplatesMutation,
   useSendMediaMutation,
   useGetSegmentsQuery,
+  useCreateBroadcastMutation
 
 } = apiSlice;

@@ -35,9 +35,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useCreateBroadcastMutation } from "@/store/features/apislice";
+
 
 export default function CreateBroadcastCampaign() {
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
+  const [broadcast, { isLoading }] = useCreateBroadcastMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,33 +52,33 @@ export default function CreateBroadcastCampaign() {
 
       utmParameters: {
         utm_source: {
-          enabled: false,
+          enabled: true,
           value: "roi_magnet",
         },
         utm_medium: {
-          enabled: false,
+          enabled: true,
           value: "whatsapp",
         },
         utm_campaign: {
-          enabled: false,
+          enabled: true,
           value: "test_campaign",
         },
-        utm_id: false,
+        utm_id: true,
         utm_term: false,
       },
       advanceFilters: {
         skipInactiveContacts: {
-          enabled: false,
+          enabled: true,
           days: 15,
         },
         limitMarketingMessages: {
-          enabled: false,
+          enabled: true,
           maxMessages: 2,
           timeRange: 24,
           timeUnit: "hours",
         },
         avoidDuplicateContacts: {
-          enabled: false,
+          enabled: true,
         },
       },
       schedule: {
@@ -89,20 +92,22 @@ export default function CreateBroadcastCampaign() {
   const selectedContacts = form.watch("contact");
   const selectedTemplate = form.watch("template");
 
-
-
-  const onSubmit = (data: any) => {
-    console.log(data);
-  
+  const onSubmit = async(data: any) => {
+    console.log("Form data:", data);
+    const datas = await broadcast(data).unwrap()
+    console.log("Broadcast created successfully:", datas);
   };
   const onError = (errors: any) => {
     console.log("Validation errors:", errors);
   };
 
   return (
-    <ScrollArea className="  text-white p-4 h-[90vh] ">
+    <ScrollArea className="  text-white p-4 h-[calc(100vh-100px)] ">
       <Form {...form}>
-        <form className=" mx-auto" onSubmit={form.handleSubmit(onSubmit, onError)}>
+        <form
+          className=" mx-auto"
+          onSubmit={form.handleSubmit(onSubmit, onError)}
+        >
           <header className="flex items-center justify-between mb-8">
             <h1 className="text-xl font-semibold">Create Broadcast Campaign</h1>
             <div className="flex gap-2">
@@ -117,126 +122,119 @@ export default function CreateBroadcastCampaign() {
           </header>
 
           <div className="space-y-8">
-            <div className=" flex justify-between gap-10 items-center">
-              <div className="basis-1/2 flex flex-col gap-5">
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field, fieldState }) => (
-                      <FormItem className="py-2">
-                        <FormLabel className="text-2xl">
-                          BroadCast Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Enter broadcast name"
-                            className="bg-transparent border-gray-600 text-white p-6 rounded-3xl"
-                          />
-                        </FormControl>
-                        <FormMessage>{fieldState.error?.message}</FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="space-y-2 ">
-                  <FormField
-                    control={form.control}
-                    name="template"
-                    render={({ field, fieldState }) => (
-                      <FormItem className="py-2 text-2xl text-white">
-                        Select Template <span className="text-red-500">*</span>
-                        <FormDescription className="text-gray-400">
-                          Select a template for broadcast messages
-                        </FormDescription>
-                        <FormControl>
-                          <div>
-                            <Button
-                              className="bg-transparent bg-blue-500 text-white hover:bg-blue-600"
-                              onClick={() => setTemplateSelectionDialog(true)}
-                            >
-                              Select Template
-                            </Button>
-                            <TemplateBuilder
-                              open={templateSelectionDialog}
-                              setOpen={setTemplateSelectionDialog}
-                              selectedTemplate={field.value}
-                              setSelectedTemplate={field.onChange}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage>{fieldState.error?.message}</FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+            <div className=" flex flex-col gap-5 ">
+              <div className="flex gap-5">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="space-y-3 basis-1/2">
+                      <FormLabel className="text-2xl">BroadCast Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter broadcast name"
+                          className="bg-transparent  border-gray-400 text-white  rounded-3xl focus:border-blue-500 lg:w-10/12"
+                        />
+                      </FormControl>
+                      <FormMessage>{fieldState.error?.message}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="space-y-3 basis-1/2">
+                      <FormLabel className="text-2xl">
+                        Select a Category
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
+                            <SelectValue placeholder="Select a Category" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-blue-50 ">
+                            <SelectItem value="PROMOTIONAL">
+                              Promotional
+                            </SelectItem>
+                            <SelectItem value="TRANSACTIONAL">
+                              Transactional
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage>{fieldState.error?.message}</FormMessage>
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <div className="basis-1/2 flex flex-col gap-5">
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field, fieldState }) => (
-                      <FormItem className="py-2">
-                        <FormLabel className="text-2xl">
-                          Select a Category
-                        </FormLabel>
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
+              <div className=" flex  gap-5">
+                <FormField
+                
+                  control={form.control}
+                  name="template"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="py-2 text-2xl text-white basis-1/2">
+                      Select Template 
+                      <FormDescription className="text-gray-400">
+                        Select a template for broadcast messages
+                      </FormDescription>
+                      <FormControl>
+                        <div>
+                          <Button
+                            className="  py-3 px-5 bg-blue-500 text-white hover:bg-blue-600"
+                            onClick={() => setTemplateSelectionDialog(true)}
                           >
-                            <SelectTrigger className="w-full bg-transparent border-gray-600 text-white p-6 rounded-3xl">
-                              <SelectValue placeholder="Select a Category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="promotional">
-                                Promotional
-                              </SelectItem>
-                              <SelectItem value="transactional">
-                                Transactional
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage>{fieldState.error?.message}</FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="space-y-2 ">
-                  <FormField
-                    control={form.control}
-                    name="contact"
-                    render={({ field, fieldState }) => (
-                      <FormItem className="py-2">
-                        <FormLabel className="text-white text-2xl">
-                          {" "}
-                          Recipients <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormDescription className="text-gray-400">
-                          {" "}
-                          You can upload an Excel sheet or select a Shopify
-                          segment.
-                        </FormDescription>
-                        <FormControl>
-                          <SelectContactDialog
-                            selectContacts={field.value}
-                            setSelectedContacts={field.onChange}
-                          >
-                            <Button className="bg-blue-500 hover:bg-blue-500">
-                              <Upload className="w-4 h-4 mr-2" /> Upload
-                              Recipients
-                            </Button>
-                          </SelectContactDialog>
-                        </FormControl>
-                        <FormMessage>{fieldState.error?.message}</FormMessage>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                            Select Template
+                          </Button>
+                          <TemplateBuilder
+                            open={templateSelectionDialog}
+                            setOpen={setTemplateSelectionDialog}
+                            selectedTemplate={field.value}
+                            setSelectedTemplate={field.onChange}
+                          />
+                        </div>
+                      </FormControl>
+                   
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="contact"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="py-2">
+                      <FormLabel className="text-white text-2xl">
+                        {" "}
+                        Recipients 
+                      </FormLabel>
+                      <FormDescription className="text-gray-400">
+                        {" "}
+                        You can upload an Excel sheet or select a Shopify
+                        segment.
+                      </FormDescription>
+                      <FormControl>
+                        <SelectContactDialog
+                          selectContacts={field.value}
+                          setSelectedContacts={field.onChange}
+                        >
+                          <Button className="bg-blue-500 hover:bg-blue-500 py-3 px-5">
+                            <Upload className="w-4 h-4 mr-2" /> Upload
+                            Recipients
+                          </Button>
+                        </SelectContactDialog>
+                      </FormControl>
+                      <FormMessage>{fieldState.error?.message}</FormMessage>
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
 
@@ -263,15 +261,15 @@ export default function CreateBroadcastCampaign() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm text-gray-400">
-                Select reply action <span className="text-red-500">*</span>
+              <Label className="text-2xl">
+                Select reply action 
               </Label>
               <p className="text-xs text-gray-400">
                 Auto-reply bot for responses. If the user replies within 72
                 hours of getting the message.
               </p>
               <Select>
-                <SelectTrigger className="w-full bg-transparent border-gray-600 text-white">
+                <SelectTrigger className=" bg-transparent w-1/4 text-white">
                   <SelectValue placeholder="Transfer Bot" />
                 </SelectTrigger>
                 <SelectContent>
@@ -286,9 +284,9 @@ export default function CreateBroadcastCampaign() {
                 control={form.control}
                 name="utmParameters"
                 render={({ field, fieldState }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-sm font-medium">
-                      UTM Parameters <span className="text-red-500">*</span>
+                  <FormItem className="space-y-2 py-2">
+                    <FormLabel className="text-2xl  font-medium">
+                      UTM Parameters 
                     </FormLabel>
                     <FormDescription className="text-xs text-gray-400">
                       Link in this broadcast will include additional tracking
@@ -301,7 +299,7 @@ export default function CreateBroadcastCampaign() {
                         utmParameters={field.value}
                         setUtmParameters={field.onChange}
                       >
-                        <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                        <Button className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600 ">
                           + Add Parameters
                         </Button>
                       </UTMParametersDialog>
@@ -315,8 +313,8 @@ export default function CreateBroadcastCampaign() {
                 control={form.control}
                 name="advanceFilters"
                 render={({ field, fieldState }) => (
-                  <FormItem className="py-2">
-                    <FormLabel className="text-sm font-medium">
+                  <FormItem className="py-2 space-y-2">
+                    <FormLabel className="text-2xl font-medium">
                       Audience Filtering Options
                     </FormLabel>
                     <FormDescription>
@@ -328,7 +326,7 @@ export default function CreateBroadcastCampaign() {
                         filters={field.value}
                         setFilters={field.onChange}
                       >
-                        <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+                        <Button className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600">
                           + Add Filter
                         </Button>
                       </AudienceFilteringDialog>
@@ -343,7 +341,7 @@ export default function CreateBroadcastCampaign() {
               name="onlimitexced"
               render={({ field, fieldState }) => (
                 <FormItem className="py-2">
-                  <FormLabel className="text-sm font-medium">
+                  <FormLabel className="text-2xl font-medium">
                     Messaging Limit
                   </FormLabel>
                   <FormDescription className="text-sm">
@@ -393,18 +391,20 @@ export default function CreateBroadcastCampaign() {
             />
 
             <div className="space-y-4">
-            <FormField
+              <FormField
                 control={form.control}
                 name="schedule"
                 render={({ field, fieldState }) => (
                   <FormItem className="py-2">
                     <FormControl>
-                    <ScheduleBroadcast schedule={field.value} setSchedule={field.onChange}/>
+                      <ScheduleBroadcast
+                        schedule={field.value}
+                        setSchedule={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
               />
-            
             </div>
 
             <div className="space-y-4">
@@ -416,7 +416,7 @@ export default function CreateBroadcastCampaign() {
                   className="bg-transparent border-gray-600 text-white w-full md:w-72"
                 />
               </div>
-              <Button className="bg-[#4B6BFB] hover:bg-[#4B6BFB]/90">
+              <Button className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600">
                 Send Text Message
               </Button>
             </div>

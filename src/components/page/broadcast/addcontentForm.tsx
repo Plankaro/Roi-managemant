@@ -10,13 +10,11 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
- 
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "react-hot-toast"
+import { toast } from "react-hot-toast";
 import { useUploadFilesMutation } from "@/store/features/apislice";
-
 
 function AddContentForm({
   selectedContact,
@@ -29,12 +27,10 @@ function AddContentForm({
   formData: any;
   setFormData: (data: any) => void;
 }) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [uploadFiles] = useUploadFilesMutation()
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadFiles] = useUploadFilesMutation();
 
- 
   useEffect(() => {
-   
     if (selectedTemplate) {
       const newFormData = {
         header: {
@@ -146,9 +142,6 @@ function AddContentForm({
   const hasEditableParts = () => {
     if (!selectedTemplate) return false;
 
-
-    
-
     const hasEditableHeader = selectedTemplate.components.some(
       (component: any) =>
         component.type === "HEADER" &&
@@ -185,6 +178,7 @@ function AddContentForm({
     index: number,
     value: any
   ) => {
+    console.log(section, index, value);
     handleInputChange(section, index, "fromsegment", value);
     if (!value) {
       ["segmentname", "segmentAltValue", "segmenttype"].forEach((field) => {
@@ -195,75 +189,84 @@ function AddContentForm({
     }
   };
 
+
+
   const handleInputChange = (
     section: "header" | "body" | "buttons",
     index: number,
     key: string,
     value: any
   ) => {
-    setFormData((prev: any) => {
-      const newData = { ...prev };
-      if (section === "header") {
-        newData.header = { ...newData.header, [key]: value };
-      } else if (section === "body") {
-        newData.body[index] = { ...newData.body[index], [key]: value };
-      } else if (section === "buttons") {
-        newData.buttons[index] = { ...newData.buttons[index], [key]: value };
-      }
-      return newData;
-    });
+    const newData = { ...formData };
+    if (section === "header") {
+      newData.header = { ...formData.header, [key]: value };
+    } else if (section === "body") {
+      newData.body[index] = { ...formData.body[index], [key]: value };
+    } else if (section === "buttons") {
+      newData.buttons[index] = { ...formData.buttons[index], [key]: value };
+    }
+    setFormData(newData);
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
- 
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
     if (file) {
-      
-      if(file.size>5*1024*1024) {
-        toast.error("File size should be less than 5MB")
-        return
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size should be less than 5MB");
+        return;
       }
-      const formData = new FormData()
-      formData.append("file", file)
+      const formData = new FormData();
+      formData.append("file", file);
 
       try {
-        const promise = uploadFiles(formData).unwrap()
+        const promise = uploadFiles(formData).unwrap();
         toast.promise(promise, {
           loading: "Uploading...",
           success: "File uploaded successfully!",
-          error: (error: any) => error?.data?.message || "An unexpected error occurred.",
-        })
-        const data = await promise
-        const link = data[0].link
+          error: (error: any) =>
+            error?.data?.message || "An unexpected error occurred.",
+        });
+        const data = await promise;
+        const link = data[0].link;
 
         // Set the header value with the uploaded link
-        handleInputChange("header", 0, "value", link)
+        handleInputChange("header", 0, "value", link);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     }
-  }
+  };
 
   const handleUploadClick = (type: string) => {
     if (fileInputRef.current) {
-      fileInputRef.current.click()
-      fileInputRef.current.setAttribute("data-upload-type", type)
+      fileInputRef.current.click();
+      fileInputRef.current.setAttribute("data-upload-type", type);
     }
-  }
+  };
 
   const handledropdownItems =
-    selectedContact?.type === "excel"
-      ? Object.keys(selectedContact?.data[0])
-      : ["First Name", "Last Name", "Display Name", "Phone", "Email"];
-
+  selectedContact?.type === "excel"
+    ? Object.keys(selectedContact?.data[0] || {}).map(key => ({
+        type: key,
+        value: key,
+      }))
+    : [
+        { type: "First Name", value: "firstName" },
+        { type: "Last Name", value: "lastName" },
+        { type: "displayName", value: "displayName" },
+        { type: "Phone", value: "phone" },
+        { type: "Email", value: "email" },
+      ];
 
   if (!selectedTemplate || !selectedContact) {
     return <div>You need to select a template and contacts to acess this</div>;
   }
   return (
-    <Card className="bg-transparent text-white shadow-none border-0 h-full overflow-y-scroll no-scrollbar">
-      <CardContent className="p-6 ">
-        <h2 className="text-xl font-semibold mb-6">Add Content</h2>
+    <Card className="bg-transparent text-white shadow-none p-0 border-0 h-full overflow-y-scroll no-scrollbar">
+      <CardContent className=" p-0">
         {!hasEditableParts() ? (
           <p className="text-sm text-muted-foreground">
             This template is static and has no editable parts.
@@ -290,16 +293,13 @@ function AddContentForm({
 
                 return (
                   <div key={`${component.type}-${index}`} className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-base font-medium">
-                        {component.format || component.type}
-                      </h3>
-                      {!hasEditableContent && (
-                        <p className="text-sm text-muted-foreground">
-                          This section doesn&apos;t have editable parts
-                        </p>
-                      )}
-                    </div>
+                    {hasEditableContent && (
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-base font-medium">
+                          {component.format || component.type}
+                        </h3>
+                      </div>
+                    )}
 
                     {component.type === "HEADER" && (
                       <div className="space-y-3">
@@ -309,24 +309,26 @@ function AddContentForm({
                             component.example?.header_text) ||
                             (selectedTemplate.parameter_format === "NAMED" &&
                               component.example?.header_text_named_params)) && (
-                            <div className="space-y-2">
-                              <div>
+                            <div className="h-full flex gap-4">
+                              <div className="basis-1/2 flex flex-col gap-3">
                                 <div className="flex gap-20">
                                   <label
                                     htmlFor="header-input"
-                                    className="text-sm font-medium"
+                                    className=" font-medium text-sm text-gray-400"
                                   >
                                     {selectedTemplate.parameter_format ===
                                     "POSITIONAL"
                                       ? "{{1}}"
                                       : `{{${component.example?.header_text_named_params?.[0]?.param_name}}}`}
                                   </label>
-                                  <span className="flex items-center gap-3 text-sm">
+                                  <span className="flex items-center gap-3 text-sm font-medium text-gray-400">
                                     <Checkbox
-                                      className="border-white"
+                                      className=""
+                                      variant="blue"
                                       checked={formData.header.fromsegment}
                                       onCheckedChange={(checked) =>
-                                        handleCheckChange("header", 0, checked)
+
+                                        handleInputChange("header", 0,"fromsegment", checked)
                                       }
                                     />
                                     From {selectedContact?.type ?? ""} segment
@@ -365,8 +367,8 @@ function AddContentForm({
                                     <SelectContent>
                                       <SelectGroup>
                                         {handledropdownItems.map((item) => (
-                                          <SelectItem key={item} value={item}>
-                                            {item}
+                                          <SelectItem key={item.value} value={item.value}>
+                                            {item.type}
                                           </SelectItem>
                                         ))}
                                       </SelectGroup>
@@ -375,10 +377,10 @@ function AddContentForm({
                                 )}
                               </div>
                               {formData.header.fromsegment && (
-                                <div className="w-full">
+                                <div className="w-full flex flex-col gap-3">
                                   <label
                                     htmlFor="header-alternative"
-                                    className="text-sm font-medium"
+                                    className="text-sm font-medium text-gray-400"
                                   >
                                     {selectedTemplate.parameter_format ===
                                     "POSITIONAL"
@@ -387,7 +389,7 @@ function AddContentForm({
                                   </label>
                                   <Input
                                     id="header-alternative"
-                                    placeholder="Enter fallback value text"
+                                    placeholder="Enter fallback value text "
                                     value={formData.header.segmentAltValue}
                                     onChange={(e) =>
                                       handleInputChange(
@@ -397,7 +399,7 @@ function AddContentForm({
                                         e.target.value
                                       )
                                     }
-                                    className="border-blue-500 focus:ring-blue-500"
+                                    className="border-blue-500 focus:ring-blue-500 w-9/12"
                                   />
                                 </div>
                               )}
@@ -427,7 +429,9 @@ function AddContentForm({
                             <Button
                               type="button"
                               className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white"
-                              onClick={() => handleUploadClick(component.format || "")}
+                              onClick={() =>
+                                handleUploadClick(component.format || "")
+                              }
                             >
                               <Upload className="mr-2 h-4 w-4" />
                               Upload {component?.format?.toLowerCase()}
@@ -436,105 +440,108 @@ function AddContentForm({
                         )}
                       </div>
                     )}
-                    {component.type === "BODY" && formData.body.length > 0 && (
-                      <div className="space-y-3">
-                        <p className="text-sm text-muted-foreground">
-                          Enter the parameters for your message.
-                        </p>
-                        {formData.body.map((param: any, paramIndex: any) => (
-                          <div key={`body-${paramIndex}`} className="space-y-2">
-                            <div className="flex gap-20">
-                              <label
-                                htmlFor={`body-${paramIndex}`}
-                                className="text-sm font-medium"
-                              >
-                                {param.parameter_name}
-                              </label>
-                              <span className="flex items-center gap-3 text-sm">
-                                <Checkbox
-                                  className="border-white"
-                                  checked={param.fromsegment}
-                                  onCheckedChange={(checked) =>
-                                    handleCheckChange(
-                                      "body",
-                                      paramIndex,
-                                      checked
-                                    )
-                                  }
-                                />
-                                From {selectedContact?.type ?? ""} segment
-                              </span>
-                            </div>
-                            {!param.fromsegment ? (
-                              <Input
-                                id={`body-${paramIndex}`}
-                                placeholder={`Enter value for ${param.parameter_name}`}
-                                value={param.value}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    "body",
-                                    paramIndex,
-                                    "value",
-                                    e.target.value
-                                  )
-                                }
-                                className="border-blue-500 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <Select
-                                value={param.segmentname}
-                                onValueChange={(value) =>
-                                  handleInputChange(
-                                    "body",
-                                    paramIndex,
-                                    "segmentname",
-                                    value
-                                  )
-                                }
-                              >
-                                <SelectTrigger className="basis-2/4">
-                                  <SelectValue placeholder="Select a field" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    {handledropdownItems.map((item) => (
-                                      <SelectItem key={item} value={item}>
-                                        {item}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                            )}
-                            {param.fromsegment && (
-                              <div className="w-full">
-                                <label
-                                  htmlFor="header-alternative"
-                                  className="text-sm font-medium"
-                                >
-                                  {selectedTemplate.parameter_format ===
-                                    `Enter fallback values for {{${param.parameter_name}}}}`}
-                                </label>
-                                <Input
-                                  id="header-alternative"
-                                  placeholder="Enter fallback value text"
-                                  value={param.segmentAltValue}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "body",
-                                      paramIndex,
-                                      "segmentAltValue",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="border-blue-500 focus:ring-blue-500"
-                                />
+                    {component.type === "BODY" &&
+                      formData?.body?.length > 0 && (
+                        <div className="space-y-3">
+                          {formData.body.map((param: any, paramIndex: any) => (
+                            <div
+                              key={`body-${paramIndex}`}
+                              className="flex gap-4"
+                            >
+                              <div className="basis-1/2 flex flex-col gap-3 ">
+                                <div className="flex gap-20 text-gray-400">
+                                  <label
+                                    htmlFor={`body-${paramIndex}`}
+                                    className="text-sm font-medium"
+                                  >
+                                    {param.parameter_name}
+                                  </label>
+                                  <span className="flex items-center gap-3 text-sm">
+                                    <Checkbox
+                                      className="border-white"
+                                      variant="blue"
+                                      checked={param.fromsegment}
+                                      onCheckedChange={(checked) =>
+                                        handleCheckChange(
+                                          "body",
+                                          paramIndex,
+                                          checked
+                                        )
+                                      }
+                                    />
+                                    From {selectedContact?.type ?? ""} segment
+                                  </span>
+                                </div>
+                                {!param.fromsegment ? (
+                                  <Input
+                                    id={`body-${paramIndex}`}
+                                    placeholder={`Enter value for ${param.parameter_name}`}
+                                    value={param.value}
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "body",
+                                        paramIndex,
+                                        "value",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="border-blue-500 focus:ring-blue-500"
+                                  />
+                                ) : (
+                                  <Select
+                                    value={param.segmentname}
+                                    onValueChange={(value) =>
+                                      handleInputChange(
+                                        "body",
+                                        paramIndex,
+                                        "segmentname",
+                                        value
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger className="basis-2/4">
+                                      <SelectValue placeholder="Select a field" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectGroup>
+                                        {handledropdownItems.map((item) => (
+                                          <SelectItem key={item.value} value={item.value}>
+                                            {item.type}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectGroup>
+                                    </SelectContent>
+                                  </Select>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                              {param.fromsegment && (
+                                <div className="w-full flex flex-col gap-3">
+                                  <label
+                                    htmlFor="header-alternative"
+                                    className="text-sm font-medium text-gray-400"
+                                  >
+                                Enter fallback values for {param.parameter_name}
+                                  </label>
+                                  <Input
+                                    id="header-alternative"
+                                    placeholder="Enter fallback value text"
+                                    value={param.segmentAltValue}
+                                    onChange={(e) =>
+                                      handleInputChange(
+                                        "body",
+                                        paramIndex,
+                                        "segmentAltValue",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="border-blue-500 focus:ring-blue-500 w-9/12"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     {component.type === "BUTTONS" &&
                       formData.buttons.map((button: any, buttonIndex: any) => (
                         <div
@@ -546,12 +553,12 @@ function AddContentForm({
                               ? "CTA Button"
                               : button.type === "COPY_CODE"
                               ? "Copy Code"
-                              : "Button"}
+                              : ""}
                           </h3>
                           {(button.type === "URL" ||
                             button.type === "COPY_CODE") && (
                             <>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-muted-foreground text-gray-400">
                                 Enter the{" "}
                                 {button.type === "URL"
                                   ? "URL for the CTA Button"
@@ -573,7 +580,7 @@ function AddContentForm({
                                     e.target.value
                                   )
                                 }
-                                className="border-blue-500 focus:ring-blue-500"
+                                className="border-blue-500 focus:ring-blue-500 w-1/2"
                               />
                             </>
                           )}

@@ -224,6 +224,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+   
     if (validateForm()) {
       // Build the preview header using formData.header
       const previewHeader = {

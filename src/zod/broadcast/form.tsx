@@ -183,11 +183,34 @@ const bodyItemSchema = z
     }
   });
 
-const buttonSchema = z.object({
-  type: z.string().min(1, "Button type is required"),
-  value: z.string().min(1, "Button value is required"),
-  isEditable: z.boolean(),
-});
+
+
+  const buttonSchema = z.object({
+    type: z.string(),
+    value: z.string(),
+    isEditable: z.boolean(),
+  }).superRefine((data, ctx) => {
+    if (data.isEditable) {
+      if (data.type.length < 1) {
+        ctx.addIssue({
+          path: ["type"],
+          message: "Button type is required",
+          code: "custom",
+        });
+      }
+      if (data.value.length < 1) {
+        ctx.addIssue({
+          path: ["value"],
+          message: "Button value is required",
+          code: "custom",
+        });
+      }
+    }
+  });
+  
+  // Example usage
+
+  
 
 export const TemplateFormSchema = z.object({
   header: headerSchema,
@@ -201,8 +224,8 @@ export const formSchema = z.object({
   template: Templateschema,
   templateForm: TemplateFormSchema,
   contact: z.any(),
-  utmParameters: utmParametersSchema,
-  advanceFilters: advanceFiltersSchema,
+  utmParameters: z.any(),
+  advanceFilters: z.any(),
   onlimitexced:z.enum(["pause", "skip"]).default("pause"),
   schedule: z.any(),
 });

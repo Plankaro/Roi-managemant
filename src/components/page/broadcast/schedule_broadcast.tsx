@@ -14,43 +14,43 @@ import { useState } from "react";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Checkbox } from "@/components/ui/checkbox";
 import z from "zod";
-import { scheduleSchema } from "@/zod/broadcast/form";function ScheduleBroadcast({
+import { scheduleSchema } from "@/zod/broadcast/form";
+
+function ScheduleBroadcast({
   schedule,
   setSchedule,
 }: {
   schedule: z.infer<typeof scheduleSchema>;
-  setSchedule: React.Dispatch<React.SetStateAction<z.infer<typeof scheduleSchema>>>;
+  setSchedule: React.Dispatch<
+    React.SetStateAction<z.infer<typeof scheduleSchema>>
+  >;
 }) {
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
 
   const handleDateChange = (selectedDate: any) => {
     if (!selectedDate) return; // Prevent errors on null/undefined selection
 
-    setSchedule((prev) => ({
-      ...prev,
-      date: selectedDate, // Ensure we're updating the correct key
-    }));
+    // Compute the new schedule object and update directly.
+    const newSchedule = { ...schedule, date: selectedDate };
+    setSchedule(newSchedule);
 
-    // Automatically open time picker if today's date is selected
+    console.log(newSchedule);
+
+    // Automatically open time picker if today's date is selected.
     if (selectedDate.toDateString() === new Date().toDateString()) {
-      setSchedule((prev) => ({
-        ...prev,
-        time: format(new Date(), "hh:mm a"), // Set current time
-      }));
+      setSchedule({ ...schedule, time: format(new Date(), "hh:mm a") });
     }
 
     setIsTimePickerOpen(true);
   };
 
   const handleTimeChange = (selectedTime: string) => {
-    setSchedule((prev) => ({
-      ...prev,
-      time: selectedTime, // Ensure time is updated properly
-    }));
+    setSchedule({ ...schedule, time: selectedTime });
     setIsTimePickerOpen(false);
   };
 
-  const isToday = schedule.date.toDateString() === new Date().toDateString();
+  const isToday =
+    schedule?.date?.toDateString() === new Date().toDateString();
 
   return (
     <div className="text-lg">
@@ -59,12 +59,14 @@ import { scheduleSchema } from "@/zod/broadcast/form";function ScheduleBroadcast
         className="border-white mr-3"
         checked={schedule.schedule}
         onCheckedChange={() =>
-          setSchedule((prev) => ({ ...prev, schedule: !prev.schedule }))
+          setSchedule({ ...schedule, schedule: !schedule.schedule })
         }
       />
       Schedule broadcast
       <div className="">
-        <Label className="text-sm font-medium">Date & Time (IST)</Label>
+        <Label className="text-sm text-gray-500">
+          Date &amp; Time (IST)
+        </Label>
         <div className="flex gap-2 mt-1.5">
           <Popover>
             <PopoverTrigger asChild>
@@ -82,11 +84,14 @@ import { scheduleSchema } from "@/zod/broadcast/form";function ScheduleBroadcast
                   : "Select date"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 border-none" align="start">
+            <PopoverContent
+              className="w-auto p-0 border-none"
+              align="start"
+            >
               <Calendar
                 mode="single"
                 selected={schedule.date}
-                onSelect={handleDateChange} // Directly pass the function
+                onSelect={handleDateChange}
                 initialFocus
                 disabled={(date) =>
                   date < new Date(new Date().setHours(0, 0, 0, 0))
@@ -95,7 +100,10 @@ import { scheduleSchema } from "@/zod/broadcast/form";function ScheduleBroadcast
             </PopoverContent>
           </Popover>
 
-          <Popover open={isTimePickerOpen} onOpenChange={setIsTimePickerOpen}>
+          <Popover
+            open={isTimePickerOpen}
+            onOpenChange={setIsTimePickerOpen}
+          >
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -114,7 +122,7 @@ import { scheduleSchema } from "@/zod/broadcast/form";function ScheduleBroadcast
               align="start"
             >
               <TimePicker
-                value={schedule.time}
+                value={schedule?.time ?? ""}
                 onChange={handleTimeChange}
                 onCancel={() => setIsTimePickerOpen(false)}
                 onOk={() => setIsTimePickerOpen(false)}
