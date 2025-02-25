@@ -125,12 +125,15 @@ function AddContentForm({
         } else if (component.type === "BUTTONS" && component.buttons) {
           newFormData.buttons = component.buttons.map((button: any) => ({
             type: button.type,
+
             value: "",
             isEditable: /{{.+?}}/.test(
               button.type === "URL"
                 ? button.url || ""
                 : button.example?.[0] || ""
             ),
+            text:button.text ??"jhh",
+
           }));
         }
       });
@@ -311,7 +314,7 @@ function AddContentForm({
                               component.example?.header_text_named_params)) && (
                             <div className="h-full flex gap-4">
                               <div className="basis-1/2 flex flex-col gap-3">
-                                <div className="flex gap-20">
+                                <div className="flex justify-between">
                                   <label
                                     htmlFor="header-input"
                                     className=" font-medium text-sm text-gray-400"
@@ -446,10 +449,10 @@ function AddContentForm({
                           {formData.body.map((param: any, paramIndex: any) => (
                             <div
                               key={`body-${paramIndex}`}
-                              className="flex gap-4"
+                              className="flex gap-6"
                             >
                               <div className="basis-1/2 flex flex-col gap-3 ">
-                                <div className="flex gap-20 text-gray-400">
+                                <div className="flex justify-between text-gray-400">
                                   <label
                                     htmlFor={`body-${paramIndex}`}
                                     className="text-sm font-medium"
@@ -498,7 +501,7 @@ function AddContentForm({
                                         value
                                       )
                                     }
-                                  >
+                                                                     >
                                     <SelectTrigger className="basis-2/4">
                                       <SelectValue placeholder="Select a field" />
                                     </SelectTrigger>

@@ -3,12 +3,18 @@ import { z } from "zod";
 const utmParameterSchema = z
   .object({
     enabled: z.boolean(),
-    value: z.string().min(1, "Value is required").optional(),
+    value: z.string().optional(), // Initially optional
   })
-  .refine((data) => !data.enabled || (data.enabled && data.value), {
-    message: "Value is required when enabled is true",
-    path: ["value"], // This ensures the error message appears on the correct field
+  .superRefine((data, ctx) => {
+    if (data.enabled && (!data.value || data.value.trim().length < 1)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Value is required when enabled is true",
+        path: ["value"],
+      });
+    }
   });
+
 
 export const utmParametersSchema = z.object({
   utm_source: utmParameterSchema,
@@ -115,15 +121,18 @@ const Templateschema = z
   const headerSchema = z
   .object({
     type: z.string().min(1, "Type is required"),
-    value: z.string().min(1, "Value is required"),
+    value: z.string().optional(), // Make value optional initially
     isEditable: z.boolean(),
     fromsegment: z.boolean(),
-    segmentname: z.string(), 
+    segmentname: z.string(),
     segmenttype: z.string(),
     segmentAltValue: z.string(),
-  }).optional()
+  })
+  .optional()
   .superRefine((data, ctx) => {
-    if (data?.fromsegment) {
+    if (!data) return;
+
+    if (data.fromsegment) {
       if (!data.segmentname.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -145,13 +154,21 @@ const Templateschema = z
           path: ["segmentAltValue"],
         });
       }
+    } else {
+      // Require value only when fromsegment is false
+      if (!data.value || !data.value.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Value is required when fromsegment is false",
+          path: ["value"],
+        });
+      }
     }
   });
-
-const bodyItemSchema = z
+  const bodyItemSchema = z
   .object({
     parameter_name: z.string().min(1, "Parameter name is required"),
-    value: z.string().min(1, "Value is required"),
+    value: z.string().optional(), // Make value optional initially
     fromsegment: z.boolean(),
     segmentname: z.string(),
     segmenttype: z.string(),
@@ -180,6 +197,15 @@ const bodyItemSchema = z
           path: ["segmentAltValue"],
         });
       }
+    } else {
+      // Require value only when fromsegment is false
+      if (!data.value || !data.value.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Value is required when fromsegment is false",
+          path: ["value"],
+        });
+      }
     }
   });
 
@@ -189,6 +215,7 @@ const bodyItemSchema = z
     type: z.string(),
     value: z.string(),
     isEditable: z.boolean(),
+    text:z.string(),
   }).superRefine((data, ctx) => {
     if (data.isEditable) {
       if (data.type.length < 1) {
@@ -223,12 +250,22 @@ export const formSchema = z.object({
   type: z.string().min(1, "Type is required"),
   template: Templateschema,
   templateForm: TemplateFormSchema,
-  contact: z.any(),
-  utmParameters: z.any(),
-  advanceFilters: z.any(),
-  onlimitexced:z.enum(["pause", "skip"]).default("pause"),
-  schedule: z.any(),
+  contact: z.any().superRefine((data, ctx) => {
+    if (!data || Object.keys(data).length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Contact cannot be empty",
+      
+      });
+    }
+  }),
+  utmParameters: utmParametersSchema,
+  advanceFilters: advanceFiltersSchema,
+  onlimitexced: z.enum(["pause", "skip"]).default("pause"),
+  schedule: scheduleSchema,
+  testphoneno:z.string().optional()
 });
+
 
 export type TemplateFormData = {
   header: {

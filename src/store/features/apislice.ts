@@ -180,7 +180,14 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    sendTestMessage:builder.mutation({
+      query: (body) => ({
+        url: "/broadcast/test",
+        method: "POST",
+        body,
+      })
 
+    })
 
   }),
 });
@@ -208,6 +215,7 @@ export const {
   useSendTemplatesMutation,
   useSendMediaMutation,
   useGetSegmentsQuery,
-  useCreateBroadcastMutation
+  useCreateBroadcastMutation,
+  useSendTestMessageMutation
 
 } = apiSlice;

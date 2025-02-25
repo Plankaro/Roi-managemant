@@ -239,7 +239,7 @@ const selectedChats = useSelector((state: RootState) =>
                                   key={index}
                                   className="bg-primary-100 w-full text-black"
                                 >
-                                  {button}
+                                  {button.text}
                                 </Button>
                               ))}
                           </div>

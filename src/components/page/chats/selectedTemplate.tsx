@@ -60,7 +60,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
   const [formData, setFormData] = useState<{
     header: { type: string; value: string; isEditable: boolean }
     body: { parameter_name: string; value: string }[]
-    buttons: { type: string; value: string,isEditable: boolean }[]
+    buttons: { type: string; value: string,isEditable: boolean ,text:string}[]
   }>({
     header: { type: "", value: "", isEditable: false },
     body: [],
@@ -68,12 +68,14 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  console.log(selectedTemplate)
+
   useEffect(() => {
     if (selectedTemplate) {
       const newFormData = {
         header: { type: "", value: "", isEditable: false },
         body: [] as { parameter_name: string; value: string }[],
-        buttons: [] as { type: string; value: string ;isEditable: boolean}[],
+        buttons: [] as { type: string; value: string ;isEditable: boolean,text:string}[],
       }
 
       selectedTemplate.components.forEach((component) => {
@@ -125,7 +127,8 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
           newFormData.buttons = component.buttons.map((button) => ({
             type: button.type,
             value: button.type === "URL" ? button.url || "" : button.example?.[0] || "",
-            isEditable: /{{.+?}}/.test(button.type === "URL" ? button.url || "" : button.example?.[0] || "")
+            isEditable: /{{.+?}}/.test(button.type === "URL" ? button.url || "" : button.example?.[0] || ""),
+            text:button.text ??"jhh",
           }))
         }
       })
@@ -137,6 +140,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
   if (!selectedTemplate) {
     return <div>No template selected</div>
   }
+  console.log(selectedTemplate.components)
 
   const handleInputChange = (
     section: "header" | "body" | "buttons",

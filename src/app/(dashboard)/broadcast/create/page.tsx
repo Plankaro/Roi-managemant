@@ -35,12 +35,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useCreateBroadcastMutation } from "@/store/features/apislice";
+import { useCreateBroadcastMutation,useSendTestMessageMutation } from "@/store/features/apislice";
+import toast from "react-hot-toast";
+import { isValidPhoneNumber } from "@/lib/isvalidphoneno";
+import Link from "next/link";
 
 
 export default function CreateBroadcastCampaign() {
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
+
   const [broadcast, { isLoading }] = useCreateBroadcastMutation();
+  const [sendTestMessage, { isLoading: sendTestMessageLoading }] = useSendTestMessageMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,14 +97,41 @@ export default function CreateBroadcastCampaign() {
   const selectedContacts = form.watch("contact");
   const selectedTemplate = form.watch("template");
 
-  const onSubmit = async(data: any) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log("Form data:", data);
-    const datas = await broadcast(data).unwrap()
+    const datas = await broadcast(data).unwrap();
     console.log("Broadcast created successfully:", datas);
   };
+
+  const handleTestMessage = async () => {
+    // Test message functionality goes here
+    const formvalues =  form.getValues();
+    console.log("Form data:", formvalues);
+    const datavalidation = formSchema.safeParse(formvalues);
+    if (!datavalidation.success) {
+      toast.error("Fix errors & complete form");
+      return;
+    }
+    const ValidPhoneNumber =  isValidPhoneNumber(formvalues?.testphoneno??"")
+    if(!ValidPhoneNumber){
+      toast.error("Invalid phone number");
+      return
+    }
+    const datas = await sendTestMessage(formvalues).unwrap();
+    console.log("Test message sent successfully:", datas);
+    
+
+
+  };
+
   const onError = (errors: any) => {
     console.log("Validation errors:", errors);
+    if (errors.templateForm) {
+      toast.error("invalid or empty fields in add content form");
+    }
   };
+
+  
 
   return (
     <ScrollArea className="  text-white p-4 h-[calc(100vh-100px)] ">
@@ -110,13 +142,18 @@ export default function CreateBroadcastCampaign() {
         >
           <header className="flex items-center justify-between mb-8">
             <h1 className="text-xl font-semibold">Create Broadcast Campaign</h1>
+            
             <div className="flex gap-2">
+            <Link href={"/broadcast"}>
               <Button
                 variant="outline"
                 className="bg-transparent border-primary py-3 px-7"
+                type="button"
               >
                 Exit
               </Button>
+              </Link>
+              
               <Button className="bg-blue-500 py-3 px-7">Proceed</Button>
             </div>
           </header>
@@ -176,12 +213,11 @@ export default function CreateBroadcastCampaign() {
 
               <div className=" flex  gap-5">
                 <FormField
-                
                   control={form.control}
                   name="template"
                   render={({ field, fieldState }) => (
                     <FormItem className="py-2 text-2xl text-white basis-1/2">
-                      Select Template 
+                      Select Template
                       <FormDescription className="text-gray-400">
                         Select a template for broadcast messages
                       </FormDescription>
@@ -190,6 +226,7 @@ export default function CreateBroadcastCampaign() {
                           <Button
                             className="  py-3 px-5 bg-blue-500 text-white hover:bg-blue-600"
                             onClick={() => setTemplateSelectionDialog(true)}
+                            type="button"
                           >
                             Select Template
                           </Button>
@@ -201,7 +238,7 @@ export default function CreateBroadcastCampaign() {
                           />
                         </div>
                       </FormControl>
-                   
+                      <FormMessage>{fieldState.error?.message}</FormMessage>
                     </FormItem>
                   )}
                 />
@@ -213,7 +250,7 @@ export default function CreateBroadcastCampaign() {
                     <FormItem className="py-2">
                       <FormLabel className="text-white text-2xl">
                         {" "}
-                        Recipients 
+                        Recipients
                       </FormLabel>
                       <FormDescription className="text-gray-400">
                         {" "}
@@ -225,7 +262,10 @@ export default function CreateBroadcastCampaign() {
                           selectContacts={field.value}
                           setSelectedContacts={field.onChange}
                         >
-                          <Button className="bg-blue-500 hover:bg-blue-500 py-3 px-5">
+                          <Button
+                            className="bg-blue-500 hover:bg-blue-500 py-3 px-5"
+                            type="button"
+                          >
                             <Upload className="w-4 h-4 mr-2" /> Upload
                             Recipients
                           </Button>
@@ -261,9 +301,7 @@ export default function CreateBroadcastCampaign() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-2xl">
-                Select reply action 
-              </Label>
+              <Label className="text-2xl">Select reply action</Label>
               <p className="text-xs text-gray-400">
                 Auto-reply bot for responses. If the user replies within 72
                 hours of getting the message.
@@ -283,30 +321,46 @@ export default function CreateBroadcastCampaign() {
               <FormField
                 control={form.control}
                 name="utmParameters"
-                render={({ field, fieldState }) => (
-                  <FormItem className="space-y-2 py-2">
-                    <FormLabel className="text-2xl  font-medium">
-                      UTM Parameters 
-                    </FormLabel>
-                    <FormDescription className="text-xs text-gray-400">
-                      Link in this broadcast will include additional tracking
-                      information called UTM parameters. This allows source
-                      tracking within third party reporting tools such as Google
-                      Analytics
-                    </FormDescription>
-                    <FormControl>
-                      <UTMParametersDialog
-                        utmParameters={field.value}
-                        setUtmParameters={field.onChange}
-                      >
-                        <Button className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600 ">
-                          + Add Parameters
-                        </Button>
-                      </UTMParametersDialog>
-                    </FormControl>
-                    <FormMessage>{fieldState.error?.message}</FormMessage>
-                  </FormItem>
-                )}
+                render={({ field, fieldState }) => {
+                  console.log("FieldState Error:", fieldState.error); // Debugging log
+
+                  return (
+                    <FormItem className="space-y-2 py-2">
+                      <FormLabel className="text-2xl font-medium">
+                        UTM Parameters
+                      </FormLabel>
+                      <FormDescription className="text-xs text-gray-400">
+                        Link in this broadcast will include additional tracking
+                        information called UTM parameters. This allows source
+                        tracking within third-party reporting tools such as
+                        Google Analytics.
+                      </FormDescription>
+                      <FormControl>
+                        <UTMParametersDialog
+                          utmParameters={field.value}
+                          setUtmParameters={field.onChange}
+                        >
+                          <Button
+                            className="py-3 px-5 bg-blue-500 text-white hover:bg-blue-600"
+                            type="button"
+                          >
+                            + Add Parameters
+                          </Button>
+                        </UTMParametersDialog>
+                      </FormControl>
+                      <div className="text-sm text-red-500">
+                        {fieldState.error
+                          ? Object.values(fieldState.error).flatMap(
+                              (err: any) =>
+                                typeof err === "object" && err.value?.message
+                                  ? err.value.message
+                                  : []
+                            )[0] || "Invalid or missing required value"
+                          : ""}
+                      </div>
+                    </FormItem>
+                  );
+                }}
               />
 
               <FormField
@@ -326,11 +380,15 @@ export default function CreateBroadcastCampaign() {
                         filters={field.value}
                         setFilters={field.onChange}
                       >
-                        <Button className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600">
+                        <Button
+                          className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600"
+                          type="button"
+                        >
                           + Add Filter
                         </Button>
                       </AudienceFilteringDialog>
                     </FormControl>
+                    <FormMessage>{fieldState.error?.message}</FormMessage>
                   </FormItem>
                 )}
               />
@@ -408,15 +466,34 @@ export default function CreateBroadcastCampaign() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">Run test message</h3>
-              <div className="space-y-2">
-                <Label className="text-sm">Enter the mobile number</Label>
-                <Input
-                  placeholder="+91 9876543212"
-                  className="bg-transparent border-gray-600 text-white w-full md:w-72"
-                />
-              </div>
-              <Button className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600">
+              <FormField
+                control={form.control}
+                name="testphoneno"
+                render={({ field, fieldState }) => (
+                  <FormItem className="py-2">
+                    <FormLabel className="text-sm font-medium">
+                      Run test message
+                    </FormLabel>
+                    <FormDescription className="text-sm">
+                      Enter the mobile number
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter mobile no"
+                        {...field}
+                        className="bg-transparent border-gray-600 text-white w-full md:w-72"
+                      />
+                    </FormControl>
+                    <FormMessage>{fieldState.error?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600"
+                type="button"
+                onClick={handleTestMessage}
+              >
                 Send Text Message
               </Button>
             </div>

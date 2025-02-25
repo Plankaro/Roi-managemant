@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { DialogClose } from "@radix-ui/react-dialog"
-
+import { isValidPhoneNumber } from "@/lib/isvalidphoneno"
 function SelectContactDialog({
   children,
   setSelectedContacts,
@@ -57,10 +57,7 @@ function SelectContactDialog({
     }
   }
 
-  const isValidPhoneNumber = (phone: string) => {
-    const phoneRegex = /^(\+?[1-9]\d{0,2})\d{7,14}$/
-    return phoneRegex.test(phone)
-  }
+
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
