@@ -75,39 +75,35 @@ function MessagesSkeleton() {
     </ScrollArea>
   );
 }
-function Messages({isLoading }: { isLoading: boolean, }) {
+function Messages({ isLoading }: { isLoading: boolean }) {
   const myPhoneNo = "15551365364"; // Your phone number
- 
-const selectedProspect = useSelector((state:RootState)=>state.Prospect.selectedProspect)
 
-const selectedChats = useSelector((state: RootState) =>
-  orderBy(
-    state.chat.chats.find((chatGroup) => chatGroup.prospectId === selectedProspect?.id)?.chats || [],
-    ['createdAt'],
-  
-  )
-);
+  const selectedProspect = useSelector(
+    (state: RootState) => state.Prospect.selectedProspect
+  );
 
+  const selectedChats = useSelector((state: RootState) =>
+    orderBy(
+      state.chat.chats.find(
+        (chatGroup) => chatGroup.prospectId === selectedProspect?.id
+      )?.chats || [],
+      ["createdAt"]
+    )
+  );
 
-  
-
-//     useEffect(() => {
-//       const prospectMessages = selectedChats.filter(
-//         (chat: Chat) => chat.senderPhoneNo !== myPhoneNo
-//       );
-//       const lastProspectMessage =
-//         prospectMessages.length > 0
-//           ? prospectMessages[prospectMessages.length - 1]
-//           : null;
-// console.log(lastProspectMessage) 
-//       if (lastProspectMessage) {
-//         dispatch(updateLastChatTime(`${lastProspectMessage.createdAt}`))
-//       } 
-//     },[selectedChats])
-   
-  
-
-
+  //     useEffect(() => {
+  //       const prospectMessages = selectedChats.filter(
+  //         (chat: Chat) => chat.senderPhoneNo !== myPhoneNo
+  //       );
+  //       const lastProspectMessage =
+  //         prospectMessages.length > 0
+  //           ? prospectMessages[prospectMessages.length - 1]
+  //           : null;
+  // console.log(lastProspectMessage)
+  //       if (lastProspectMessage) {
+  //         dispatch(updateLastChatTime(`${lastProspectMessage.createdAt}`))
+  //       }
+  //     },[selectedChats])
 
   // useEffect(() => {
   //   if (data) {
@@ -127,7 +123,7 @@ const selectedChats = useSelector((state: RootState) =>
 
   //   // Listen for new messages
   //   socket.on("messages", (data) => {
-      
+
   //     console.log("📩 New Messages:", data);
   //     // setMessages((prev) => [...prev, ...data.processedResults]);
   //   });
@@ -153,7 +149,7 @@ const selectedChats = useSelector((state: RootState) =>
           <div className="space-y-4 p-4">
             {selectedChats &&
               selectedChats.length > 0 &&
-              selectedChats.map((chat:any) => {
+              selectedChats.map((chat: any) => {
                 const isMyMessage = chat.senderPhoneNo === myPhoneNo;
                 console.log(selectedChats);
                 return (
@@ -172,7 +168,7 @@ const selectedChats = useSelector((state: RootState) =>
                               selectedProspect?.image ||
                               "https://github.com/shadcn.png"
                             }
-                            alt={selectedProspect?.name??""}
+                            alt={selectedProspect?.name ?? ""}
                             className="object-cover"
                           />
                         </Avatar>
@@ -233,18 +229,42 @@ const selectedChats = useSelector((state: RootState) =>
                             )}
                           <div className="flex gap-2 mt-2">
                             {chat?.Buttons &&
-                              chat.Buttons?.length > 0 &&
-                              chat.Buttons.map((button:any, index:number) => (
-                                <Button
-                                  key={index}
-                                  className="bg-primary-100 w-full text-black"
-                                >
-                                  {button.text}
-                                </Button>
-                              ))}
+                              chat.Buttons.length > 0 &&
+                              chat.Buttons.map((button:any, index:any) => {
+                                if (button.type === "URL") {
+                                  return (
+                                    <Button
+                                      key={index}
+                                      className="bg-primary-100 w-full text-black"
+                                    >
+                                      <a
+                                        href={button.value}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        {button.text}
+                                      </a>
+                                    </Button>
+                                  );
+                                }
+                                else{
+                                  return (
+                                    <Button
+                                      key={index}
+                                      className="bg-primary-100 w-full text-black"
+                                    >
+                                      {button.text}
+                                    </Button>
+                                  );
+                                }
+                              })}
                           </div>
-                          <div className={`mt-2  w-full ${isMyMessage ? "flex" : "hidden"} justify-end text-[10px] items-center gap-2`} >
-                       {getStatusIcon(chat.Status)}
+                          <div
+                            className={`mt-2  w-full ${
+                              isMyMessage ? "flex" : "hidden"
+                            } justify-end text-[10px] items-center gap-2`}
+                          >
+                            {getStatusIcon(chat.Status)}
                             {chat.Status}
                           </div>
                         </div>
@@ -274,7 +294,6 @@ const selectedChats = useSelector((state: RootState) =>
               })}
           </div>
         </ScrollArea>
- 
       )}
     </>
   );

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "react-hot-toast";
 import { useUploadFilesMutation } from "@/store/features/apislice";
-
+import { Eye } from "lucide-react";
 function AddContentForm({
   selectedContact,
   selectedTemplate,
@@ -52,6 +52,7 @@ function AddContentForm({
         }[],
         buttons: [] as { type: string; value: string; isEditable: boolean }[],
       };
+
 
       selectedTemplate.components.forEach((component: any) => {
         if (component.type === "HEADER") {
@@ -132,8 +133,7 @@ function AddContentForm({
                 ? button.url || ""
                 : button.example?.[0] || ""
             ),
-            text:button.text ??"jhh",
-
+            text: button.text ?? "jhh",
           }));
         }
       });
@@ -192,8 +192,6 @@ function AddContentForm({
     }
   };
 
-
-
   const handleInputChange = (
     section: "header" | "body" | "buttons",
     index: number,
@@ -251,18 +249,18 @@ function AddContentForm({
   };
 
   const handledropdownItems =
-  selectedContact?.type === "excel"
-    ? Object.keys(selectedContact?.data[0] || {}).map(key => ({
-        type: key,
-        value: key,
-      }))
-    : [
-        { type: "First Name", value: "firstName" },
-        { type: "Last Name", value: "lastName" },
-        { type: "displayName", value: "displayName" },
-        { type: "Phone", value: "phone" },
-        { type: "Email", value: "email" },
-      ];
+    selectedContact?.type === "excel"
+      ? Object.keys(selectedContact?.data[0] || {}).map((key) => ({
+          type: key,
+          value: key,
+        }))
+      : [
+          { type: "First Name", value: "firstName" },
+          { type: "Last Name", value: "lastName" },
+          { type: "displayName", value: "displayName" },
+          { type: "Phone", value: "phone" },
+          { type: "Email", value: "email" },
+        ];
 
   if (!selectedTemplate || !selectedContact) {
     return <div>You need to select a template and contacts to acess this</div>;
@@ -330,8 +328,12 @@ function AddContentForm({
                                       variant="blue"
                                       checked={formData.header.fromsegment}
                                       onCheckedChange={(checked) =>
-
-                                        handleInputChange("header", 0,"fromsegment", checked)
+                                        handleInputChange(
+                                          "header",
+                                          0,
+                                          "fromsegment",
+                                          checked
+                                        )
                                       }
                                     />
                                     From {selectedContact?.type ?? ""} segment
@@ -370,7 +372,10 @@ function AddContentForm({
                                     <SelectContent>
                                       <SelectGroup>
                                         {handledropdownItems.map((item) => (
-                                          <SelectItem key={item.value} value={item.value}>
+                                          <SelectItem
+                                            key={item.value}
+                                            value={item.value}
+                                          >
                                             {item.type}
                                           </SelectItem>
                                         ))}
@@ -429,16 +434,29 @@ function AddContentForm({
                               className="hidden"
                               ref={fileInputRef}
                             />
-                            <Button
-                              type="button"
-                              className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white"
-                              onClick={() =>
-                                handleUploadClick(component.format || "")
-                              }
-                            >
-                              <Upload className="mr-2 h-4 w-4" />
-                              Upload {component?.format?.toLowerCase()}
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white"
+                                onClick={() =>
+                                  handleUploadClick(component.format || "")
+                                }
+                              >
+                                <Upload className="mr-2 h-4 w-4" />
+                                Upload {component?.format?.toLowerCase()}
+                              </Button>
+                              {formData?.header?.value && (
+                                <a
+                                  href={formData?.header?.value??""}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex cursor-pointer items-center gap-2 px-3 py-1  bg-blue-500 text-white font-semibold rounded-md shadow-md transition-all duration-200"
+                                >
+                                  <Eye className="w-5 h-5" />
+                                  <span>Preview File</span>
+                                </a>
+                               )} 
+                            </div>
                           </>
                         )}
                       </div>
@@ -501,14 +519,17 @@ function AddContentForm({
                                         value
                                       )
                                     }
-                                                                     >
+                                  >
                                     <SelectTrigger className="basis-2/4">
                                       <SelectValue placeholder="Select a field" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectGroup>
                                         {handledropdownItems.map((item) => (
-                                          <SelectItem key={item.value} value={item.value}>
+                                          <SelectItem
+                                            key={item.value}
+                                            value={item.value}
+                                          >
                                             {item.type}
                                           </SelectItem>
                                         ))}
@@ -523,7 +544,8 @@ function AddContentForm({
                                     htmlFor="header-alternative"
                                     className="text-sm font-medium text-gray-400"
                                   >
-                                Enter fallback values for {param.parameter_name}
+                                    Enter fallback values for{" "}
+                                    {param.parameter_name}
                                   </label>
                                   <Input
                                     id="header-alternative"
