@@ -67,7 +67,7 @@ function ScheduleBroadcast({
         <Label className="text-sm text-gray-500">
           Date &amp; Time (IST)
         </Label>
-        <div className="flex gap-2 mt-1.5">
+        <div className="flex md:flex-row flex-col gap-2 mt-1.5">
           <Popover>
             <PopoverTrigger asChild>
               <Button

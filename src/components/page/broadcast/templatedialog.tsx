@@ -49,7 +49,7 @@ console.log(selectedTemplate)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className=" p-6 gap-6 bg-blue-50 md:min-w-[60vw] h-[80vh] no-scrollbar overflow-auto">
+      <DialogContent className=" md:p-6 p-2 md:max-w-auto w-[95vw]  md:min-w-[60vw] gap-6 bg-blue-50 rounded-sm  h-[80vh] no-scrollbar overflow-auto ">
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-10">
           {/* Select Template Section */}
           <ScrollArea className="overflow-scroll h-[80vh] no-scrollbar">

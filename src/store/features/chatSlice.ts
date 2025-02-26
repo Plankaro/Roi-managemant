@@ -33,6 +33,7 @@ export enum MessageStatus {
   DELIVERED = "delivered",
   READ = "read",
   FAILED = "failed",
+  SKIPPED = "skipped",
 }
 
 export enum HeaderType {
@@ -88,8 +89,11 @@ const chatSlice = createSlice({
         );
 
         if (existingChatIndex !== -1) {
-          // Update message status if it already exists
-          prospectChatGroup.chats[existingChatIndex].Status = newChat.Status;
+      
+          prospectChatGroup.chats[existingChatIndex] = {
+            ...prospectChatGroup.chats[existingChatIndex],
+            Status: newChat.Status, // Update status safely
+          };
         } else {
           // Add new chat for this prospect
           prospectChatGroup.chats.push(newChat);

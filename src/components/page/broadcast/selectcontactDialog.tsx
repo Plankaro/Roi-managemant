@@ -91,26 +91,30 @@ function SelectContactDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-2xl bg-blue-50">
+      <DialogContent className="md:max-w-2xl md:p-5 p-3 max-w-[90vw] md:h-[75vh] h-[80vh] overflow-auto no-scrollbar rounded-sm bg-blue-50">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-blue-800">Select Recipients</DialogTitle>
+          <DialogTitle className="text-lg md:text-2xl  font-bold text-blue-800">Select Recipients</DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="segments" className="mt-4">
           <TabsList className="grid w-full grid-cols-2 bg-blue-50 ">
             <TabsTrigger
               value="segments"
-              className="gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white text-black"
+              className=" data-[state=active]:bg-blue-600 data-[state=active]:text-white text-black py-2"
             >
-              <Users className="w-4 h-4" />
+              <Users className="w-4 h-4 sm:block hidden" />
+              <span className="md:text-base text-xs">
               Shopify Segments
+              </span>
             </TabsTrigger>
             <TabsTrigger
               value="excel"
-              className="gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white text-black"
+              className="gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white py-2 text-black md:text-base text-sm"
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-4 h-4 sm:block hidden" />
+              <span className="md:text-base text-xs">
               Excel Upload
+              </span>
             </TabsTrigger>
           </TabsList>
 
@@ -121,20 +125,20 @@ function SelectContactDialog({
                 <Input placeholder="Search segments..." className="pl-9 border-blue-200 focus:border-blue-500" />
               </div>
 
-              <ScrollArea className="h-[400px] rounded-md border border-blue-200 p-4">
+              <ScrollArea className="h-[400px] rounded-md border border-blue-200 sm:p-4">
                 <RadioGroup value={selectContacts?.id ?? ""} onValueChange={(value) => setShopifyContact(value)}>
                   {segments?.map((segment: any) => (
                     <div
                       key={segment.id}
-                      className="flex items-center space-x-2 py-2 px-3 rounded-lg hover:bg-blue-100"
+                      className="flex items-center space-x-2 py-2 px-2 rounded-lg hover:bg-blue-100"
                     >
                       <RadioGroupItem value={segment.id} id={`${segment.id}`} className="text-blue-500" />
                       <Label
                         htmlFor={`${segment.id}`}
-                        className="flex-1 flex items-center justify-between cursor-pointer"
+                        className="flex-1 flex items-center justify-between cursor-pointer gap-5"
                       >
-                        <span className="text-blue-800">{segment.name}</span>
-                        <span className="text-sm text-blue-500">({segment.totalCount} members)</span>
+                        <span className="text-blue-800 md:text-base text-sx sm:text-sm">{segment.name}</span>
+                        <span className="sm:text-sm text-blue-500 text-xs">({segment.totalCount} members)</span>
                       </Label>
                     </div>
                   ))}

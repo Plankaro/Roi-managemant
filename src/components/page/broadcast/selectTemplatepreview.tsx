@@ -69,25 +69,13 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
             ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
             component.example?.header_handle
           ) {
-            newFormData.header.value = component.example.header_handle[0]
+            newFormData.header.value = component.example.header_handle[0] || ""
             newFormData.header.isEditable = true
           } else if (component.format === "TEXT") {
-            if (
-              selectedTemplate.parameter_format === "POSITIONAL" &&
-              component.example?.header_text
-            ) {
-              newFormData.header.value = component.example.header_text[0]
-              newFormData.header.isEditable = true
-            } else if (
-              selectedTemplate.parameter_format === "NAMED" &&
-              component.example?.header_text_named_params
-            ) {
-              newFormData.header.value = component.example.header_text_named_params[0].example
-              newFormData.header.isEditable = true
-            } else {
+         
               newFormData.header.value = component.text || ""
-              newFormData.header.isEditable = false
-            }
+              newFormData.header.isEditable = true
+           
           }
         } else if (component.type === "BODY") {
           if (
@@ -228,7 +216,7 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
     <div className=" gap-6">
       
    
-          <h2 className="text-xl font-semibold mb-6">Preview</h2>
+        
           {renderPreview()}
         
     </div>

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload } from "lucide-react";
+import { Upload, ArrowRightFromLine } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
@@ -35,20 +35,29 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useCreateBroadcastMutation,useSendTestMessageMutation } from "@/store/features/apislice";
+import {
+  useCreateBroadcastMutation,
+  useSendTestMessageMutation,
+} from "@/store/features/apislice";
 import toast from "react-hot-toast";
 import { isValidPhoneNumber } from "@/lib/isvalidphoneno";
 import Link from "next/link";
-
+import BroadcastPopup from "@/components/page/broadcast/proceedmodel";
+import { useRouter } from "next/navigation";
+import { truncate } from "node:fs/promises";
 
 export default function CreateBroadcastCampaign() {
+  const router = useRouter();
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
+  const [checkoutDialog, setCheckoutDialog] = useState(false);
 
   const [broadcast, { isLoading }] = useCreateBroadcastMutation();
-  const [sendTestMessage, { isLoading: sendTestMessageLoading }] = useSendTestMessageMutation();
+  const [sendTestMessage, { isLoading: sendTestMessageLoading }] =
+    useSendTestMessageMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       name: "",
       type: "",
@@ -98,30 +107,56 @@ export default function CreateBroadcastCampaign() {
   const selectedTemplate = form.watch("template");
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log("Form data:", data);
-    const datas = await broadcast(data).unwrap();
-    console.log("Broadcast created successfully:", datas);
+    try {
+      console.log("Form data:", data);
+      const datas =  broadcast(data).unwrap();
+      toast.promise(datas, {
+        loading: "Creating broadcast...",
+        success: () => toast.success("Broadcast created successfully"),
+        error: () => toast.error("Failed to create broadcast"),
+      });
+      const dataBrod = await datas
+      router.push(`/broadcast`);
+    } catch (error) {
+      console.log(error);
+    }
+    
+  };
+
+  const validateForm = async () => {
+    let validate = false;
+    const isValid = await form.trigger();
+    console.log(isValid); // Triggers validation manually
+
+    if (!isValid) {
+      const errors = form.formState.errors;
+      const errorFields = Object.keys(errors.templateForm || {}).join(", ");
+
+      toast.error(`Invalid or template fields: ${errorFields}`);
+      return validate;
+    }
+    validate = true;
+    return validate;
   };
 
   const handleTestMessage = async () => {
+    const isValid = await validateForm();
+    if (!isValid) return;
     // Test message functionality goes here
-    const formvalues =  form.getValues();
+    const formvalues = form.getValues();
     console.log("Form data:", formvalues);
-    const datavalidation = formSchema.safeParse(formvalues);
-    if (!datavalidation.success) {
-      toast.error("Fix errors & complete form");
+
+    const ValidPhoneNumber = isValidPhoneNumber(formvalues?.testphoneno ?? "");
+    if (!ValidPhoneNumber) {
+      toast.error("Invalid phone number");
       return;
     }
-    const ValidPhoneNumber =  isValidPhoneNumber(formvalues?.testphoneno??"")
-    if(!ValidPhoneNumber){
-      toast.error("Invalid phone number");
-      return
-    }
-    const datas = await sendTestMessage(formvalues).unwrap();
-    console.log("Test message sent successfully:", datas);
-    
-
-
+    const datas = sendTestMessage(formvalues).unwrap();
+    toast.promise(datas, {
+      loading: "Sending test message...",
+      success: () => toast.success("Test message sent successfully"),
+      error: () => toast.error("Failed to send test message"),
+    });
   };
 
   const onError = (errors: any) => {
@@ -131,8 +166,17 @@ export default function CreateBroadcastCampaign() {
     }
   };
 
-  
+  const handlecheckoutDialog = async(value: boolean) => {
+    if (value===true) {
+      const isValid = await validateForm();
+      console.log(isValid);
+      if (!isValid) return;
+        
+    }
+    setCheckoutDialog(value);
+  }
 
+  console.log(selectedTemplate);
   return (
     <ScrollArea className="  text-white p-4 h-[calc(100vh-100px)] ">
       <Form {...form}>
@@ -141,37 +185,56 @@ export default function CreateBroadcastCampaign() {
           onSubmit={form.handleSubmit(onSubmit, onError)}
         >
           <header className="flex items-center justify-between mb-8">
-            <h1 className="text-xl font-semibold">Create Broadcast Campaign</h1>
-            
+            <h1 className="md:text-xl text-base font-semibold">
+              Create Broadcast Campaign
+            </h1>
+
             <div className="flex gap-2">
-            <Link href={"/broadcast"}>
-              <Button
-                variant="outline"
-                className="bg-transparent border-primary py-3 px-7"
-                type="button"
-              >
-                Exit
-              </Button>
+              <Link href={"/broadcast"} className="md:block hidden">
+                <Button
+                  variant="outline"
+                  className="bg-transparent border-primary py-3 px-7"
+                  type="button"
+                >
+                  Exit
+                </Button>
               </Link>
-              
-              <Button className="bg-blue-500 py-3 px-7">Proceed</Button>
+              <BroadcastPopup selectedTemplate={selectedTemplate} form={form} open={checkoutDialog} onOpenChange={handlecheckoutDialog}>
+                <div className="flex  gap-2">
+                  <Button
+                    className="bg-blue-500 py-3 px-7 hidden md:flex items-center"
+                    type="button"
+                  >
+                    Proceed
+                  </Button>
+                  <Button
+                    className="bg-blue-500 rounded-full md:hidden flex items-center"
+                    size="icon"
+                    type="button"
+                  >
+                    <ArrowRightFromLine />
+                  </Button>
+                </div>
+              </BroadcastPopup>
             </div>
           </header>
 
           <div className="space-y-8">
             <div className=" flex flex-col gap-5 ">
-              <div className="flex gap-5">
+              <div className="flex md:flex-row flex-col gap-5">
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field, fieldState }) => (
                     <FormItem className="space-y-3 basis-1/2">
-                      <FormLabel className="text-2xl">BroadCast Name</FormLabel>
+                      <FormLabel className="md:text-2xl text-lg">
+                        BroadCast Name
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           placeholder="Enter broadcast name"
-                          className="bg-transparent  border-gray-400 text-white  rounded-3xl focus:border-blue-500 lg:w-10/12"
+                          className="bg-transparent sm:text-base text-sm  border-gray-400 text-white  rounded-3xl focus:border-blue-500 lg:w-10/12"
                         />
                       </FormControl>
                       <FormMessage>{fieldState.error?.message}</FormMessage>
@@ -184,7 +247,7 @@ export default function CreateBroadcastCampaign() {
                   name="type"
                   render={({ field, fieldState }) => (
                     <FormItem className="space-y-3 basis-1/2">
-                      <FormLabel className="text-2xl">
+                      <FormLabel className=" md:text-2xl text-lg">
                         Select a Category
                       </FormLabel>
                       <FormControl>
@@ -211,12 +274,12 @@ export default function CreateBroadcastCampaign() {
                 />
               </div>
 
-              <div className=" flex  gap-5">
+              <div className=" flex md:flex-row flex-col gap-5">
                 <FormField
                   control={form.control}
                   name="template"
                   render={({ field, fieldState }) => (
-                    <FormItem className="py-2 text-2xl text-white basis-1/2">
+                    <FormItem className="py-2 md:text-2xl text-lg  text-white basis-1/2">
                       Select Template
                       <FormDescription className="text-gray-400">
                         Select a template for broadcast messages
@@ -248,11 +311,11 @@ export default function CreateBroadcastCampaign() {
                   name="contact"
                   render={({ field, fieldState }) => (
                     <FormItem className="py-2">
-                      <FormLabel className="text-white text-2xl">
+                      <FormLabel className="text-white md:text-2xl text-lg ">
                         {" "}
                         Recipients
                       </FormLabel>
-                      <FormDescription className="text-gray-400">
+                      <FormDescription className="text-gray-400 md:text-base sm:text-sm text-xs">
                         {" "}
                         You can upload an Excel sheet or select a Shopify
                         segment.
@@ -284,8 +347,8 @@ export default function CreateBroadcastCampaign() {
                 name="templateForm"
                 render={({ field, fieldState }) => (
                   <FormItem className="py-2">
-                    <FormLabel className="text-2xl text-white">
-                      Add Content <span className="text-red-500">*</span>
+                    <FormLabel className="md:text-2xl text-lg  text-white">
+                      Add Content
                     </FormLabel>
                     <FormControl>
                       <AddContentForm
@@ -307,7 +370,7 @@ export default function CreateBroadcastCampaign() {
                 hours of getting the message.
               </p>
               <Select>
-                <SelectTrigger className=" bg-transparent w-1/4 text-white">
+                <SelectTrigger className=" bg-transparent lg:w-1/4 md:w-1/2 text-white">
                   <SelectValue placeholder="Transfer Bot" />
                 </SelectTrigger>
                 <SelectContent>
@@ -326,7 +389,7 @@ export default function CreateBroadcastCampaign() {
 
                   return (
                     <FormItem className="space-y-2 py-2">
-                      <FormLabel className="text-2xl font-medium">
+                      <FormLabel className="md:text-2xl text-lg  font-medium">
                         UTM Parameters
                       </FormLabel>
                       <FormDescription className="text-xs text-gray-400">
@@ -368,7 +431,7 @@ export default function CreateBroadcastCampaign() {
                 name="advanceFilters"
                 render={({ field, fieldState }) => (
                   <FormItem className="py-2 space-y-2">
-                    <FormLabel className="text-2xl font-medium">
+                    <FormLabel className="md:text-2xl text-lg  font-medium">
                       Audience Filtering Options
                     </FormLabel>
                     <FormDescription>

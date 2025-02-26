@@ -101,7 +101,7 @@ export const scheduleSchema = z
     }
   );
 
-const Templateschema = z
+export const Templateschema = z
   .object({
     name: z.string().min(1, "Name is required"),
     parameter_format: z.string().min(1, "Parameter format is required"),

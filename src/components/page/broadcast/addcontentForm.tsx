@@ -263,7 +263,7 @@ function AddContentForm({
         ];
 
   if (!selectedTemplate || !selectedContact) {
-    return <div>You need to select a template and contacts to acess this</div>;
+    return <div className="md:text-base text-sm">You need to select a template and contacts to acess this</div>;
   }
   return (
     <Card className="bg-transparent text-white shadow-none p-0 border-0 h-full overflow-y-scroll no-scrollbar">
@@ -310,8 +310,8 @@ function AddContentForm({
                             component.example?.header_text) ||
                             (selectedTemplate.parameter_format === "NAMED" &&
                               component.example?.header_text_named_params)) && (
-                            <div className="h-full flex gap-4">
-                              <div className="basis-1/2 flex flex-col gap-3">
+                            <div className={`h-full lg:flex-row  flex flex-col gap-4`}>
+                              <div className={`lg:basis-1/2 flex flex-col gap-3`}>
                                 <div className="flex justify-between">
                                   <label
                                     htmlFor="header-input"
@@ -366,7 +366,7 @@ function AddContentForm({
                                       )
                                     }
                                   >
-                                    <SelectTrigger className="basis-2/4">
+                                    <SelectTrigger className="lg:basis-1/2">
                                       <SelectValue placeholder="Select a field" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -385,7 +385,7 @@ function AddContentForm({
                                 )}
                               </div>
                               {formData.header.fromsegment && (
-                                <div className="w-full flex flex-col gap-3">
+                                <div className="w-full flex flex-col gap-3 lg:basis-1/2">
                                   <label
                                     htmlFor="header-alternative"
                                     className="text-sm font-medium text-gray-400"
@@ -407,7 +407,7 @@ function AddContentForm({
                                         e.target.value
                                       )
                                     }
-                                    className="border-blue-500 focus:ring-blue-500 w-9/12"
+                                    className="border-blue-500 focus:ring-blue-500 xl:w-9/12"
                                   />
                                 </div>
                               )}
@@ -417,7 +417,7 @@ function AddContentForm({
                           component.format || ""
                         ) && (
                           <>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="sm:text-sm  text-xs text-muted-foreground">
                               Upload a {component?.format?.toLowerCase()} under
                               5 MB with a recommended aspect ratio of 1.91:1.
                             </p>
@@ -443,17 +443,17 @@ function AddContentForm({
                                 }
                               >
                                 <Upload className="mr-2 h-4 w-4" />
-                                Upload {component?.format?.toLowerCase()}
+                                <span className="md:text-base text-sm ">Upload {component?.format?.toLowerCase()}</span>
                               </Button>
                               {formData?.header?.value && (
                                 <a
                                   href={formData?.header?.value??""}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex cursor-pointer items-center gap-2 px-3 py-1  bg-blue-500 text-white font-semibold rounded-md shadow-md transition-all duration-200"
+                                  className="flex cursor-pointer items-center gap-2 md:px-3 md:py-1 p-2   bg-blue-500 text-white font-semibold sm:rounded-md rounded-full shadow-md transition-all duration-200"
                                 >
-                                  <Eye className="w-5 h-5" />
-                                  <span>Preview File</span>
+                                  <Eye className="w-5 h-5 " />
+                                  <span className="sm:text-base md:block hidden ">Preview File</span>
                                 </a>
                                )} 
                             </div>
@@ -467,9 +467,9 @@ function AddContentForm({
                           {formData.body.map((param: any, paramIndex: any) => (
                             <div
                               key={`body-${paramIndex}`}
-                              className="flex gap-6"
+                              className="flex lg:flex-row flex-col gap-6"
                             >
-                              <div className="basis-1/2 flex flex-col gap-3 ">
+                              <div className={` lg:basis-1/2  flex flex-col gap-3 `}>
                                 <div className="flex justify-between text-gray-400">
                                   <label
                                     htmlFor={`body-${paramIndex}`}
@@ -506,7 +506,7 @@ function AddContentForm({
                                         e.target.value
                                       )
                                     }
-                                    className="border-blue-500 focus:ring-blue-500"
+                                    className="border-blue-500  focus:ring-blue-500"
                                   />
                                 ) : (
                                   <Select
@@ -520,7 +520,7 @@ function AddContentForm({
                                       )
                                     }
                                   >
-                                    <SelectTrigger className="basis-2/4">
+                                    <SelectTrigger className="">
                                       <SelectValue placeholder="Select a field" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -539,7 +539,7 @@ function AddContentForm({
                                 )}
                               </div>
                               {param.fromsegment && (
-                                <div className="w-full flex flex-col gap-3">
+                                <div className="w-full flex flex-col gap-3 lg:basis-1/2">
                                   <label
                                     htmlFor="header-alternative"
                                     className="text-sm font-medium text-gray-400"
@@ -559,7 +559,7 @@ function AddContentForm({
                                         e.target.value
                                       )
                                     }
-                                    className="border-blue-500 focus:ring-blue-500 w-9/12"
+                                    className="border-blue-500 focus:ring-blue-500 xl:w-9/12"
                                   />
                                 </div>
                               )}
@@ -605,7 +605,7 @@ function AddContentForm({
                                     e.target.value
                                   )
                                 }
-                                className="border-blue-500 focus:ring-blue-500 w-1/2"
+                                className="border-blue-500 focus:ring-blue-500 xl:w-1/2"
                               />
                             </>
                           )}
