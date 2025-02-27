@@ -187,7 +187,33 @@ export const apiSlice = createApi({
         body,
       })
 
-    })
+    }),
+    getAllBroadcasts: builder.query({
+      query: () => ({
+        url: "/broadcast",
+        method: "GET",
+      }),
+    }),
+    getBroadcastById: builder.query({
+      query: (id) => ({
+        url: `/broadcast/${id}`,
+        method: "GET",
+      }),
+    }),
+    createBroadcastRetry: builder.mutation({
+      query: (body) => ({
+        url: `/broadcast/retry`,
+        method: "Post",
+        body
+
+      }),
+    }),
+    getRetryBroadcast:builder.query({
+      query: (id) => ({
+        url: `/broadcast/retry/${id}`,
+        method: "GET",
+      }),
+    }),
 
   }),
 });
@@ -216,6 +242,11 @@ export const {
   useSendMediaMutation,
   useGetSegmentsQuery,
   useCreateBroadcastMutation,
-  useSendTestMessageMutation
+  useSendTestMessageMutation,
+  useGetAllBroadcastsQuery,
+  useGetBroadcastByIdQuery,
+  useCreateBroadcastRetryMutation,
+  useGetRetryBroadcastQuery
+  
 
 } = apiSlice;

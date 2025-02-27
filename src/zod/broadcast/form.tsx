@@ -125,7 +125,7 @@ export const Templateschema = z
     isEditable: z.boolean(),
     fromsegment: z.boolean(),
     segmentname: z.string(),
-    segmenttype: z.string(),
+  
     segmentAltValue: z.string(),
   })
   .optional()
@@ -140,13 +140,7 @@ export const Templateschema = z
           path: ["segmentname"],
         });
       }
-      if (!data.segmenttype.trim()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Segment Type is required when fromsegment is true",
-          path: ["segmenttype"],
-        });
-      }
+      
       if (!data.segmentAltValue.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -171,7 +165,7 @@ export const Templateschema = z
     value: z.string().optional(), // Make value optional initially
     fromsegment: z.boolean(),
     segmentname: z.string(),
-    segmenttype: z.string(),
+   
     segmentAltValue: z.string(),
   })
   .superRefine((data, ctx) => {
@@ -183,13 +177,7 @@ export const Templateschema = z
           path: ["segmentname"],
         });
       }
-      if (!data.segmenttype.trim()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Segment Type is required when fromsegment is true",
-          path: ["segmenttype"],
-        });
-      }
+     
       if (!data.segmentAltValue.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

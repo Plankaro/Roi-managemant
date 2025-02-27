@@ -111,9 +111,9 @@ export default function MessageStatus() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex flex-col gap-4 justify-center">
+            <div className="flex md:flex-col gap-4 justify-center">
               {chartData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2 md:ml-0 ml-4">
+                <div key={index} className="flex  items-center gap-2 md:ml-0 ml-4">
                   <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.fill }} />
                   <span className="text-sm text-zinc-400">{item.name}</span>
                 </div>

@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { motion, AnimatePresence } from "framer-motion"
 import { z } from "zod"
-import { formSchema, Templateschema } from "@/zod/broadcast/form"
+import {  Templateschema } from "@/zod/broadcast/form"
 import { ReactNode } from "react"
 import SelectedPreview from "./selectTemplatepreview"
 import {  format } from 'date-fns';
@@ -22,9 +22,10 @@ interface BroadcastPopupProps {
     onOpenChange?: (open: boolean) => void;
     selectedTemplate: z.infer<typeof Templateschema>;
     form: any;
+ submitref: any;
   }
 
-function BroadcastPopup({ children,open,onOpenChange,selectedTemplate,form }: BroadcastPopupProps) {
+function BroadcastPopup({ children,open,onOpenChange,selectedTemplate,form,submitref}: BroadcastPopupProps) {
   const formData = form.getValues();
   function mergeDateTime(dateStr: string, timeStr: string): string {
     const parsedDate = new Date(dateStr); // Convert date string to Date object
@@ -54,10 +55,10 @@ function BroadcastPopup({ children,open,onOpenChange,selectedTemplate,form }: Br
   ? mergeDateTime(`${formData.schedule.date}`, `${formData.schedule.time || '00:00'}`)
   : new Date();
 
-  async function onConfirm() {
-    await form.trigger()
+  const handleSubmit = ()=>{
+    submitref.current?.click()
   }
-
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -133,7 +134,7 @@ function BroadcastPopup({ children,open,onOpenChange,selectedTemplate,form }: Br
             <Button variant="outline" className="h-8 px-4 text-sm">
               Exit
             </Button>
-            <Button className="h-8 px-4 text-sm bg-blue-600 hover:bg-blue-700" onClick={onConfirm} type="submit">Confirm</Button>
+            <Button className="h-8 px-4 text-sm bg-blue-600 hover:bg-blue-700" onClick={handleSubmit} type="submit">Confirm</Button>
           </div>
         </div>
       </DialogContent>

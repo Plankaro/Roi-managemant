@@ -39,7 +39,7 @@ function AddContentForm({
           isEditable: false,
           fromsegment: false,
           segmentname: "",
-          segmenttype: "",
+         
           segmentAltValue: "",
         },
         body: [] as {
@@ -47,7 +47,7 @@ function AddContentForm({
           value: string;
           fromsegment: boolean;
           segmentname: string;
-          segmenttype: string;
+       
           segmentAltValue: string;
         }[],
         buttons: [] as { type: string; value: string; isEditable: boolean }[],
@@ -72,7 +72,7 @@ function AddContentForm({
               newFormData.header.isEditable = true;
               newFormData.header.fromsegment = false;
               newFormData.header.segmentname = "";
-              newFormData.header.segmenttype = "";
+            
               newFormData.header.segmentAltValue = "";
             } else if (
               selectedTemplate.parameter_format === "NAMED" &&
@@ -82,14 +82,14 @@ function AddContentForm({
               newFormData.header.isEditable = true;
               newFormData.header.fromsegment = false;
               newFormData.header.segmentname = "";
-              newFormData.header.segmenttype = "";
+           
               newFormData.header.segmentAltValue = "";
             } else {
               newFormData.header.value = component.text || "";
               newFormData.header.isEditable = false;
               newFormData.header.fromsegment = false;
               newFormData.header.segmentname = "";
-              newFormData.header.segmenttype = "";
+       
               newFormData.header.segmentAltValue = "";
             }
           }
@@ -104,7 +104,7 @@ function AddContentForm({
                 value: "",
                 fromsegment: false,
                 segmentname: "",
-                segmenttype: "",
+              
                 segmentAltValue: "",
               })
             );
@@ -118,7 +118,7 @@ function AddContentForm({
                 value: "",
                 fromsegment: false,
                 segmentname: "",
-                segmenttype: "",
+              
                 segmentAltValue: "",
               })
             );
@@ -174,22 +174,6 @@ function AddContentForm({
     );
 
     return hasEditableHeader || hasEditableBody || hasEditableButtons;
-  };
-
-  const handleCheckChange = (
-    section: "header" | "body" | "buttons",
-    index: number,
-    value: any
-  ) => {
-    console.log(section, index, value);
-    handleInputChange(section, index, "fromsegment", value);
-    if (!value) {
-      ["segmentname", "segmentAltValue", "segmenttype"].forEach((field) => {
-        handleInputChange(section, index, field, "");
-      });
-    } else {
-      handleInputChange(section, index, "segmenttype", selectedContact.type);
-    }
   };
 
   const handleInputChange = (
@@ -327,14 +311,10 @@ function AddContentForm({
                                       className=""
                                       variant="blue"
                                       checked={formData.header.fromsegment}
-                                      onCheckedChange={(checked) =>
-                                        handleInputChange(
-                                          "header",
-                                          0,
-                                          "fromsegment",
-                                          checked
-                                        )
-                                      }
+                                      onCheckedChange={(checked) => {
+                                        handleInputChange("header", 0, "fromsegment", checked);
+                                        
+                                      }}
                                     />
                                     From {selectedContact?.type ?? ""} segment
                                   </span>
@@ -483,11 +463,7 @@ function AddContentForm({
                                       variant="blue"
                                       checked={param.fromsegment}
                                       onCheckedChange={(checked) =>
-                                        handleCheckChange(
-                                          "body",
-                                          paramIndex,
-                                          checked
-                                        )
+                                        handleInputChange("body", paramIndex, "fromsegment", checked)
                                       }
                                     />
                                     From {selectedContact?.type ?? ""} segment

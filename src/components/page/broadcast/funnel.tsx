@@ -44,8 +44,8 @@ function Funnel() {
           <div className="grid grid-cols-4 gap-4 text-center">
             {data.map((item, index) => (
               <div key={index} className="space-y-1">
-                <p className="text-gray-300 text-sm">{item.name}</p>
-                <p className="text-red-500 font-medium">{item.total.toLocaleString()}</p>
+                <p className="text-gray-300 sm:text-sm text-xs">{item.name}</p>
+                <p className="text-red-500 font-medium md:text-base sm:text-sm text-xs">{item.total.toLocaleString()}</p>
               </div>
             ))}
           </div>

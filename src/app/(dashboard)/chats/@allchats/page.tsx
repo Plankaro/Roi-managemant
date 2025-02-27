@@ -374,7 +374,7 @@ const handleDeleteChats=async(id: string)=>{
                     >
                       <DropdownMenuItem>
                         <Link
-                          href={`/orders/${selectedProspect.shopify_id}`}
+                          href={`/orders/${selectedProspect.id}`}
                           className="flex  pr-14 gap-5"
                         >
                           <Image

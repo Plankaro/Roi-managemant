@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Upload, ArrowRightFromLine } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import SelectContactDialog from "@/components/page/broadcast/selectcontactDialog";
 import { UTMParametersDialog } from "@/components/page/broadcast/utmparameters";
@@ -44,20 +44,23 @@ import { isValidPhoneNumber } from "@/lib/isvalidphoneno";
 import Link from "next/link";
 import BroadcastPopup from "@/components/page/broadcast/proceedmodel";
 import { useRouter } from "next/navigation";
-import { truncate } from "node:fs/promises";
+
+import { useGetAllBroadcastsQuery } from "@/store/features/apislice";
 
 export default function CreateBroadcastCampaign() {
   const router = useRouter();
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [checkoutDialog, setCheckoutDialog] = useState(false);
+  const submitRef = useRef(null)
 
   const [broadcast, { isLoading }] = useCreateBroadcastMutation();
+  const {refetch} = useGetAllBroadcastsQuery({})
   const [sendTestMessage, { isLoading: sendTestMessageLoading }] =
     useSendTestMessageMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    mode: "onChange",
+  
     defaultValues: {
       name: "",
       type: "",
@@ -116,7 +119,8 @@ export default function CreateBroadcastCampaign() {
         error: () => toast.error("Failed to create broadcast"),
       });
       const dataBrod = await datas
-      router.push(`/broadcast`);
+      refetch()
+      // router.push(`/broadcast`);
     } catch (error) {
       console.log(error);
     }
@@ -131,6 +135,8 @@ export default function CreateBroadcastCampaign() {
     if (!isValid) {
       const errors = form.formState.errors;
       const errorFields = Object.keys(errors.templateForm || {}).join(", ");
+      console.log(form.watch("templateForm"))
+      console.log(errors)
 
       toast.error(`Invalid or template fields: ${errorFields}`);
       return validate;
@@ -199,7 +205,7 @@ export default function CreateBroadcastCampaign() {
                   Exit
                 </Button>
               </Link>
-              <BroadcastPopup selectedTemplate={selectedTemplate} form={form} open={checkoutDialog} onOpenChange={handlecheckoutDialog}>
+              <BroadcastPopup selectedTemplate={selectedTemplate} form={form} open={checkoutDialog} onOpenChange={handlecheckoutDialog} submitref={submitRef}>
                 <div className="flex  gap-2">
                   <Button
                     className="bg-blue-500 py-3 px-7 hidden md:flex items-center"
@@ -552,13 +558,15 @@ export default function CreateBroadcastCampaign() {
                 )}
               />
 
-              <Button
+              <Button 
                 className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600"
                 type="button"
                 onClick={handleTestMessage}
+                disabled={!form.getValues("testphoneno")}
               >
                 Send Text Message
               </Button>
+              <button ref={submitRef} className="hidden">Submit</button>
             </div>
           </div>
         </form>
