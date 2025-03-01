@@ -12,10 +12,14 @@ import { SiShopify,  } from "react-icons/si";
 import { IoLogoWhatsapp } from "react-icons/io";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IoSyncCircleOutline } from "react-icons/io5";
+import { useGetAllShopifyContactsQuery } from "@/store/features/apislice";
 
 const ITEMS_PER_PAGE = 12;
 
 export default function ProspectList() {
+  const { data: contacts, error } = useGetAllShopifyContactsQuery({});
+  console.log(contacts,error);
+
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

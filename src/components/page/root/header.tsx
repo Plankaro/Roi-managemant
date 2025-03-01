@@ -9,7 +9,7 @@ import { RootState } from "@/store/store";
 import {  useSession } from "next-auth/react";
 const Header = () => {
   const session:any = useSession();
-  console.log(session)
+
     const isOpen = useSelector((state:RootState)=>state.Prospect.openMenuModal)
     const dispatch = useDispatch()
   return (

@@ -2,26 +2,20 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useCreateBroadcastRetryMutation } from "@/store/features/apislice";
+import { useCreateBroadcastRetryMutation, useGetBroadcastByIdQuery } from "@/store/features/apislice";
 import toast from "react-hot-toast";
 import { useGetRetryBroadcastQuery } from "@/store/features/apislice";
 import { format } from "date-fns";
-
-interface BroadcastEntry {
-  type: string;
-  scheduledOn: string;
-  status: string;
-  delivered: number;
-  failed: number;
-}
+import { BroadcastDetailResult } from "@/zod/broadcast/broadcast";
 
 export default function BroadcastAndRetries({
   selectedBroadcast,
 }: {
-  selectedBroadcast: any;
+  selectedBroadcast: BroadcastDetailResult;
 }) {
   const [createBroadcastRetry] = useCreateBroadcastRetryMutation();
-  const { data } = useGetRetryBroadcastQuery(selectedBroadcast?.id);
+  const { data,refetch } = useGetRetryBroadcastQuery(selectedBroadcast?.id);
+
   console.log(data);
 
   const handleCreateBroadcastRetry = async () => {
@@ -30,11 +24,12 @@ export default function BroadcastAndRetries({
         id: selectedBroadcast?.id ?? "",
       }).unwrap();
       toast.promise(promise, {
-        loading: "Creating broadcast...",
-        success: "Broadcast created successfully",
+        loading: "Creating retry for broadcast...",
+        success: "Retry created successfully",
         error: (error: any) =>
           error?.data?.message || "An unexpected error occurred",
       });
+      refetch()
     } catch (error) {
       console.log(error);
     }

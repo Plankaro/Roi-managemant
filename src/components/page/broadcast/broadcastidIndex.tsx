@@ -5,34 +5,45 @@ import { BentoGrid, BentoGridItem } from "@/components/ui/bentogrid"
 import MessageStatus from "@/components/page/broadcast/messagestatus"
 import ProfitChart from "@/components/page/broadcast/profit"
 import Funnel from "@/components/page/broadcast/funnel"
-import PreviewComponent from "@/components/page/broadcast/previewComponent"
+import BroadcastDashboard from "./previewComponent"
 import BroadcastAndRetries from "@/components/page/broadcast/Broadcastretries"
 import { useGetBroadcastByIdQuery } from "@/store/features/apislice"
 
+import { BroadcastDetailResult } from "@/zod/broadcast/broadcast"
 
-
-
+import { calculateTotalPrice } from "@/lib/utils"
 
 export default function BroadcastDetails({id}:{id:string}) {
 
-  const {data,isLoading} = useGetBroadcastByIdQuery(id)
-console.log(data,isLoading)
+  const { data, isLoading }: { data?: BroadcastDetailResult; isLoading: boolean } = useGetBroadcastByIdQuery(id);
+  
+  let totalOrderPrice = 0;
+
+  if (Array.isArray(data?.Order) && data.Order.length > 0) {
+    totalOrderPrice = calculateTotalPrice(data.Order);
+  }
+  console.log(totalOrderPrice);
+  const roi = data?.price ? (totalOrderPrice / Number(data.price)).toFixed(3) : "0.000";
+
+
+
 
 const gridComponents = [
-  <MessageStatus key="message-status" />,
-  <ProfitChart key="profit-chart" />,
-  <Funnel key="funnel" />,
-  <PreviewComponent key="preview-component" />,
+  <MessageStatus key="message-status" selectedBroadcast={data} />,
+  <ProfitChart key="profit-chart" expense={Number(data?.price)} revenue={totalOrderPrice}/>,
+  <Funnel key="funnel" selectedBroadcast={data}/>,
+  <BroadcastDashboard  key="preview-component" selectedBroadcast={data}/>,
   <BroadcastAndRetries key="broadcast-retries" selectedBroadcast={data}/>
+  
 ];
 
 const metrics = [
-  { label: "Orders", value: "641" },
-  { label: "ROI", value: "₹641.00" },
+  { label: "Orders", value: data?.Order?.length },
+  { label: "ROI", value: `${roi}%` },
   { label: "Link Clicks", value: "12" },
   { label: "Button Clicks", value: "12" },
-  { label: "Conversions", value: "12" },
-  { label: "Replies", value: "12" },
+  { label: "Conversions", value: data?.unique_order_created },
+  { label: "Replies", value: data?.reply_count },
 ]
 
 

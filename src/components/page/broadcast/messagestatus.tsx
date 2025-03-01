@@ -3,13 +3,9 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+import { BroadcastDetailResult } from "@/zod/broadcast/broadcast"
 
-const chartData = [
-  { name: "Received", value: 1500, fill: "#A7B8D9" },
-  { name: "Retry", value: 200, fill: "#1B2A48" },
-  { name: "Failed", value: 191, fill: "#E61B23" },
-  { name: "Skipped", value: 100, fill: "#2563EB" },
-]
+
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -26,36 +22,23 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function MessageStatus() {
-  const totalMessages = chartData.reduce((acc, curr) => acc + curr.value, 0)
+export default function MessageStatus({ selectedBroadcast}: {selectedBroadcast:BroadcastDetailResult}) {
 
-  const failedReasons = [
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Rate limit exceeded", count: 89 },
-    { error: "Error from Whatsapp: Invalid phone number", count: 67 },
-    { error: "Error from Whatsapp: User not found", count: 45 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Rate limit exceeded", count: 89 },
-    { error: "Error from Whatsapp: Invalid phone number", count: 67 },
-    { error: "Error from Whatsapp: User not found", count: 45 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Message not delivered", count: 123 },
-    { error: "Error from Whatsapp: Rate limit exceeded", count: 89 },
-    { error: "Error from Whatsapp: Invalid phone number", count: 67 },
-    { error: "Error from Whatsapp: User not found", count: 45 },
+  if(!selectedBroadcast) return null
+  console.log(selectedBroadcast)
+const {sentCount,readCount,failedCount,skippedCount,deliveredCount} = selectedBroadcast
+
+  const chartData = [
+    { name: "Delivered", value: deliveredCount, fill: "#A7B8D9" },
+    { name: "Read", value: readCount, fill: "#1B2A48" },
+    { name: "Failed", value: failedCount, fill: "#E61B23" },
+    { name: "Skipped", value: skippedCount, fill: "#2563EB" },
   ]
 
-  const skippedReasons = [
-    { error: "Invalid phone number format", count: 78 },
-    { error: "Missing required template parameters", count: 56 },
-    { error: "Template not approved", count: 34 },
-    { error: "Business account not verified", count: 23 },
-  ]
+  const totalMessages = sentCount + readCount + failedCount + deliveredCount + skippedCount
+
+
+ 
 
   // const chartConfig = {
   //   visitors: {
@@ -89,7 +72,7 @@ export default function MessageStatus() {
         <CardHeader className="space-y-1 pb-4">
           <CardTitle className="text-lg font-normal">Message delivery status</CardTitle>
           <p className="text-2xl font-semibold text-red-500">
-            {totalMessages.toLocaleString()} <span className="text-sm font-normal text-zinc-400">messages sent</span>
+            {totalMessages} <span className="text-sm font-normal text-zinc-400">messages sent</span>
           </p>
         </CardHeader>
         <CardContent className="space-y-8 md:p-6 p-1">
@@ -129,10 +112,10 @@ export default function MessageStatus() {
             <TabsContent value="failed">
               <ScrollArea className="h-[200px] w-full border-none p-4 no-scrollbar">
                 <div className="space-y-3">
-                  {failedReasons.map((item, index) => (
+                  {selectedBroadcast && selectedBroadcast?.failedReasonGroups.map((item, index) => (
                     <div key={index} className="flex items-start justify-between gap-4">
                       <div className="text-sm">
-                        {index + 1}. {item.error}
+                        {index + 1}. {item.failedReason}
                       </div>
                       <div className="text-sm text-zinc-400">{item.count}</div>
                     </div>
@@ -143,10 +126,10 @@ export default function MessageStatus() {
             <TabsContent value="skipped">
               <ScrollArea className="h-[200px] w-full border-none p-4 no-scrollbar">
                 <div className="space-y-3">
-                  {skippedReasons.map((item, index) => (
+                  {selectedBroadcast && selectedBroadcast?.skippedReasonGroups.map((item, index) => (
                     <div key={index} className="flex items-start justify-between gap-4">
                       <div className="text-sm">
-                        {index + 1}. {item.error}
+                        {index + 1}. {item.failedReason}
                       </div>
                       <div className="text-sm text-zinc-400">{item.count}</div>
                     </div>

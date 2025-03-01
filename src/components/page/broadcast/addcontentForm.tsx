@@ -270,7 +270,7 @@ function AddContentForm({
                       ["IMAGE", "VIDEO", "DOCUMENT"].includes(
                         component.format || ""
                       ))) ||
-                  (component.type === "BODY" && formData.body.length > 0) ||
+                  (component.type === "BODY" && formData?.body?.length > 0) ||
                   (component.type === "BUTTONS" &&
                     formData.buttons.some(
                       (b: any) => b.type === "URL" || b.type === "COPY_CODE"
@@ -323,7 +323,7 @@ function AddContentForm({
                                   <Input
                                     id="header-input"
                                     placeholder="Enter header text"
-                                    value={formData.header.value}
+                                    value={formData?.header?.value}
                                     onChange={(e) =>
                                       handleInputChange(
                                         "header",
@@ -336,7 +336,7 @@ function AddContentForm({
                                   />
                                 ) : (
                                   <Select
-                                    value={formData.header.segmentname}
+                                    value={formData?.header?.segmentname}
                                     onValueChange={(value) =>
                                       handleInputChange(
                                         "header",
@@ -364,7 +364,7 @@ function AddContentForm({
                                   </Select>
                                 )}
                               </div>
-                              {formData.header.fromsegment && (
+                              {formData?.header?.fromsegment && (
                                 <div className="w-full flex flex-col gap-3 lg:basis-1/2">
                                   <label
                                     htmlFor="header-alternative"
@@ -378,7 +378,7 @@ function AddContentForm({
                                   <Input
                                     id="header-alternative"
                                     placeholder="Enter fallback value text "
-                                    value={formData.header.segmentAltValue}
+                                    value={formData?.header?.segmentAltValue}
                                     onChange={(e) =>
                                       handleInputChange(
                                         "header",

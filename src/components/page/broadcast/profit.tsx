@@ -2,16 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
-const data = [
-  {
-    name: "Revenue",
-    total: 75685
-  },
-  {
-    name: "Expenses",
-    total: 51234
-  }
-];
+
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -21,11 +12,24 @@ const CustomTooltip = ({ active, payload }: any) => {
       </div>
     );
   }
+
+
   return null;
 };
 
-function ProfileChart() {
-  const totalProfit = data[0].total - data[1].total;
+function ProfileChart({expense,revenue}:{expense:number,revenue:number}) {
+  const totalProfit = revenue - expense;
+
+  const data = [
+    {
+      name: "Revenue",
+      total: revenue
+    },
+    {
+      name: "Expenses",
+      total: expense
+    }
+  ];
 
   return (
  
@@ -33,7 +37,8 @@ function ProfileChart() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white">
-              Total Profit: ₹{totalProfit.toLocaleString()}
+            {totalProfit < 0 ? 'Total Loss' : 'Total Profit'}: ₹{Math.abs(totalProfit).toLocaleString()} 
+
             </h2>
           </div>
           

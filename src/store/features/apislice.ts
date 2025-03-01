@@ -4,7 +4,7 @@ import baseQuery from "./basequery";
 
 export const apiSlice = createApi({
   baseQuery,
-  tagTypes: ["Prospect","shopifyCustomer"], // Define tags for invalidation
+  tagTypes: ["Prospect","shopifyCustomer","getbroadcastbyid"], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
       query: (body) => ({
@@ -199,6 +199,7 @@ export const apiSlice = createApi({
         url: `/broadcast/${id}`,
         method: "GET",
       }),
+      providesTags:["getbroadcastbyid"]
     }),
     createBroadcastRetry: builder.mutation({
       query: (body) => ({
@@ -207,6 +208,7 @@ export const apiSlice = createApi({
         body
 
       }),
+      invalidatesTags: ["getbroadcastbyid"], // Invalidate the 'getbroadcastbyid' tag after creating
     }),
     getRetryBroadcast:builder.query({
       query: (id) => ({
@@ -214,8 +216,10 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
+   
 
   }),
+ 
 });
 
 export const {
@@ -246,7 +250,8 @@ export const {
   useGetAllBroadcastsQuery,
   useGetBroadcastByIdQuery,
   useCreateBroadcastRetryMutation,
-  useGetRetryBroadcastQuery
+  useGetRetryBroadcastQuery,
+
   
 
 } = apiSlice;

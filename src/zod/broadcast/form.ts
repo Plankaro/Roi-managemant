@@ -236,6 +236,7 @@ export const TemplateFormSchema = z.object({
 export const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   type: z.string().min(1, "Type is required"),
+  
   template: Templateschema,
   templateForm: TemplateFormSchema,
   contact: z.any().superRefine((data, ctx) => {

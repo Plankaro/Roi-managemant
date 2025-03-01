@@ -1,38 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card } from "@/components/ui/card";
+import { BroadcastDetailResult } from "@/zod/broadcast/broadcast";
 import { Bar, BarChart, ResponsiveContainer,  YAxis, Tooltip } from "recharts";
 
-const data = [
-  {
-    name: "Processed",
-    total: 1234
-  },
-  {
-    name: "Delivered",
-    total: 1234
-  },
-  {
-    name: "Read",
-    total: 1234
-  },
-  {
-    name: "Unique Engage",
-    total: 1234
-  }
-];
+
 
 const CustomTooltip = ({ active, payload}: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white/10 backdrop-blur-md p-2 rounded-lg border border-white/20">
-        <p className="text-white font-medium">{payload[0].value.toLocaleString()}</p>
+        <p className="text-white font-medium">{payload[0]?.value.toLocaleString()}</p>
       </div>
     );
   }
   return null;
 };
 
-function Funnel() {
+function Funnel({ selectedBroadcast }: { selectedBroadcast: BroadcastDetailResult }) {
+  if(!selectedBroadcast) return
+  const {sentCount,readCount,failedCount,skippedCount,deliveredCount} = selectedBroadcast
+  const totalMessages = sentCount + readCount + failedCount + deliveredCount + skippedCount 
+
+  const data = [
+    {
+      name: "Processed",
+      total: totalMessages
+    },
+    {
+      name: "Delivered",
+      total: selectedBroadcast?.deliveredCount??0
+    },
+    {
+      name: "Read",
+      total: selectedBroadcast?.readCount??0
+    },
+    {
+      name: "Unique Engage",
+      total: 1
+    }
+  ];
   return (
   
       <Card className="p-4 md:p-6 h-full bg-transparent border-primary shadow-lg rounded-xl">
@@ -45,7 +51,7 @@ function Funnel() {
             {data.map((item, index) => (
               <div key={index} className="space-y-1">
                 <p className="text-gray-300 sm:text-sm text-xs">{item.name}</p>
-                <p className="text-red-500 font-medium md:text-base sm:text-sm text-xs">{item.total.toLocaleString()}</p>
+                <p className="text-red-500 font-medium md:text-base sm:text-sm text-xs">{item?.total.toLocaleString()}</p>
               </div>
             ))}
           </div>

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Upload, ArrowRightFromLine } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import SelectContactDialog from "@/components/page/broadcast/selectcontactDialog";
 import { UTMParametersDialog } from "@/components/page/broadcast/utmparameters";
@@ -66,7 +66,7 @@ export default function CreateBroadcastCampaign() {
       type: "",
       template: undefined,
       contact: null,
-
+   
       utmParameters: {
         utm_source: {
           enabled: true,
@@ -110,22 +110,25 @@ export default function CreateBroadcastCampaign() {
   const selectedTemplate = form.watch("template");
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      console.log("Form data:", data);
-      const datas =  broadcast(data).unwrap();
-      toast.promise(datas, {
-        loading: "Creating broadcast...",
-        success: () => toast.success("Broadcast created successfully"),
-        error: () => toast.error("Failed to create broadcast"),
-      });
-      const dataBrod = await datas
-      refetch()
-      // router.push(`/broadcast`);
-    } catch (error) {
+     try {
+       console.log("Form data:", data);
+       
+       
+       const datas =  broadcast(data).unwrap();
+       toast.promise(datas, {
+         loading: "Creating broadcast...",
+         success: () => toast.success("Broadcast created successfully"),
+         error: () => toast.error("Failed to create broadcast"),
+       });
+       const dataBrod = await datas
+       refetch()
+      //  router.push(`/broadcast`);
+     } catch (error) {
       console.log(error);
-    }
+     }
+    } 
     
-  };
+  
 
   const validateForm = async () => {
     let validate = false;
@@ -144,6 +147,9 @@ export default function CreateBroadcastCampaign() {
     validate = true;
     return validate;
   };
+
+
+
 
   const handleTestMessage = async () => {
     const isValid = await validateForm();

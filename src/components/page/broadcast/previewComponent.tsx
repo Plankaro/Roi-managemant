@@ -2,8 +2,18 @@ import { Card } from "@/components/ui/card"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { FlameIcon as Fire, MessageSquare } from "lucide-react"
+import { BroadcastDetailResult } from "@/zod/broadcast/broadcast";
+import { format } from "date-fns";
 
-export default function BroadcastDashboard() {
+export default function BroadcastDashboard({ selectedBroadcast }: { selectedBroadcast: BroadcastDetailResult }) {
+  const createdDate = new Date(
+    selectedBroadcast?.isScheduled && selectedBroadcast?.scheduledDate
+      ? selectedBroadcast?.scheduledDate
+      : selectedBroadcast?.createdAt || Date.now()
+  );
+  
+  const formattedCreatedDate = format(createdDate, "P, p")
+console.log("selected",selectedBroadcast);
   return (
     <div className=" w-full">
       <Card className="  text-white bg-transparent border-primary border sm:p-6 p-2">
@@ -11,9 +21,8 @@ export default function BroadcastDashboard() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <h2 className="md:text-2xl text-base font-bold">Estimated Spend</h2>
-            <span className="md:text-2xl text-base font-bold flex gap-3"><span>₹</span>5000</span>
-          </div>
-          <p className="md:text-sm text-xs stext-muted-foreground">Spend is calculated according to recipients country code</p>
+            <span className="md:text-2xl text-base font-bold flex gap-3"><span>₹</span>{selectedBroadcast?.price}</span>
+          </div>  
         </div>
         <hr  className="my-3"/>
 
@@ -23,19 +32,19 @@ export default function BroadcastDashboard() {
           <div>
             <h2 className="md:text-2xl sm:text-xl text-lg font-bold mb-6">Information</h2>
             <div className="space-y-4">
-              <InfoRow label="Template Name" value="ABC broadcast" />
-              <InfoRow label="Tags" value="No tags added" />
-              <InfoRow label="Category" value="Marketing" />
-              <InfoRow label="Scheduled Date & Time" value="Jan 24, 2025 at 10 am" />
-              <InfoRow label="Recipients" value="22 contacts" />
-              <InfoRow label="Broadcast Settings" value="UTM Parameters, Skip Rules" />
-              <InfoRow label="Created by" value="Skinbae Support" />
+              <InfoRow label="Template Name" value={selectedBroadcast?.name} />
+       
+              <InfoRow label="Category" value={selectedBroadcast?.type} />
+              <InfoRow label="Scheduled Date & Time" value={formattedCreatedDate}/>
+              <InfoRow label="Recipients" value={`${selectedBroadcast?.total_contact || 0} contacts`} />
+            
+              <InfoRow label="Created by" value={selectedBroadcast?.creator?.name??""} />
             </div>
           </div>
 
           {/* Preview Section */}
           <div>
-            <h2 className="text-2xl font-bold mb-6">Preview</h2>
+            <h2 className="text-2xl font-bold mb-6">Template Used</h2>
             <Card className="bg-white p-4 rounded-lg max-w-sm mx-auto">
               <div className="space-y-4">
                 <div className="relative aspect-square rounded-lg overflow-hidden">
@@ -76,7 +85,7 @@ export default function BroadcastDashboard() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-muted-foreground min-w-[140px] md:text-base sm:text-sm text-xs">
+      <span className="text-muted-foreground min-w-[200px] md:text-base sm:text-sm text-xs">
         {label}
       </span>
       <span className="md:text-base sm:text-sm text-xs flex-1 break-words">: {value}</span>

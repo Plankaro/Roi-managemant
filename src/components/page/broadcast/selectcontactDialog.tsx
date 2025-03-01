@@ -36,6 +36,8 @@ function SelectContactDialog({
     setSelectedContacts({
       type: "shopify",
       id,
+    total_count:segments.find((segments: any) => segments.id === id)?.totalCount
+      
     })
     setExcelData([])
     setFileName("")
@@ -48,7 +50,8 @@ function SelectContactDialog({
       type: "excel",
       data: excelData,
       selectedField,
-      validContacts: validContacts.map((contact) => contact[selectedField]),
+      validContacts: validContacts,
+      total_count:validContacts.length
     })
   }
   const openExcelUploader = () => {

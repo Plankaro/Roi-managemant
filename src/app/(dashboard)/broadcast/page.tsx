@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
-
+import { formatScheduledDate } from "@/lib/utils"
 import { useGetAllBroadcastsQuery } from "@/store/features/apislice"
 
 export default function BroadcastPage() {
@@ -59,15 +59,11 @@ function BroadcastCard({ broadcast }: { broadcast: any }) {
   const failedPercentage = Math.round((broadcast.failedCount / totalMessages) * 100)
 
   // Format dates
-  const createdDate = new Date(broadcast.createdAt)
+  const createdDate = broadcast.isScheduled ? new Date(broadcast.scheduledDate) : new Date(broadcast.createdAt) || new Date()
   const formattedCreatedDate = `${createdDate.toLocaleDateString()}, ${createdDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
 
-  let scheduledDate = null
-  let formattedScheduledDate = ""
-  if (broadcast.isScheduled && broadcast.scheduledDate) {
-    scheduledDate = new Date(broadcast.scheduledDate)
-    formattedScheduledDate = `${scheduledDate.toLocaleDateString()}, ${scheduledDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-  }
+  
+  
 
   return (
     <Link href={`/broadcast/${broadcast.id}`}>
@@ -105,8 +101,7 @@ function BroadcastCard({ broadcast }: { broadcast: any }) {
             {broadcast.isScheduled && (
               <div>
                 <p className="text-blue-400">Scheduled at</p>
-                <p>{formattedScheduledDate.split(",")[0]},</p>
-                <p>{formattedScheduledDate.split(",")[1]}</p>
+                <p>{formattedCreatedDate.split(",")[0]},</p>
               </div>
             )}
           </div>
