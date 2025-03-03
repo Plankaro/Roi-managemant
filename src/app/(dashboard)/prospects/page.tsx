@@ -1,11 +1,27 @@
-import { Suspense } from "react";
 
+"use client";
 import ProspectList from "@/components/page/prospects/prospect-list";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useGetAllShopifyContactsQuery } from "@/store/features/apislice";
+import { addOrUpdateCustomerProspect } from "@/store/features/customersSlice";
+import { RootState } from "@/store/store";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function Page() {
+  const {data} = useGetAllShopifyContactsQuery({})
+  const [contact,setContact] = useState("")
+  const prospect = useSelector((state:RootState) => state.customerProspect)
+  console.log(prospect)
+
+  useEffect(() => {
+    if(data){
+      addOrUpdateCustomerProspect(data)
+    }
+  }, [data])
+ 
   return (
-    <div className="h-[calc(100vh-100px)] overflow-auto no-scrollbar">
+    <div className="h-[calc(100vh-100px)]">
       <header className="mb-6  space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-white">Prospects</h1>
@@ -35,13 +51,14 @@ export default function Page() {
   </TabsList>
 </Tabs>
           <div className="text-white text-sm hidden md:block">
-            Total: <span className="font-semibold">50</span> Contacts
+            Total: <span className="font-semibold">{contact}</span> Contacts
           </div>
         </div>
       </header>
-      <Suspense fallback={<ProspectListSkeleton />}>
-        <ProspectList />
-      </Suspense>
+      <div className="h-[calc(100vh-200px)] overflow-auto no-scrollbar">
+        <ProspectList prospects={data}/>
+        </div>
+    
     </div>
   );
 }

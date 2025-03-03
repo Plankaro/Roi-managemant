@@ -25,6 +25,7 @@ import { getStatusIcon } from "@/components/page/chats/getchatstatus";
 
 
 
+
 export function ChatListSkeleton() {
   return (
     <div className="space-y-2 p-2 w-full animate-pulse">
@@ -114,7 +115,7 @@ const ChatLists = () => {
       {isLoading ? <ChatListSkeleton />:  <ScrollArea className="w-full no-scrollbar">
         <div className="space-y-2 p-1 w-full">
           {filteredProspects  && filteredProspects.map((contact: any) => {
-           console.log(user?.buisness?.whatsapp_mobile ,contact.chats[0]?.receiverPhoneNo)
+           console.log(user?.buisness?.whatsapp_mobile ,contact?.chats[0]?.receiverPhoneNo)
          
             return(
               <button
@@ -139,7 +140,7 @@ const ChatLists = () => {
                     />
                    <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
                      >
-                        {contact?.name?.slice(0, 2).toUpperCase()??"cn" }
+                        {contact?.name?.slice(0, 2).toUpperCase()??"" }
                       </AvatarFallback>
                     
                   </Avatar>

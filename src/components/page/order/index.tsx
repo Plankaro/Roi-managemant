@@ -6,16 +6,23 @@ import ProductInventory from '@/components/page/order/products'
 import Profile from '@/components/page/order/profile'
 import { Button } from '@/components/ui/button'
 import React from 'react'
-import { useGetProductsQuery,  useGetSpecificShopifyContactsQuery, } from '@/store/features/apislice'
+import { useGetProductsQuery,  useGetSpecificShopifyContactsQuery ,useGetShopifyOrdersQuery} from '@/store/features/apislice'
 import { removeall } from '@/store/features/cartSlice'
 import { useDispatch } from 'react-redux'
 
 
+
 function OrderIndex({id}:{id:string}) {
+
   const [isOrderCreated, setIsOrderCreated] = useState(false);
   const {data: products, isLoading: productsLoading} = useGetProductsQuery({})
   const {data: prospect, isLoading: prospectLoading,refetch:prospectrefetch} = useGetSpecificShopifyContactsQuery(id)
-  console.log(prospect)
+  const {data:orders, isLoading: ordersLoading} = useGetShopifyOrdersQuery(id)
+
+  console.log(products)
+
+
+  // console.log(prospect)
   const dispatch = useDispatch()
 ;
  
@@ -40,15 +47,15 @@ function OrderIndex({id}:{id:string}) {
         <Button className='bg-blue-500 hover:bg-blue-600' onClick={handleOrderCreated}>{isOrderCreated ? 'Cancel Order' : 'Create Order'}</Button>
       </div>
       <Profile
-        image={prospect?.image.url ?? ""}
-        name={`${prospect?.firstName ?? ""} ${prospect?.lastName ?? ""}`}
+        image={prospect?.DbData?.image??""}
+        name={`${prospect?.DbData?.name || prospect?.shopifyData?.displayName || prospect?.DbData?.phoneNo || prospect?.shopifyData?.phone}`}
         isLoading={prospectLoading}
       />
     <div className='flex xl:flex-row flex-col-reverse gap-4 justify-end xl:h-[65vh] md:h-[70vh] h-[90vh]'> 
 
     {isOrderCreated && <Cart id = {id} refetch={prospectrefetch}/>}
     {isOrderCreated && <ProductInventory products={products || []} loading={productsLoading} />}
-    <HistoryView order={prospect?.orders.nodes || []} isLoading={prospectLoading}/>
+    <HistoryView  order={orders} isLoading={ordersLoading}/>
     </div>
     </div>
     

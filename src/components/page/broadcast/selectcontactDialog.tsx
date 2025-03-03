@@ -94,7 +94,7 @@ function SelectContactDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="md:max-w-2xl md:p-5 p-3 max-w-[90vw] md:h-[75vh] h-[80vh] overflow-auto no-scrollbar rounded-sm bg-blue-50">
+      <DialogContent className="md:max-w-2xl md:p-5 p-3 max-w-[90vw] md:h-[85vh] h-[80vh] md:overflow-hidden overflow-auto no-scrollbar rounded-sm bg-blue-50">
         <DialogHeader>
           <DialogTitle className="text-lg md:text-2xl  font-bold text-blue-800">Select Recipients</DialogTitle>
         </DialogHeader>
@@ -128,7 +128,7 @@ function SelectContactDialog({
                 <Input placeholder="Search segments..." className="pl-9 border-blue-200 focus:border-blue-500" />
               </div>
 
-              <ScrollArea className="h-[400px] rounded-md border border-blue-200 sm:p-4">
+              <ScrollArea className="h-[45vh] rounded-md border border-blue-200 sm:p-4">
                 <RadioGroup value={selectContacts?.id ?? ""} onValueChange={(value) => setShopifyContact(value)}>
                   {segments?.map((segment: any) => (
                     <div

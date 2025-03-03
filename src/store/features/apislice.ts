@@ -56,6 +56,12 @@ export const apiSlice = createApi({
       }),
       providesTags: ["shopifyCustomer"], // Provide the 'Prospect' tag
     }),
+    getShopifyOrders: builder.query({
+      query: (id) => ({
+        url: `/orders/customer/${id}`,
+        method: "GET",
+      })
+    }),
 
 
     createProspect: builder.mutation({
@@ -251,6 +257,7 @@ export const {
   useGetBroadcastByIdQuery,
   useCreateBroadcastRetryMutation,
   useGetRetryBroadcastQuery,
+  useGetShopifyOrdersQuery
 
   
 

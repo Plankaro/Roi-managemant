@@ -69,6 +69,7 @@ import { useChangeBlockStatusMutation } from '@/store/features/apislice';
 import { getTimeDifference } from '@/lib/timetill';
 
 
+
 interface FileUploadProps {
   onFileSelect: (file: File, type: FileType) => void;
 }
@@ -94,7 +95,7 @@ const AllChats = () => {
 
   const [message, setMessage] = useState("");
   const [sendText, { isLoading }] = useSendTextMutation();
-  const [priview,setPreview] = useState("");
+
   const [uploadFiles, { isLoading: isuploadingfile }] =
     useUploadFilesMutation();
   const [sendMedia, { isLoading: isSendingMedia }] = useSendMediaMutation();
@@ -107,6 +108,7 @@ const AllChats = () => {
   const [takeOver, settakeOver] = useState(false);
   const [show, setShow] = useState(false);
   const [dialog, setDialog] = useState(false);
+  console.log(dialog);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   console.log("select",selectedProspect)
@@ -336,7 +338,6 @@ const handleDeleteChats=async(id: string)=>{
                     </button>
                     <Avatar className="sm:h-14 sm:w-14 h-8 w-8">
                       <AvatarImage
-                        
                         src={selectedProspect?.image || "/placeholder.svg"}
                         alt={selectedProspect?.name ?? ""}
                         className="object-cover"
@@ -348,10 +349,14 @@ const handleDeleteChats=async(id: string)=>{
                       {selectedProspect?.name || selectedProspect?.phoneNo}
                     </h3>
 
-                    <div className={`flex gap-3  px-3 py-2 rounded-3xl items-center bg-[#A7B8D9] ${!getDifference && "hidden"}`}>
+                    <div
+                      className={`flex gap-3  px-3 py-2 rounded-3xl items-center bg-[#A7B8D9] ${
+                        !getDifference && "hidden"
+                      }`}
+                    >
                       <Hourglass className="sm:w-4 sm:h-4 w-3 h-3" />
                       <span className="sm:text-sm text-xs">
-                      {getDifference}
+                        {getDifference}
                       </span>
                     </div>
                   </div>
@@ -374,7 +379,7 @@ const handleDeleteChats=async(id: string)=>{
                     >
                       <DropdownMenuItem>
                         <Link
-                          href={`/orders/${selectedProspect.id}`}
+                          href={`/orders/${selectedProspect.shopify_id}`}
                           className="flex  pr-14 gap-5"
                         >
                           <Image
@@ -409,22 +414,24 @@ const handleDeleteChats=async(id: string)=>{
             <Messages isLoading={isChatsLoading} />
 
             {/* Input */}
-            {!takeOver ? (
+            {selectedProspect.is_blocked ? (
               <div className="p-4 border-t border-primary bg-[#4064AC80] ">
                 <div className="flex items-center gap-2 text-white justify-between">
                   <div className="flex items-center gap-2 text-sm">
-                    <BotIcon /> <p>This conversation is assigned to a Bot</p>
+                    <ShieldCheck className="h-6 w-6" />
+                    <p>The user is blocked</p>
                   </div>
-
                   <Button
-                    onClick={() => settakeOver(true)}
                     className="bg-blue-600 hover:bg-blue-700 capitalize"
+                    onClick={() =>
+                      handleBlockStatusChange(selectedProspect?.id)
+                    }
                   >
-                    Take Over
+                    Unblock
                   </Button>
                 </div>
               </div>
-            ) : (
+            ) : getDifference ? (
               <div className="p-4 border-t border-primary bg-primary rounded-b-[20px]">
                 <input
                   type="file"
@@ -449,10 +456,9 @@ const handleDeleteChats=async(id: string)=>{
                     >
                       <DropdownMenuTrigger asChild>
                         <Button
-                          variant={"ghost"}
+                          variant="ghost"
                           className="bg-transparent hover:bg-transparent hover:text-white"
                         >
-                          {" "}
                           <PlusCircle />
                         </Button>
                       </DropdownMenuTrigger>
@@ -485,13 +491,13 @@ const handleDeleteChats=async(id: string)=>{
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <TemplateBuilder   open={dialog} setOpen={setDialog}/>
+                
                   </Button>
                   <Input
                     placeholder="Type a message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="bg-white/5 border-none hover:right-0 focus-visible:ring-0  text-white placeholder:text-gray-400"
+                    className="bg-white/5 border-none hover:right-0 focus-visible:ring-0 text-white placeholder:text-gray-400"
                   />
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 capitalize"
@@ -502,8 +508,27 @@ const handleDeleteChats=async(id: string)=>{
                   </Button>
                 </div>
               </div>
+            ) : (
+              <div className="p-4 border-t border-primary bg-[#4064AC80] ">
+                <div className="flex items-center gap-2 text-white justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                    <PlusCircle  className="h-6 w-6" />
+                    You can&apos;t message this user as WhatsApp blocks business messages after 24 hours of no reply.
+                  </div>
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 capitalize"
+                    onClick={() => {
+                      setDialog(true);
+                      
+                    }}
+                  >
+                   Send Templates
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
+          <TemplateBuilder open={dialog} setOpen={setDialog} />
           <div
             className={`absolute xl:relative top-0 right-0 h-full  backdrop-blur-3xl transition-all duration-300 ease-in-out transform ${
               show
@@ -546,51 +571,66 @@ const handleDeleteChats=async(id: string)=>{
                       className="hidden"
                     />
                     <Button
-                    size={"icon"}
-                     disabled={isUpdatingProspect}
-                      className="absolute bg-primary/70 -bottom-2 -right-3 rounded-full" onClick={openprofile}
+                      size={"icon"}
+                      disabled={isUpdatingProspect}
+                      className="absolute bg-primary/70 -bottom-2 -right-3 rounded-full"
+                      onClick={openprofile}
                     >
                       <Pencil className="h-2 w-2 text-white" />
                     </Button>
                   </div>
                   <div className="text-center">
                     <h2 className="text-white text-lg font-medium flex justify-center items-center">
-                      <EditableField initialValue={selectedProspect?.name??""} onSave={(name)=>handleeditDetails({name:name})} placeholder='enter the name'/>
+                      <EditableField
+                        initialValue={selectedProspect?.name ?? ""}
+                        onSave={(name) => handleeditDetails({ name: name })}
+                        placeholder="enter the name"
+                      />
                     </h2>
-                    <p className="text-red-500 text-sm mt-2">{lastOnlineStatus}</p>
+                    <p className="text-red-500 text-sm mt-2">
+                      {lastOnlineStatus}
+                    </p>
                   </div>
                 </div>
 
                 {/* Contact Info */}
                 <div className="space-y-4 ">
-           
-                    <div
-                   
-                      className="flex items-center gap-3 text-white"
-                    >
-                      <Mail className="h-5 w-5 text-gray-400" />
-                      <EditableField initialValue={selectedProspect?.email??""} onSave={(email)=>handleeditDetails({email:email})} inputClassName="text-sm" textClassName="text-sm min-w-[160px]" placeholder='enter the email'/>
-                    </div>
-                     <div
-                     
-                     className="flex items-center gap-3 text-white "
-                   >
-                     <Phone className="h-5 w-5 text-gray-400" />
-                     <span className="text-sm">{selectedProspect?.phoneNo ?? ""}</span>
-                   </div>
+                  <div className="flex items-center gap-3 text-white">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                    <EditableField
+                      initialValue={selectedProspect?.email ?? ""}
+                      onSave={(email) => handleeditDetails({ email: email })}
+                      inputClassName="text-sm"
+                      textClassName="text-sm min-w-[160px]"
+                      placeholder="enter the email"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 text-white ">
+                    <Phone className="h-5 w-5 text-gray-400" />
+                    <span className="text-sm">
+                      {selectedProspect?.phoneNo ?? ""}
+                    </span>
+                  </div>
                   {/* ))} */}
 
                   {/* Role Select */}
                   <div className="flex items-center  gap-3">
                     <User className="h-5 w-5 text-gray-400" />
-                    <Select value={selectedProspect?.lead} onValueChange={(lead) => handleeditDetails({lead:lead})}>
+                    <Select
+                      value={selectedProspect?.lead}
+                      onValueChange={(lead) =>
+                        handleeditDetails({ lead: lead })
+                      }
+                    >
                       <SelectTrigger className=" bg-transparent border-gray-800 text-white">
                         <SelectValue placeholder={selectedProspect?.lead} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="LEAD">Lead</SelectItem>
                         <SelectItem value="LOST">Lost</SelectItem>
-                        <SelectItem value=" NEGOTIATION">Negotiation</SelectItem>
+                        <SelectItem value=" NEGOTIATION">
+                          Negotiation
+                        </SelectItem>
                         <SelectItem value="OTHER">Other</SelectItem>
                       </SelectContent>
                     </Select>
@@ -637,17 +677,22 @@ const handleDeleteChats=async(id: string)=>{
                   <Button
                     variant="ghost"
                     className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                    onClick={() => {handleBlockStatusChange(selectedProspect?.id)}}
-
+                    onClick={() => {
+                      handleBlockStatusChange(selectedProspect?.id);
+                    }}
                   >
-                    
-                    {selectedProspect?.is_blocked?<ShieldCheck className="h-5 w-5 mr-2" />:<ShieldX className="h-5 w-5 mr-2" />}
+                    {selectedProspect?.is_blocked ? (
+                      <ShieldCheck className="h-5 w-5 mr-2" />
+                    ) : (
+                      <ShieldX className="h-5 w-5 mr-2" />
+                    )}
                     {selectedProspect?.is_blocked ? "Unblock" : "Block"}
                   </Button>
                   <Button
                     variant="ghost"
                     className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                  onClick={()=>handleDeleteChats(selectedProspect?.id)} >
+                    onClick={() => handleDeleteChats(selectedProspect?.id)}
+                  >
                     <Trash2 className="h-5 w-5 mr-2" />
                     Delete
                   </Button>

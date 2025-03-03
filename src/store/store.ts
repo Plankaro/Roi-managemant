@@ -4,6 +4,7 @@ import { apiSlice } from "./features/apislice";
 import chatReducer from "./features/chatSlice";
 import ProspectReducer from "./features/prospect";
 import cartReducer from "./features/cartSlice";
+import CustomerProspectReducer from "./features/customersSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     Prospect: ProspectReducer,
     cart: cartReducer,
     chat: chatReducer,
+    customerProspect: CustomerProspectReducer
 
   },
 

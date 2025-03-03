@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-import { ShippingAddressFormValues,shippingAddressSchema } from "@/zod/shipping"
+import { ShippingAddressFormValues,shippingAddressSchema } from "@/zod/types"
 import { useEffect } from "react"
 
 interface ShippingAddressFormProps {

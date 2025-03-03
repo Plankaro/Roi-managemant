@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import {  Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
@@ -49,10 +49,10 @@ console.log(selectedTemplate)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className=" md:p-6 p-2 md:max-w-auto w-[95vw]  md:min-w-[60vw] gap-6 bg-blue-50 rounded-sm  h-[80vh] no-scrollbar overflow-auto ">
+      <DialogContent className=" md:p-6 p-2 md:max-w-auto w-[95vw]  md:min-w-[60vw] gap-6 bg-blue-50 rounded-sm  h-[80vh] no-scrollbar overflow-hidden">
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-10">
           {/* Select Template Section */}
-          <ScrollArea className="overflow-scroll h-[80vh] no-scrollbar">
+          <ScrollArea className="no-scrollbar">
             <h2 className="text-lg font-semibold mb-4 bg-background top-0 pt-2">
               Select Template
             </h2>
@@ -68,7 +68,7 @@ console.log(selectedTemplate)
                   }}
                 />
               </div>
-              <div className="space-y-2 ">
+              <ScrollArea className="space-y-2 overflow-y-scroll h-[60vh] no-scrollbar">
                 {!isLoading &&
                   filteredTemplate &&
                   filteredTemplate?.map((template: any) => (
@@ -94,12 +94,12 @@ console.log(selectedTemplate)
                       </div>
                     </div>
                   ))}
-              </div>
+              </ScrollArea>
             </div>
           </ScrollArea>
 
           {/* Template Form and Preview Section */}
-          <div className="space-y-6">
+          <div className="mt-10 space-y-6">
             <SelectedPreview selectedTemplate={selectedTemplate} />
             <div className="flex justify-end">
               <Button
