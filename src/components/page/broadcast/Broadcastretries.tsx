@@ -10,8 +10,10 @@ import { BroadcastDetailResult } from "@/zod/broadcast/broadcast";
 
 export default function BroadcastAndRetries({
   selectedBroadcast,
+  BroadCastrefetch
 }: {
-  selectedBroadcast: BroadcastDetailResult;
+  selectedBroadcast: BroadcastDetailResult | undefined;
+  BroadCastrefetch:()=>void
 }) {
   const [createBroadcastRetry] = useCreateBroadcastRetryMutation();
   const { data,refetch } = useGetRetryBroadcastQuery(selectedBroadcast?.id);
@@ -30,6 +32,7 @@ export default function BroadcastAndRetries({
           error?.data?.message || "An unexpected error occurred",
       });
       refetch()
+      BroadCastrefetch()
     } catch (error) {
       console.log(error);
     }

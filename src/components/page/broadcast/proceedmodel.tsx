@@ -86,8 +86,8 @@ function BroadcastPopup({ children,open,onOpenChange,selectedTemplate,form,submi
                   { label: "Broadcast Name", value: formData.name||"" },
                
                   { label: "Broadcast launch time", value: format(new Date(dateToBroadcast), "dd/MM/yy hh:mm a") || "" },
-                  { label: "Recipients", value: "22 contacts" },
-                  { label: "Action on limit reached", value: formData.onlimitexced },
+                  { label: "Recipients", value: formData?.contact?.total_count || 0 },
+                  { label: "Action on limit reached", value: formData?.onlimitexced ||""  },
                   { label: "Reply Action", value: "Transfer Bot" },
                 ].map((item, index) => (
                   <div key={index} className="flex justify-between">

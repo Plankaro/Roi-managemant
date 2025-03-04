@@ -310,7 +310,7 @@ function AddContentForm({
                                     <Checkbox
                                       className=""
                                       variant="blue"
-                                      checked={formData.header.fromsegment}
+                                      checked={formData?.header?.fromsegment}
                                       onCheckedChange={(checked) => {
                                         handleInputChange("header", 0, "fromsegment", checked);
                                         
@@ -461,7 +461,7 @@ function AddContentForm({
                                     <Checkbox
                                       className="border-white"
                                       variant="blue"
-                                      checked={param.fromsegment}
+                                      checked={param?.fromsegment}
                                       onCheckedChange={(checked) =>
                                         handleInputChange("body", paramIndex, "fromsegment", checked)
                                       }

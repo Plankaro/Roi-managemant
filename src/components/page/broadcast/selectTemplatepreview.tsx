@@ -39,9 +39,10 @@ interface Template {
 
 interface TemplateProps {
   selectedTemplate?: Template
+  variant? : "light" | "dark"
 }
 
-const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
+const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate,variant="light" }) => {
 
   const [formData, setFormData] = useState<{
     header: { type: string; value: string; isEditable: boolean }
@@ -138,7 +139,7 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
           ) {
             const headerContent = formData.header.value
             return (
-              <div key={`preview-header-${index}`} className="mb-3">
+              <div key={`preview-header-${index}`} className="mb-3 flex items-center justify-center">
                 {component.format === "IMAGE" &&
                   (isValidUrl(headerContent) ? (
                     <Image
@@ -146,7 +147,7 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
                       alt="Header image"
                       width={300}
                       height={300}
-                      className="aspect-square rounded-lg object-cover"
+                      className="object-cover object-center rounded-lg "
                     />
                   ) : (
                     <div className="w-full h-[300px] bg-gray-200 flex items-center justify-center rounded-lg">
@@ -170,7 +171,7 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
             )
           } else if (component.format === "TEXT") {
             return (
-              <h3 key={`preview-header-${index}`} className="font-medium text-lg mb-2">
+              <h3 key={`preview-header-${index}`} className="font-medium text-lg mb-2 text-center">
                 {formData.header.value || component.text}
               </h3>
             )
@@ -180,7 +181,7 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
           const bodyText = component.text || ""
          
           return (
-            <p key={`preview-body-${index}`} className="text-sm mb-4 whitespace-pre-line">
+            <p key={`preview-body-${index}`} className={`text-sm mb-4 whitespace-pre-line ${variant ==="dark" && "text-white"}`}>
               {bodyText}
             </p>
           )
@@ -194,7 +195,7 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
           return (
             <div key={`preview-buttons-${index}`} className="space-y-2">
               {component.buttons?.map((button, i) => (
-                <Button key={`preview-button-${i}`} variant="outline" className="text-xs w-full">
+                <Button key={`preview-button-${i}`} variant="outline" className={`text-xs w-full ${variant ==="dark" && "text-white bg-blue-500 border-0"}`}>
                   {button.text}
                 </Button>
               ))}
@@ -204,7 +205,7 @@ const SelectedPreview: React.FC<TemplateProps> = ({ selectedTemplate }) => {
     })
 
     return (
-      <Card className="p-4">
+      <Card className={`p-4 ${variant ==="dark" && "bg-transparent border-0"}`}>
         <div className="space-y-2">{previewContent}</div>
       </Card>
     )

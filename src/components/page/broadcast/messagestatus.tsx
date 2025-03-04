@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+
 import { BroadcastDetailResult } from "@/zod/broadcast/broadcast"
 
 
@@ -22,11 +23,11 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function MessageStatus({ selectedBroadcast}: {selectedBroadcast:BroadcastDetailResult}) {
+export default function MessageStatus({ selectedBroadcast}: {selectedBroadcast:BroadcastDetailResult | undefined}) {
 
   if(!selectedBroadcast) return null
   console.log(selectedBroadcast)
-const {sentCount,readCount,failedCount,skippedCount,deliveredCount} = selectedBroadcast
+const {readCount,failedCount,skippedCount,deliveredCount} = selectedBroadcast
 
   const chartData = [
     { name: "Delivered", value: deliveredCount, fill: "#A7B8D9" },
@@ -35,7 +36,7 @@ const {sentCount,readCount,failedCount,skippedCount,deliveredCount} = selectedBr
     { name: "Skipped", value: skippedCount, fill: "#2563EB" },
   ]
 
-  const totalMessages = sentCount + readCount + failedCount + deliveredCount + skippedCount
+  const totalMessages = selectedBroadcast.totalMessages
 
 
  

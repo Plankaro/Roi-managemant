@@ -16,10 +16,10 @@ const CustomTooltip = ({ active, payload}: any) => {
   return null;
 };
 
-function Funnel({ selectedBroadcast }: { selectedBroadcast: BroadcastDetailResult }) {
+function Funnel({ selectedBroadcast }: { selectedBroadcast: BroadcastDetailResult | undefined }) {
   if(!selectedBroadcast) return
-  const {sentCount,readCount,failedCount,skippedCount,deliveredCount} = selectedBroadcast
-  const totalMessages = sentCount + readCount + failedCount + deliveredCount + skippedCount 
+ 
+  const totalMessages = selectedBroadcast?.totalMessages
 
   const data = [
     {
@@ -36,7 +36,7 @@ function Funnel({ selectedBroadcast }: { selectedBroadcast: BroadcastDetailResul
     },
     {
       name: "Unique Engage",
-      total: 1
+      total: selectedBroadcast?.unique_interactions??0
     }
   ];
   return (

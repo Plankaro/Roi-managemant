@@ -1,17 +1,20 @@
 import { Card } from "@/components/ui/card"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { FlameIcon as Fire, MessageSquare } from "lucide-react"
+
 import { BroadcastDetailResult } from "@/zod/broadcast/broadcast";
 import { format } from "date-fns";
+import SelectedPreview from "./selectTemplatepreview";
 
-export default function BroadcastDashboard({ selectedBroadcast }: { selectedBroadcast: BroadcastDetailResult }) {
+
+
+export default function BroadcastDashboard({ selectedBroadcast }: { selectedBroadcast: BroadcastDetailResult | undefined }) {
   const createdDate = new Date(
     selectedBroadcast?.isScheduled && selectedBroadcast?.scheduledDate
       ? selectedBroadcast?.scheduledDate
       : selectedBroadcast?.createdAt || Date.now()
   );
-  
+  console.log(selectedBroadcast);
+
+
   const formattedCreatedDate = format(createdDate, "P, p")
 console.log("selected",selectedBroadcast);
   return (
@@ -32,9 +35,9 @@ console.log("selected",selectedBroadcast);
           <div>
             <h2 className="md:text-2xl sm:text-xl text-lg font-bold mb-6">Information</h2>
             <div className="space-y-4">
-              <InfoRow label="Template Name" value={selectedBroadcast?.name} />
+              <InfoRow label="Broadcast Name" value={selectedBroadcast?.name??""} />
        
-              <InfoRow label="Category" value={selectedBroadcast?.type} />
+              <InfoRow label="Category" value={selectedBroadcast?.type??""} />
               <InfoRow label="Scheduled Date & Time" value={formattedCreatedDate}/>
               <InfoRow label="Recipients" value={`${selectedBroadcast?.total_contact || 0} contacts`} />
             
@@ -43,9 +46,9 @@ console.log("selected",selectedBroadcast);
           </div>
 
           {/* Preview Section */}
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Template Used</h2>
-            <Card className="bg-white p-4 rounded-lg max-w-sm mx-auto">
+          <div className="border border-primary flex  flex-col justify-center items-center p-4">
+            <h2 className="text-2xl font-bold mb-6 ml-3">Template Used</h2>
+            {/* <Card className="bg-white p-4 rounded-lg max-w-sm mx-auto">
               <div className="space-y-4">
                 <div className="relative aspect-square rounded-lg overflow-hidden">
                   <Image
@@ -75,7 +78,8 @@ console.log("selected",selectedBroadcast);
                   </div>
                 </div>
               </div>
-            </Card>
+            </Card> */}
+                <SelectedPreview selectedTemplate={selectedBroadcast?.template} variant="dark"/>
           </div>
         </div>
       </Card>

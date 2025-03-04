@@ -124,13 +124,19 @@ const ProspectSlice = createSlice({
         prospect.chats = [incomingChat];
       }
     },
-    clearlastChat:(state,action:PayloadAction<string>)=>{
+    clearlastChat: (state, action: PayloadAction<string>) => {
+      console.log("clearlastChat called with payload:", action.payload);
       const prospect = find(state.prospects, { id: action.payload });
       if (prospect) {
-        // Replace the entire chats array with the incoming chat
+        console.log("Found prospect:", prospect);
+        // Clear the chats array for the prospect
         prospect.chats = [];
+        console.log("Chats cleared for prospect:", prospect.id);
+      } else {
+        console.warn("No prospect found with id:", action.payload);
       }
     }
+    
     
   },
 });

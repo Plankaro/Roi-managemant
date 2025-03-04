@@ -11,11 +11,13 @@ import { useGetBroadcastByIdQuery } from "@/store/features/apislice"
 
 import { BroadcastDetailResult } from "@/zod/broadcast/broadcast"
 
-import { calculateTotalPrice } from "@/lib/utils"
+import { calculateTotalPrice, exportJsonToExcel } from "@/lib/utils"
+import Link from "next/link"
 
 export default function BroadcastDetails({id}:{id:string}) {
 
-  const { data, isLoading }: { data?: BroadcastDetailResult; isLoading: boolean } = useGetBroadcastByIdQuery(id);
+  const { data, isLoading,refetch }: { data?: BroadcastDetailResult; isLoading: boolean,refetch:()=>void } = useGetBroadcastByIdQuery(id);
+  console.log(data)
   
   let totalOrderPrice = 0;
 
@@ -33,7 +35,7 @@ const gridComponents = [
   <ProfitChart key="profit-chart" expense={Number(data?.price)} revenue={totalOrderPrice}/>,
   <Funnel key="funnel" selectedBroadcast={data}/>,
   <BroadcastDashboard  key="preview-component" selectedBroadcast={data}/>,
-  <BroadcastAndRetries key="broadcast-retries" selectedBroadcast={data}/>
+  <BroadcastAndRetries key="broadcast-retries" selectedBroadcast={data} BroadCastrefetch={refetch}/>
   
 ];
 
@@ -48,15 +50,58 @@ const metrics = [
 
 
 
+const handleDownload = async () => {
+    if (data) {
+        // Convert `data` object into an array format for Excel
+        const formattedData = [{
+            "ID": data.id,
+            "Name": data.name,
+            "Type": data.type,
+            "Status": data.status,
+            "Template Name": data.template_name,
+            "Template Language": data.template_language,
+            "Total Contacts": data.total_contact,
+            "Created At": new Date(data.createdAt).toLocaleString(),
+            "Scheduled At": new Date(data?.scheduledDate??"").toLocaleString(),
+            "Scheduled": data.isScheduled,
+            "Price": data.price,
+          
+   
+            "UTM Campaign": data.utm_campaign,
+            "UTM Medium": data.utm_medium,
+            "UTM Source": data.utm_source,
+         
+            "Reply Count": data.reply_count,
+            "Unique Interactions": data.unique_interactions,
+            "Total Messages": data.totalMessages,
+            "Delivered Count": data.deliveredCount,
+            "Read Count": data.readCount,
+            "Failed Count": data.failedCount,
+            "Sent Count": data.sentCount,
+            "Creator Name": data.creator.name
+        }];
+
+        // Create an Excel sheet
+         exportJsonToExcel(formattedData);
+    } else {
+        console.log("No data available to download.");
+    }
+};
+
+
+
+
   return (
     <div className=" bg-transparent  p-1">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl md:text-2xl font-semibold text-white">Broadcast- All Product of the month</h1>
         <div className="flex gap-2">
-          <Button variant="outline" className="border-blue-500 border-2 bg-transparent text-white hover:bg-blue-500/10 md:block hidden">
+          <Link href="/broadcast">
+          <Button variant="outline" className="border-blue-500 border-2 bg-transparent text-white hover:border-blue-500/10 md:block hidden">
             Exit
           </Button>
-          <Button className="bg-blue-500 text-white hover:bg-blue-600 md:block hidden">Download Report</Button>
+          </Link>
+          <Button className="bg-blue-500 text-white hover:bg-blue-600 md:block hidden" onClick={handleDownload}>Download Report</Button>
         </div>
       </div>
 

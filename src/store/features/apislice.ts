@@ -4,7 +4,7 @@ import baseQuery from "./basequery";
 
 export const apiSlice = createApi({
   baseQuery,
-  tagTypes: ["Prospect","shopifyCustomer","getbroadcastbyid"], // Define tags for invalidation
+  tagTypes: ["Prospect", "shopifyCustomer", "getbroadcastbyid"], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
       query: (body) => ({
@@ -13,7 +13,7 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-    logout:builder.mutation({
+    logout: builder.mutation({
       query: () => ({
         url: "/auth/logout",
         method: "POST",
@@ -56,13 +56,27 @@ export const apiSlice = createApi({
       }),
       providesTags: ["shopifyCustomer"], // Provide the 'Prospect' tag
     }),
+
+    getStarredCustomers: builder.query({
+      query: () => ({
+        url: "/customers/starred",
+        method: "GET",
+      }),
+    }),
+    createStarredCustomer: builder.mutation({
+      query: (body) => ({
+        url: "/customers/starred",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["shopifyCustomer"], // Invalidate the 'shopifyCustomer' tag after creating
+    }),
     getShopifyOrders: builder.query({
       query: (id) => ({
         url: `/orders/customer/${id}`,
         method: "GET",
-      })
+      }),
     }),
-
 
     createProspect: builder.mutation({
       query: (body) => ({
@@ -84,7 +98,7 @@ export const apiSlice = createApi({
       query: (id) => ({
         url: `/prospects/${id}`,
         method: "GET",
-      })
+      }),
     }),
     updateProspect: builder.mutation({
       query: ({ id, body }) => ({
@@ -93,11 +107,10 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-    changeBlockStatus:builder.mutation({
+    changeBlockStatus: builder.mutation({
       query: ({ id }) => ({
         url: `/prospects/block/${id}`,
         method: "PATCH",
-        
       }),
     }),
     getProducts: builder.query({
@@ -106,7 +119,7 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
-    createOrder:builder.mutation({
+    createOrder: builder.mutation({
       query: (body) => ({
         url: "/orders",
         method: "POST",
@@ -115,9 +128,9 @@ export const apiSlice = createApi({
       invalidatesTags: ["shopifyCustomer"], // Invalidate the 'Prospect' tag after creating
     }),
     getChats: builder.query({
-      query: ({prospect_id }) => ({
-        url: 'chats',
-        params: {prospect_id }, // Pass parameters here
+      query: ({ prospect_id }) => ({
+        url: "chats",
+        params: { prospect_id }, // Pass parameters here
       }),
     }),
     deleteChats: builder.mutation<void, { prospect_id: string }>({
@@ -127,28 +140,33 @@ export const apiSlice = createApi({
         params: { prospect_id }, // Pass parameters correctly
       }),
     }),
-    markasread:builder.mutation({
-      query: ({prospectId, body}) => ({
+    markasread: builder.mutation({
+      query: ({ prospectId, body }) => ({
         url: `/chats/${prospectId}`,
         method: "PATCH",
         body,
-        
       }),
     }),
 
-    
     sendText: builder.mutation({
       query: (sendChatDto) => ({
-        url: '/chats/text',
-        method: 'POST',
+        url: "/chats/text",
+        method: "POST",
         body: sendChatDto, // Send the required parameters in the body
       }),
     }),
-    
-    getAllTemplates:builder.query({
+
+    getAllTemplates: builder.query({
       query: () => ({
-        url: '/chats/template',
-        method: 'GET',
+        url: "/chats/template",
+        method: "GET",
+      }),
+    }),
+    getSpecifTemplates: builder.query({
+      query: (name) => ({
+        url: `/chats/specific-template`,
+        method: "GET",
+        query: { name },
       }),
     }),
     uploadFiles: builder.mutation({
@@ -157,16 +175,15 @@ export const apiSlice = createApi({
         method: "POST",
         body: formData,
       }),
-    })
-    ,
-    sendTemplates:builder.mutation({
+    }),
+    sendTemplates: builder.mutation({
       query: (formData) => ({
         url: "/chats/template",
         method: "POST",
         body: formData,
       }),
     }),
-    sendMedia:builder.mutation({
+    sendMedia: builder.mutation({
       query: (formData) => ({
         url: "/chats/media",
         method: "POST",
@@ -179,20 +196,19 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
-    createBroadcast:builder.mutation({
+    createBroadcast: builder.mutation({
       query: (body) => ({
         url: "/broadcast",
         method: "POST",
         body,
       }),
     }),
-    sendTestMessage:builder.mutation({
+    sendTestMessage: builder.mutation({
       query: (body) => ({
         url: "/broadcast/test",
         method: "POST",
         body,
-      })
-
+      }),
     }),
     getAllBroadcasts: builder.query({
       query: () => ({
@@ -205,27 +221,23 @@ export const apiSlice = createApi({
         url: `/broadcast/${id}`,
         method: "GET",
       }),
-      providesTags:["getbroadcastbyid"]
+      providesTags: ["getbroadcastbyid"],
     }),
     createBroadcastRetry: builder.mutation({
       query: (body) => ({
         url: `/broadcast/retry`,
         method: "Post",
-        body
-
+        body,
       }),
       invalidatesTags: ["getbroadcastbyid"], // Invalidate the 'getbroadcastbyid' tag after creating
     }),
-    getRetryBroadcast:builder.query({
+    getRetryBroadcast: builder.query({
       query: (id) => ({
         url: `/broadcast/retry/${id}`,
         method: "GET",
       }),
     }),
-   
-
   }),
- 
 });
 
 export const {
@@ -247,6 +259,7 @@ export const {
   useDeleteChatsMutation,
   useSendTextMutation,
   useGetAllTemplatesQuery,
+  useGetSpecifTemplatesQuery,
   useUploadFilesMutation,
   useSendTemplatesMutation,
   useSendMediaMutation,
@@ -257,8 +270,8 @@ export const {
   useGetBroadcastByIdQuery,
   useCreateBroadcastRetryMutation,
   useGetRetryBroadcastQuery,
-  useGetShopifyOrdersQuery
-
+  useGetShopifyOrdersQuery,
+  useGetStarredCustomersQuery,
+  useCreateStarredCustomerMutation
   
-
 } = apiSlice;

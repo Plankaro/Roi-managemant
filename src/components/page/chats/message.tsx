@@ -18,6 +18,10 @@ import { orderBy } from "lodash";
 import { Clock, Send, Check, CheckCircle2, AlertCircle } from "lucide-react";
 import { updateLastChat } from "@/store/features/prospect";
 import { getStatusIcon } from "./getchatstatus";
+import { createSelector } from "@reduxjs/toolkit";
+import { getChatsForProspect } from "../broadcast/getchats";
+import { useSession } from "next-auth/react";
+
 
 function MessagesSkeleton() {
   return (
@@ -76,87 +80,34 @@ function MessagesSkeleton() {
   );
 }
 function Messages({ isLoading }: { isLoading: boolean }) {
-  const myPhoneNo = "15551365364"; // Your phone number
+
+  const session:any = useSession();
+  const user = session?.data?.user?.user 
+  const myPhoneNo= user?.buisness?.whatsapp_mobile??"";// Your phone number
 
   const selectedProspect = useSelector(
     (state: RootState) => state.Prospect.selectedProspect
   );
 
-  const selectedChats = useSelector((state: RootState) =>
-    orderBy(
-      state.chat.chats.find(
-        (chatGroup) => chatGroup.prospectId === selectedProspect?.id
-      )?.chats || [],
-      ["createdAt"]
-    )
-  );
 
-  //     useEffect(() => {
-  //       const prospectMessages = selectedChats.filter(
-  //         (chat: Chat) => chat.senderPhoneNo !== myPhoneNo
-  //       );
-  //       const lastProspectMessage =
-  //         prospectMessages.length > 0
-  //           ? prospectMessages[prospectMessages.length - 1]
-  //           : null;
-  // console.log(lastProspectMessage)
-  //       if (lastProspectMessage) {
-  //         dispatch(updateLastChatTime(`${lastProspectMessage.createdAt}`))
-  //       }
-  //     },[selectedChats])
-
-  // useEffect(() => {
-  //   if (data) {
-  //     dispatch(setChats(data));
-  //   }
-  // }, [data, dispatch]);
-
-  // useEffect(() => {
-  //   console.log("Connecting socket...");
-  //   socket.connect();
-
-  //   socket.on("connect", () => {
-  //     console.log("Socket connected!");
-  //   });
-
-  //   socket.emit("subscribe", "15551365364");
-
-  //   // Listen for new messages
-  //   socket.on("messages", (data) => {
-
-  //     console.log("📩 New Messages:", data);
-  //     // setMessages((prev) => [...prev, ...data.processedResults]);
-  //   });
-
-  //   // Listen for new prospects
-  //   socket.on("prospect", (data) => {
-  //     console.log("👤 New Prospect Created:", data);
-  //     // setProspect(data);
-  //   });
-
-  //   return () => {
-  //     console.log("Disconnecting socket...");
-  //     socket.disconnect();
-  //   };
-  // }, [socket]);
+  // Use the selector you defined outside the component
+  const selectedChats = useSelector(getChatsForProspect);
 
   return (
     <>
       {isLoading ? (
         <MessagesSkeleton />
       ) : (
-        <ScrollArea className="flex-1 pt-20 pb-4 bg-backgroundColor">
-          <div className="space-y-4 p-4">
-            {selectedChats &&
-              selectedChats.length > 0 &&
+        <ScrollArea className="flex-1  pt-20 pb-4 bg-backgroundColor">
+          <div className="space-y-4 p-4 w-full h-full flex-1">
+            {selectedChats && selectedChats.length > 0 ? (
               selectedChats.map((chat: any) => {
                 const isMyMessage = chat.senderPhoneNo === myPhoneNo;
-                console.log(selectedChats);
                 return (
                   <div
                     key={chat.chatId}
                     className={`flex flex-col xl:max-w-[40%] lg:max-w-[50%] md:max-w-[70%] sm:max-w-[85%] ${
-                      isMyMessage ? "ml-auto" : "mr-auto"
+                      isMyMessage ? "ml-auto" : "mr-auto" 
                     }`}
                   >
                     <div className="flex gap-3 items-start">
@@ -212,25 +163,27 @@ function Messages({ isLoading }: { isLoading: boolean }) {
                           )}
                           {chat.header_type === "DOCUMENT" && (
                             <div className="mb-2 -mt-1 -mx-1">
-                              <p className="text-sm ">
-                                <a href={chat.header_value} className="">
+                              <p className="text-sm">
+                                <a href={chat.header_value}>
                                   <IoIosDocument />
                                 </a>
                               </p>
                             </div>
                           )}
-                          <p className="sm:text-sm text:xs">{chat.body_text}</p>
+                          <p className="sm:text-sm text-xs">
+                            {chat.body_text}
+                          </p>
                           {chat.footer_included &&
                             chat?.footer_text &&
                             chat?.footer_text.length > 0 && (
-                              <div className="mt-2 pt-2 border-t border-gray-200 sm:text-sm text:xs text-gray-400">
+                              <div className="mt-2 pt-2 border-t border-gray-200 sm:text-sm text-xs text-gray-400">
                                 {chat.footer_text}
                               </div>
                             )}
                           <div className="flex gap-2 mt-2">
                             {chat?.Buttons &&
                               chat.Buttons.length > 0 &&
-                              chat.Buttons.map((button:any, index:any) => {
+                              chat.Buttons.map((button: any, index: any) => {
                                 if (button.type === "URL") {
                                   return (
                                     <Button
@@ -246,8 +199,7 @@ function Messages({ isLoading }: { isLoading: boolean }) {
                                       </a>
                                     </Button>
                                   );
-                                }
-                                else{
+                                } else {
                                   return (
                                     <Button
                                       key={index}
@@ -260,7 +212,7 @@ function Messages({ isLoading }: { isLoading: boolean }) {
                               })}
                           </div>
                           <div
-                            className={`mt-2  w-full ${
+                            className={`mt-2 w-full ${
                               isMyMessage ? "flex" : "hidden"
                             } justify-end text-[10px] items-center gap-2`}
                           >
@@ -291,7 +243,12 @@ function Messages({ isLoading }: { isLoading: boolean }) {
                     </span>
                   </div>
                 );
-              })}
+              })
+            ) : (
+              <div className="text-center h-full w-full flex-1 justify-center items-center text-white">
+                No chats found
+              </div>
+            )}
           </div>
         </ScrollArea>
       )}
@@ -300,3 +257,6 @@ function Messages({ isLoading }: { isLoading: boolean }) {
 }
 
 export default Messages;
+
+
+

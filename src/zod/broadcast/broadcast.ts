@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface BroadcastDetailResult {
+  template:any;
     id: string;
     template_name: string;
     name: string;
@@ -24,6 +26,10 @@ export interface BroadcastDetailResult {
       id: string;
       // Add additional Order fields if necessary
     }>;
+    utm_campaign: string ;
+    utm_source: string ;
+    utm_medium: string ;
+    unique_interactions: number;
     // Computed statistics from your endpoint:
     totalMessages: number;
     deliveredCount: number;

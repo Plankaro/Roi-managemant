@@ -46,6 +46,7 @@ import BroadcastPopup from "@/components/page/broadcast/proceedmodel";
 import { useRouter } from "next/navigation";
 
 import { useGetAllBroadcastsQuery } from "@/store/features/apislice";
+import { error } from "console";
 
 export default function CreateBroadcastCampaign() {
   const router = useRouter();
@@ -134,7 +135,7 @@ export default function CreateBroadcastCampaign() {
     let validate = false;
     const isValid = await form.trigger();
     console.log(isValid); // Triggers validation manually
-
+console.log(form.formState.errors)
     if (!isValid) {
       const errors = form.formState.errors;
       const errorFields = Object.keys(errors.templateForm || {}).join(", ");
