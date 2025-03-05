@@ -13,6 +13,7 @@ export const getChatsForProspect = createSelector(
     const chatGroup = chats.find(
       (group) => group.prospectId === selectedProspect.id
     );
+    console.log(chatGroup);
     return orderBy(chatGroup?.chats || [], ["createdAt"]);
   }
 );

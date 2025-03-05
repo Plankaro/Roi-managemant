@@ -235,15 +235,15 @@ function AddContentForm({
   const handledropdownItems =
     selectedContact?.type === "excel"
       ? Object.keys(selectedContact?.data[0] || {}).map((key) => ({
-          type: key,
+          type: `${key} from  excel`,
           value: key,
         }))
       : [
-          { type: "First Name", value: "firstName" },
-          { type: "Last Name", value: "lastName" },
-          { type: "displayName", value: "displayName" },
-          { type: "Phone", value: "phone" },
-          { type: "Email", value: "email" },
+          { type: "First Name from shopify", value: "firstName" },
+          { type: "Last Name from shopify", value: "lastName" },
+          { type: "displayName from shopify", value: "displayName" },
+          { type: "Phone from shopify", value: "phone" },
+          { type: "Email from shopify", value: "email" },
         ];
 
   if (!selectedTemplate || !selectedContact) {
@@ -306,7 +306,7 @@ function AddContentForm({
                                       ? "{{1}}"
                                       : `{{${component.example?.header_text_named_params?.[0]?.param_name}}}`}
                                   </label>
-                                  <span className="flex items-center gap-3 text-sm font-medium text-gray-400">
+                                  <span className="flex items-center gap-3 md:text-sm  text-xs font-medium text-gray-400">
                                     <Checkbox
                                       className=""
                                       variant="blue"
@@ -316,7 +316,7 @@ function AddContentForm({
                                         
                                       }}
                                     />
-                                    From {selectedContact?.type ?? ""} segment
+                                    Select Content from {selectedContact?.type ?? ""} segment
                                   </span>
                                 </div>
                                 {!formData.header.fromsegment ? (
@@ -457,7 +457,7 @@ function AddContentForm({
                                   >
                                     {param.parameter_name}
                                   </label>
-                                  <span className="flex items-center gap-3 text-sm">
+                                  <span className="flex items-center gap-3 md:text-sm text-xs">
                                     <Checkbox
                                       className="border-white"
                                       variant="blue"
@@ -466,7 +466,7 @@ function AddContentForm({
                                         handleInputChange("body", paramIndex, "fromsegment", checked)
                                       }
                                     />
-                                    From {selectedContact?.type ?? ""} segment
+                                   Select Content from {selectedContact?.type ?? ""} segment
                                   </span>
                                 </div>
                                 {!param.fromsegment ? (

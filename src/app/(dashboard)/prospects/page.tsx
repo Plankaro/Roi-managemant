@@ -8,12 +8,15 @@ import {
 } from "@/store/features/apislice";
 
 export default function Page() {
-  const { data } = useGetAllShopifyContactsQuery({});
+  const { data:AllCustomersQuery,refetch:AllCustomersRefetch } = useGetAllShopifyContactsQuery({});
 
-  const { data: starredCustomersQuery } = useGetStarredCustomersQuery({});
+  const { data: starredCustomersQuery,refetch:starredCustomersRefetch } = useGetStarredCustomersQuery({});
   console.log(starredCustomersQuery);
+const onSave=()=>{
+  AllCustomersRefetch()
+  starredCustomersRefetch()
+}
 
-  console.log(data);
   return (
     <div className="h-[calc(100vh-100px)]">
       <Tabs defaultValue="all" className="w-auto">
@@ -47,7 +50,7 @@ export default function Page() {
             <div className="text-white text-sm hidden md:block">
               Total:{" "}
               <span className="font-semibold">
-                {data?.CustomerContact ?? 0}
+                {AllCustomersQuery?.CustomerContact ?? 0}
               </span>{" "}
               Contacts
             </div>
@@ -57,13 +60,13 @@ export default function Page() {
           value="all"
           className="h-[calc(100vh-200px)] overflow-auto no-scrollbar"
         >
-          <ProspectList prospects={data?.customers} />
+          <ProspectList prospects={AllCustomersQuery?.customers} onSave={onSave}/>
         </TabsContent>
         <TabsContent
           value="starred"
           className="h-[calc(100vh-200px)] overflow-auto no-scrollbar"
         >
-          <ProspectList prospects={starredCustomersQuery} />
+          <ProspectList prospects={starredCustomersQuery} onSave={onSave}/>
         </TabsContent>
       </Tabs>
     </div>

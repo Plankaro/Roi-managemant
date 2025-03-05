@@ -58,7 +58,7 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
             </div>
             <div className="space-y-1 text-right">
               <p className="text-gray-400">Orders</p>
-              <p className="text-xl">{order.numberOfOrders}</p>
+              <p className="text-xl">{order?.numberOfOrders}</p>
             </div>
           </div>
 
@@ -71,12 +71,12 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
                 className="w-full flex items-center justify-between py-4  hover:bg-white/5 transition-colors"
               >
                 <div className="space-y-0.5">
-                  <p className=" font-medium text-left">{order.name}</p>
-                  <p className="text-lg">₹ {Number(order.totalPrice).toFixed(2)}</p>
+                  <p className=" font-medium text-left">{order?.name}</p>
+                  <p className="text-lg">₹ {Number(order?.totalPrice).toFixed(2)}</p>
                 </div>
                 <div className="text-right space-y-0.5">
-                  <p className="text-sm">{format(order.createdAt, 'dd/MM/yy')}</p>
-                  <p className="text-sm text-blue-400">{order.fullyPaid ?"Paid":"Pending"}</p>
+                  <p className="text-sm">{format(order?.createdAt, 'dd/MM/yy')}</p>
+                  <p className="text-sm text-blue-400">{order?.fullyPaid ?"Paid":"Pending"}</p>
                 </div>
                 <ChevronRight className="w-5 h-5 ml-2 text-blue-500" />
               </button>

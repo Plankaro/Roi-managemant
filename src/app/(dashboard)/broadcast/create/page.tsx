@@ -47,11 +47,13 @@ import { useRouter } from "next/navigation";
 
 import { useGetAllBroadcastsQuery } from "@/store/features/apislice";
 import { error } from "console";
+import BroadcastSuccessModal from "@/components/page/broadcast/broadcastSucessModel";
 
 export default function CreateBroadcastCampaign() {
   const router = useRouter();
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [checkoutDialog, setCheckoutDialog] = useState(false);
+  const [sucessModel, setSucessModel] = useState(false);
   const submitRef = useRef(null)
 
   const [broadcast, { isLoading }] = useCreateBroadcastMutation();
@@ -116,14 +118,12 @@ export default function CreateBroadcastCampaign() {
        
        
        const datas =  broadcast(data).unwrap();
-       toast.promise(datas, {
-         loading: "Creating broadcast...",
-         success: () => toast.success("Broadcast created successfully"),
-         error: () => toast.error("Failed to create broadcast"),
-       });
+       
        const dataBrod = await datas
+       setCheckoutDialog(false)
+       setSucessModel(true)
        refetch()
-      //  router.push(`/broadcast`);
+      
      } catch (error) {
       console.log(error);
      }
@@ -167,9 +167,10 @@ console.log(form.formState.errors)
     const datas = sendTestMessage(formvalues).unwrap();
     toast.promise(datas, {
       loading: "Sending test message...",
-      success: () => toast.success("Test message sent successfully"),
-      error: () => toast.error("Failed to send test message"),
-    });
+      success: () => "Test message sent successfully",
+      error: () => "Failed to send test message",
+      
+    })
   };
 
   const onError = (errors: any) => {
@@ -231,7 +232,7 @@ console.log(form.formState.errors)
               </BroadcastPopup>
             </div>
           </header>
-
+<BroadcastSuccessModal open={sucessModel} onOpenChange={setSucessModel}/>
           <div className="space-y-8">
             <div className=" flex flex-col gap-5 ">
               <div className="flex md:flex-row flex-col gap-5">

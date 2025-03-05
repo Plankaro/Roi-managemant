@@ -68,20 +68,22 @@ type FileType = "image" | "video" | "document";
 import { useChangeBlockStatusMutation } from '@/store/features/apislice';
 import { getTimeDifference } from '@/lib/timetill';
 
-
+import { getChatsForProspect } from '@/components/page/broadcast/getchats';
 
 interface FileUploadProps {
   onFileSelect: (file: File, type: FileType) => void;
 }
+
 
 const AllChats = () => {
   const [fileType, setFileType] = useState<FileType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
 
-  const selectedProspect = useSelector(
-    (state: RootState) => state.Prospect?.selectedProspect
+  const{ selectedProspect, }= useSelector(
+    (state: RootState) => state.Prospect
   );
+
   const { data: chats, isLoading: isChatsLoading } = useGetChatsQuery({
     prospectId: selectedProspect?.id ?? "",
   });
@@ -92,6 +94,7 @@ const AllChats = () => {
     }
   });
   
+
 
   const [message, setMessage] = useState("");
   const [sendText, { isLoading }] = useSendTextMutation();
@@ -292,6 +295,9 @@ const AllChats = () => {
     }
   };
 
+
+
+
 const handleDeleteChats=async(id: string)=>{
   try {
     const promise = deleteChats({prospect_id: id});
@@ -301,7 +307,9 @@ const handleDeleteChats=async(id: string)=>{
       error: (error: any) =>
         error?.data?.message || "An unexpected error occurred.",
     })
+  
     const data = await promise
+
     dispatch(clearChats(id));
     dispatch(clearlastChat(id));
   } catch (error) {

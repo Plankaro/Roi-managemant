@@ -18,8 +18,10 @@ import { useCreateStarredCustomerMutation } from "@/store/features/apislice";
 
 export default function ProspectList({
   prospects,
+  onSave,
 }: {
   prospects: CustomerProspect[];
+  onSave: () => void;
 }) {
   const [createStarredCustomer] = useCreateStarredCustomerMutation()
   // const [prospects, setProspects] = useState<Prospect[]>([])
@@ -89,11 +91,16 @@ export default function ProspectList({
   //   })
   // }
   const toogleStar = (prospect_id:string,event:any)=>{
-    event.preventDefault()
-    event.stopPropagation()
-
-    createStarredCustomer({ customerId: prospect_id })
-    console.log("starred")
+    try {
+      event.preventDefault()
+      event.stopPropagation()
+  
+      createStarredCustomer({ customerId: prospect_id })
+      console.log("starred")
+      onSave()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (

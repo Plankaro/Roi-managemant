@@ -115,7 +115,7 @@ const ChatLists = () => {
       {isLoading ? <ChatListSkeleton />:  <ScrollArea className="w-full no-scrollbar">
         <div className="space-y-2 p-1 w-full">
           {filteredProspects  && filteredProspects.map((contact: any) => {
-           console.log(user?.buisness?.whatsapp_mobile ,contact?.chats[0]?.receiverPhoneNo)
+         
          
             return(
               <button

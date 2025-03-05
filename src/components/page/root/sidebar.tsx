@@ -25,11 +25,14 @@ import Logo from "@/components/ui/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {  useSession } from "next-auth/react";
 import { handleSignOut } from "@/app/(auth)/sign-in/action";
+import { FaBoltLightning } from "react-icons/fa6";
 
 
 export const sidebarItems = [
   { icon: AIBuilder, label: "Overview", slug: "/" },
   { icon: MessageSquare, label: "Chats", slug: "/chats" },
+  { icon: FaBoltLightning, label: "Flash Response", slug: "/flashresponse" },
+
   { icon: BetweenHorizonalEnd, label: "Broadcast", slug: "/broadcast" },
   { icon: AIBuilder, label: "AI Builder", slug: "/ai-builder" },
   { icon: LineChart, label: "Analytics", slug: "/analytics" },

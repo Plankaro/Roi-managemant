@@ -121,7 +121,8 @@ const chatSlice = createSlice({
         
         // Replace the entire group object with a new one that has an empty chats array
         state.chats[groupIndex] = {
-          ...state.chats[groupIndex],
+          // ...state.chats[groupIndex],
+          prospectId :state?.chats?.[groupIndex]?.prospectId,
           chats: []
         };
         

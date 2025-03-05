@@ -4,7 +4,7 @@ import baseQuery from "./basequery";
 
 export const apiSlice = createApi({
   baseQuery,
-  tagTypes: ["Prospect", "shopifyCustomer", "getbroadcastbyid"], // Define tags for invalidation
+  tagTypes: ["Prospect", "shopifyCustomer", "getbroadcastbyid", "getchatsById","flashresponse"], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
       query: (body) => ({
@@ -132,6 +132,7 @@ export const apiSlice = createApi({
         url: "chats",
         params: { prospect_id }, // Pass parameters here
       }),
+      providesTags: ["getchatsById"],
     }),
     deleteChats: builder.mutation<void, { prospect_id: string }>({
       query: ({ prospect_id }) => ({
@@ -139,6 +140,7 @@ export const apiSlice = createApi({
         method: "DELETE",
         params: { prospect_id }, // Pass parameters correctly
       }),
+      invalidatesTags: ["getchatsById"],
     }),
     markasread: builder.mutation({
       query: ({ prospectId, body }) => ({
@@ -237,6 +239,37 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
+    getFlashResponse: builder.query({
+      query: () => ({
+        url: `/flashresponse`,
+        method: "GET",
+      }),
+      providesTags: ["flashresponse"], // Provide the 'flashresponse' tag
+    }),
+    createFlashResponse: builder.mutation({
+      query: (body) => ({
+        url: "/flashresponse",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["flashresponse"], // Invalidate the 'flashresponse' tag after creating
+    }),
+    updateFlashResponse: builder.mutation({
+      query: ({ id, body }) => ({
+        
+        url: `/flashresponse/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["flashresponse"], // Invalidate the 'flashresponse' tag after updating
+    }),
+    deleteFlashResponse: builder.mutation<void, { id: string }>({
+    query: ({ id }) => ({
+      url: `/flashresponse/${id}`,
+      method: "DELETE",
+    }),
+    invalidatesTags: ["flashresponse"],
+    }),
   }),
 });
 
@@ -272,6 +305,9 @@ export const {
   useGetRetryBroadcastQuery,
   useGetShopifyOrdersQuery,
   useGetStarredCustomersQuery,
-  useCreateStarredCustomerMutation
-  
+  useCreateStarredCustomerMutation,
+  useCreateFlashResponseMutation,
+  useGetFlashResponseQuery,
+  useUpdateFlashResponseMutation,
+  useDeleteFlashResponseMutation,
 } = apiSlice;
