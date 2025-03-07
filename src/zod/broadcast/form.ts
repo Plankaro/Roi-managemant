@@ -136,7 +136,7 @@ export const Templateschema = z
       if (!data.segmentname.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Segment Name is required when fromsegment is true",
+          message: "Segement name is required",
           path: ["segmentname"],
         });
       }
@@ -144,7 +144,7 @@ export const Templateschema = z
       if (!data.segmentAltValue.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Segment Alt Value is required when fromsegment is true",
+          message: "Alternative segment Value  is required",
           path: ["segmentAltValue"],
         });
       }
@@ -153,7 +153,7 @@ export const Templateschema = z
       if (!data.value || !data.value.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Value is required when fromsegment is false",
+          message: "Missing header value ",
           path: ["value"],
         });
       }
@@ -173,7 +173,7 @@ export const Templateschema = z
       if (!data.segmentname.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Segment Name is required when fromsegment is true",
+          message: "Segment Name is required",
           path: ["segmentname"],
         });
       }
@@ -181,7 +181,7 @@ export const Templateschema = z
       if (!data.segmentAltValue.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Segment Alt Value is required when fromsegment is true",
+          message: "Alternative segment Value  is required",
           path: ["segmentAltValue"],
         });
       }
@@ -190,7 +190,7 @@ export const Templateschema = z
       if (!data.value || !data.value.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Value is required when fromsegment is false",
+          message: "Missing value",
           path: ["value"],
         });
       }

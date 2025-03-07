@@ -54,22 +54,22 @@ export default function CreateBroadcastCampaign() {
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [checkoutDialog, setCheckoutDialog] = useState(false);
   const [sucessModel, setSucessModel] = useState(false);
-  const submitRef = useRef(null)
+  const submitRef = useRef(null);
 
   const [broadcast, { isLoading }] = useCreateBroadcastMutation();
-  const {refetch} = useGetAllBroadcastsQuery({})
+  const { refetch } = useGetAllBroadcastsQuery({});
   const [sendTestMessage, { isLoading: sendTestMessageLoading }] =
     useSendTestMessageMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-  
+
     defaultValues: {
       name: "",
       type: "",
       template: undefined,
       contact: null,
-   
+
       utmParameters: {
         utm_source: {
           enabled: true,
@@ -113,44 +113,35 @@ export default function CreateBroadcastCampaign() {
   const selectedTemplate = form.watch("template");
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-     try {
-       //console.log("Form data:", data);
-       
-       
-       const datas =  broadcast(data).unwrap();
-       
-       const dataBrod = await datas
-       setCheckoutDialog(false)
-       setSucessModel(true)
-       refetch()
-      
-     } catch (error) {
+    try {
+      //console.log("Form data:", data);
+
+      const datas = broadcast(data).unwrap();
+
+      const dataBrod = await datas;
+      setCheckoutDialog(false);
+      setSucessModel(true);
+      refetch();
+    } catch (error) {
       //console.log(error);
-     }
-    } 
-    
-  
+    }
+  };
 
   const validateForm = async () => {
     let validate = false;
     const isValid = await form.trigger();
     //console.log(isValid); // Triggers validation manually
-//console.log(form.formState.errors)
+    //console.log(form.formState.errors)
     if (!isValid) {
-      const errors = form.formState.errors;
-      const errorFields = Object.keys(errors.templateForm || {}).join(", ");
-      //console.log(form.watch("templateForm"))
+      
       //console.log(errors)
 
-      toast.error(`Invalid or template fields: ${errorFields}`);
+      toast.error(`Please check in all required fields to continue`);
       return validate;
     }
     validate = true;
     return validate;
   };
-
-
-
 
   const handleTestMessage = async () => {
     const isValid = await validateForm();
@@ -169,8 +160,7 @@ export default function CreateBroadcastCampaign() {
       loading: "Sending test message...",
       success: () => "Test message sent successfully",
       error: () => "Failed to send test message",
-      
-    })
+    });
   };
 
   const onError = (errors: any) => {
@@ -180,15 +170,14 @@ export default function CreateBroadcastCampaign() {
     }
   };
 
-  const handlecheckoutDialog = async(value: boolean) => {
-    if (value===true) {
+  const handlecheckoutDialog = async (value: boolean) => {
+    if (value === true) {
       const isValid = await validateForm();
       //console.log(isValid);
       if (!isValid) return;
-        
     }
     setCheckoutDialog(value);
-  }
+  };
 
   //console.log(selectedTemplate);
   return (
@@ -213,7 +202,13 @@ export default function CreateBroadcastCampaign() {
                   Exit
                 </Button>
               </Link>
-              <BroadcastPopup selectedTemplate={selectedTemplate} form={form} open={checkoutDialog} onOpenChange={handlecheckoutDialog} submitref={submitRef}>
+              <BroadcastPopup
+                selectedTemplate={selectedTemplate}
+                form={form}
+                open={checkoutDialog}
+                onOpenChange={handlecheckoutDialog}
+                submitref={submitRef}
+              >
                 <div className="flex  gap-2">
                   <Button
                     className="bg-blue-500 py-3 px-7 hidden md:flex items-center hover:bg-blue-600"
@@ -232,7 +227,10 @@ export default function CreateBroadcastCampaign() {
               </BroadcastPopup>
             </div>
           </header>
-<BroadcastSuccessModal open={sucessModel} onOpenChange={setSucessModel}/>
+          <BroadcastSuccessModal
+            open={sucessModel}
+            onOpenChange={setSucessModel}
+          />
           <div className="space-y-8">
             <div className=" flex flex-col gap-5 ">
               <div className="flex md:flex-row flex-col gap-5">
@@ -370,6 +368,7 @@ export default function CreateBroadcastCampaign() {
                         selectedTemplate={selectedTemplate}
                         formData={field.value}
                         setFormData={field.onChange}
+                        errors={form.formState.errors}
                       />
                     </FormControl>
                   </FormItem>
@@ -425,16 +424,13 @@ export default function CreateBroadcastCampaign() {
                           </Button>
                         </UTMParametersDialog>
                       </FormControl>
-                      <div className="text-sm text-red-500">
-                        {fieldState.error
-                          ? Object.values(fieldState.error).flatMap(
-                              (err: any) =>
-                                typeof err === "object" && err.value?.message
-                                  ? err.value.message
-                                  : []
-                            )[0] || "Invalid or missing required value"
-                          : ""}
-                      </div>
+                      {form?.formState?.errors?.utmParameters && (
+                        <div className="text-sm text-red-500">
+                          {Object.keys(
+                            form?.formState?.errors?.utmParameters
+                          ).join(", ") + " field(s) are missing values."}
+                        </div>
+                      )}
                     </FormItem>
                   );
                 }}
@@ -487,6 +483,7 @@ export default function CreateBroadcastCampaign() {
                       <div className="flex items-center gap-2">
                         <Checkbox
                           id="pause"
+                            variant="blue"
                           className="border-gray-600"
                           checked={field.value === "pause"}
                           onCheckedChange={(checked: boolean) => {
@@ -506,6 +503,7 @@ export default function CreateBroadcastCampaign() {
                       <div className="flex items-center gap-2">
                         <Checkbox
                           id="skip"
+                          variant="blue"
                           className="border-gray-600"
                           checked={field.value === "skip"}
                           onCheckedChange={(checked: boolean) => {
@@ -552,7 +550,7 @@ export default function CreateBroadcastCampaign() {
                       Run test message
                     </FormLabel>
                     <FormDescription className="text-sm">
-                      Enter the mobile number
+                      Enter the mobile number along with countrycode
                     </FormDescription>
                     <FormControl>
                       <Input
@@ -566,7 +564,7 @@ export default function CreateBroadcastCampaign() {
                 )}
               />
 
-              <Button 
+              <Button
                 className=" py-3 px-5 bg-blue-500 text-white hover:bg-blue-600"
                 type="button"
                 onClick={handleTestMessage}
@@ -574,7 +572,9 @@ export default function CreateBroadcastCampaign() {
               >
                 Send Text Message
               </Button>
-              <button ref={submitRef} className="hidden">Submit</button>
+              <button ref={submitRef} className="hidden">
+                Submit
+              </button>
             </div>
           </div>
         </form>

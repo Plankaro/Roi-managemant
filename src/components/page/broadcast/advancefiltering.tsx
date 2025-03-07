@@ -65,7 +65,7 @@ export function AudienceFilteringDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-2xl bg-gradient-to-b bg-blue-50 rounded-3xl">
+      <DialogContent className="sm:max-w-2xl w-[80vw] bg-gradient-to-b bg-blue-50 rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
             Audience Filtering Options

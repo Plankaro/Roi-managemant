@@ -4,7 +4,7 @@ import baseQuery from "./basequery";
 
 export const apiSlice = createApi({
   baseQuery,
-  tagTypes: ["Prospect", "shopifyCustomer", "getbroadcastbyid", "getchatsById","flashresponse"], // Define tags for invalidation
+  tagTypes: ["Prospect", "shopifyCustomer", "getbroadcastbyid", "getchatsById","flashresponse","getbroadcastbyid",], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
       query: (body) => ({

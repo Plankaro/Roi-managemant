@@ -37,7 +37,7 @@ export const sidebarItems = [
   { icon: AIBuilder, label: "AI Builder", slug: "/ai-builder" },
   { icon: LineChart, label: "Analytics", slug: "/analytics" },
   { icon: RiAccountPinBoxFill, label: "Prospects", slug: "/prospects" },
-  { icon: Users, label: "Agents", slug: "/agents" },
+  { icon: Users, label: "Teams", slug: "/teams" },
 ];
 
 const Sidebar = () => {
