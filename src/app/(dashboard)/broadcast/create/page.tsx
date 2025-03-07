@@ -216,7 +216,7 @@ export default function CreateBroadcastCampaign() {
               <BroadcastPopup selectedTemplate={selectedTemplate} form={form} open={checkoutDialog} onOpenChange={handlecheckoutDialog} submitref={submitRef}>
                 <div className="flex  gap-2">
                   <Button
-                    className="bg-blue-500 py-3 px-7 hidden md:flex items-center"
+                    className="bg-blue-500 py-3 px-7 hidden md:flex items-center hover:bg-blue-600"
                     type="button"
                   >
                     Proceed

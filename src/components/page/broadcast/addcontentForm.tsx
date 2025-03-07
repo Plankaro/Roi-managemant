@@ -39,7 +39,7 @@ function AddContentForm({
           isEditable: false,
           fromsegment: false,
           segmentname: "",
-         
+
           segmentAltValue: "",
         },
         body: [] as {
@@ -47,12 +47,11 @@ function AddContentForm({
           value: string;
           fromsegment: boolean;
           segmentname: string;
-       
+
           segmentAltValue: string;
         }[],
         buttons: [] as { type: string; value: string; isEditable: boolean }[],
       };
-
 
       selectedTemplate.components.forEach((component: any) => {
         if (component.type === "HEADER") {
@@ -72,7 +71,7 @@ function AddContentForm({
               newFormData.header.isEditable = true;
               newFormData.header.fromsegment = false;
               newFormData.header.segmentname = "";
-            
+
               newFormData.header.segmentAltValue = "";
             } else if (
               selectedTemplate.parameter_format === "NAMED" &&
@@ -82,14 +81,14 @@ function AddContentForm({
               newFormData.header.isEditable = true;
               newFormData.header.fromsegment = false;
               newFormData.header.segmentname = "";
-           
+
               newFormData.header.segmentAltValue = "";
             } else {
               newFormData.header.value = component.text || "";
               newFormData.header.isEditable = false;
               newFormData.header.fromsegment = false;
               newFormData.header.segmentname = "";
-       
+
               newFormData.header.segmentAltValue = "";
             }
           }
@@ -104,7 +103,7 @@ function AddContentForm({
                 value: "",
                 fromsegment: false,
                 segmentname: "",
-              
+
                 segmentAltValue: "",
               })
             );
@@ -118,7 +117,7 @@ function AddContentForm({
                 value: "",
                 fromsegment: false,
                 segmentname: "",
-              
+
                 segmentAltValue: "",
               })
             );
@@ -247,7 +246,11 @@ function AddContentForm({
         ];
 
   if (!selectedTemplate || !selectedContact) {
-    return <div className="md:text-base text-sm">You need to select a template and contacts to acess this</div>;
+    return (
+      <div className="md:text-base text-sm">
+        You need to select a template and contacts to acess this
+      </div>
+    );
   }
   return (
     <Card className="bg-transparent text-white shadow-none p-0 border-0 h-full overflow-y-scroll no-scrollbar">
@@ -294,8 +297,12 @@ function AddContentForm({
                             component.example?.header_text) ||
                             (selectedTemplate.parameter_format === "NAMED" &&
                               component.example?.header_text_named_params)) && (
-                            <div className={`h-full lg:flex-row  flex flex-col gap-4`}>
-                              <div className={`lg:basis-1/2 flex flex-col gap-3`}>
+                            <div
+                              className={`h-full lg:flex-row  flex flex-col gap-4`}
+                            >
+                              <div
+                                className={`lg:basis-1/2 flex flex-col gap-3`}
+                              >
                                 <div className="flex justify-between">
                                   <label
                                     htmlFor="header-input"
@@ -306,17 +313,22 @@ function AddContentForm({
                                       ? "{{1}}"
                                       : `{{${component.example?.header_text_named_params?.[0]?.param_name}}}`}
                                   </label>
-                                  <span className="flex items-center gap-3 md:text-sm  text-xs font-medium text-gray-400">
+                                  <span className="sm:flex hidden items-center gap-3 md:text-sm  text-xs font-medium text-gray-400 ">
                                     <Checkbox
-                                      className=""
+                                      className="border border-white"
                                       variant="blue"
                                       checked={formData?.header?.fromsegment}
                                       onCheckedChange={(checked) => {
-                                        handleInputChange("header", 0, "fromsegment", checked);
-                                        
+                                        handleInputChange(
+                                          "header",
+                                          0,
+                                          "fromsegment",
+                                          checked
+                                        );
                                       }}
                                     />
-                                    Select Content from {selectedContact?.type ?? ""} segment
+                                    Select Content from{" "}
+                                    {selectedContact?.type ?? ""} segment
                                   </span>
                                 </div>
                                 {!formData.header.fromsegment ? (
@@ -364,6 +376,23 @@ function AddContentForm({
                                   </Select>
                                 )}
                               </div>
+                              <span className="flex items-center sm:hidden gap-3 md:text-sm  text-xs font-medium text-gray-400">
+                                <Checkbox
+                                  className="border border-white"
+                                  variant="blue"
+                                  checked={formData?.header?.fromsegment}
+                                  onCheckedChange={(checked) => {
+                                    handleInputChange(
+                                      "header",
+                                      0,
+                                      "fromsegment",
+                                      checked
+                                    );
+                                  }}
+                                />
+                                Select Content from{" "}
+                                {selectedContact?.type ?? ""} segment
+                              </span>
                               {formData?.header?.fromsegment && (
                                 <div className="w-full flex flex-col gap-3 lg:basis-1/2">
                                   <label
@@ -423,19 +452,23 @@ function AddContentForm({
                                 }
                               >
                                 <Upload className="mr-2 h-4 w-4" />
-                                <span className="md:text-base text-sm ">Upload {component?.format?.toLowerCase()}</span>
+                                <span className="md:text-base text-sm ">
+                                  Upload {component?.format?.toLowerCase()}
+                                </span>
                               </Button>
                               {formData?.header?.value && (
                                 <a
-                                  href={formData?.header?.value??""}
+                                  href={formData?.header?.value ?? ""}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex cursor-pointer items-center gap-2 md:px-3 md:py-1 p-2   bg-blue-500 text-white font-semibold sm:rounded-md rounded-full shadow-md transition-all duration-200"
                                 >
                                   <Eye className="w-5 h-5 " />
-                                  <span className="sm:text-base md:block hidden ">Preview File</span>
+                                  <span className="sm:text-base md:block hidden ">
+                                    Preview File
+                                  </span>
                                 </a>
-                               )} 
+                              )}
                             </div>
                           </>
                         )}
@@ -443,13 +476,16 @@ function AddContentForm({
                     )}
                     {component.type === "BODY" &&
                       formData?.body?.length > 0 && (
-                        <div className="space-y-3">
+                        <div className="space-y-3 flex flex-col gap-6">
                           {formData.body.map((param: any, paramIndex: any) => (
                             <div
                               key={`body-${paramIndex}`}
                               className="flex lg:flex-row flex-col gap-6"
                             >
-                              <div className={` lg:basis-1/2  flex flex-col gap-3 `}>
+                              <div className="flex flex-col gap-2  lg:basis-1/2">
+                              <div
+                                className={`  flex flex-col gap-3 `}
+                              >
                                 <div className="flex justify-between text-gray-400">
                                   <label
                                     htmlFor={`body-${paramIndex}`}
@@ -457,16 +493,22 @@ function AddContentForm({
                                   >
                                     {param.parameter_name}
                                   </label>
-                                  <span className="flex items-center gap-3 md:text-sm text-xs">
+                                  <span className="sm:flex hidden items-center gap-3 md:text-sm text-xs">
                                     <Checkbox
-                                      className="border-white"
+                                      className="border-white "
                                       variant="blue"
                                       checked={param?.fromsegment}
                                       onCheckedChange={(checked) =>
-                                        handleInputChange("body", paramIndex, "fromsegment", checked)
+                                        handleInputChange(
+                                          "body",
+                                          paramIndex,
+                                          "fromsegment",
+                                          checked
+                                        )
                                       }
                                     />
-                                   Select Content from {selectedContact?.type ?? ""} segment
+                                    Select Content from{" "}
+                                    {selectedContact?.type ?? ""} segment
                                   </span>
                                 </div>
                                 {!param.fromsegment ? (
@@ -513,6 +555,24 @@ function AddContentForm({
                                     </SelectContent>
                                   </Select>
                                 )}
+                              </div>
+                              <span className="sm:hidden flex items-center gap-3 md:text-sm text-xs">
+                                <Checkbox
+                                  className="border-white"
+                                  variant="blue"
+                                  checked={param?.fromsegment}
+                                  onCheckedChange={(checked) =>
+                                    handleInputChange(
+                                      "body",
+                                      paramIndex,
+                                      "fromsegment",
+                                      checked
+                                    )
+                                  }
+                                />
+                                Select Content from{" "}
+                                {selectedContact?.type ?? ""} segment
+                              </span>
                               </div>
                               {param.fromsegment && (
                                 <div className="w-full flex flex-col gap-3 lg:basis-1/2">

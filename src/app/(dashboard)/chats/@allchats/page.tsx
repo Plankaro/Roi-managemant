@@ -356,7 +356,7 @@ const AllChats = () => {
             } relative transition-all duration-300 ease-in-out backdrop-blur-3xl`}
           >
             {/* Header */}
-            <div className="p-4 w-full   absolute top-0 z-10 bg-primary/50 glass">
+            <div className="sm:p-4 px-2 py-4 w-full   absolute top-0 z-10 bg-primary/50 glass">
               <div className="flex items-center justify-between">
                 <div
                   className="flex items-center gap-4"
