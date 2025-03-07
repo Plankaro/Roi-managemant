@@ -19,10 +19,10 @@ function OrderIndex({id}:{id:string}) {
   const {data: prospect, isLoading: prospectLoading,refetch:prospectrefetch} = useGetSpecificShopifyContactsQuery(id)
   const {data:orders, isLoading: ordersLoading} = useGetShopifyOrdersQuery(id)
 
-  console.log(products)
+  //console.log(products)
 
 
-  // console.log(prospect)
+  // //console.log(prospect)
   const dispatch = useDispatch()
 ;
  

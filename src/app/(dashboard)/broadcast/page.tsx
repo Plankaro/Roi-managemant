@@ -15,7 +15,7 @@ import { useGetAllBroadcastsQuery } from "@/store/features/apislice"
 
 export default function BroadcastPage() {
   const { data: broadcasts, isLoading } = useGetAllBroadcastsQuery({})
-  console.log(broadcasts)
+  //console.log(broadcasts)
 
   return (
     <div className=" ">
@@ -72,7 +72,7 @@ function BroadcastCard({ broadcast }: { broadcast: any }) {
         <CardContent className=" md:p-4 p-2 space-y-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium">{broadcast.name || "Title of broadcast"}</h3>
+              <h3 className="font-medium line-clamp-1">{broadcast.name || "Title of broadcast"}</h3>
               <Badge variant="outline" className="border-2 border-primary text-white rounded-lg">
                 {broadcast.type || "Transactional"}
               </Badge>

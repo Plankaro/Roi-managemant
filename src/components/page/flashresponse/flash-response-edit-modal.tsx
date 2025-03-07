@@ -177,6 +177,7 @@ export default function FlashResponseEditModal({
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      className="data-[state=checked]:bg-[#A7B8D9]"
                     />
                   </FormControl>
                 </FormItem>
@@ -184,7 +185,7 @@ export default function FlashResponseEditModal({
             />
 
             <DialogFooter>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" className="bg-blue-500 hover:bg-blue-500">Save Changes</Button>
             </DialogFooter>
           </form>
         </Form>

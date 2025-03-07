@@ -61,12 +61,12 @@ const AuthForm = <T extends FieldValues>({
   });
 
   const handleSubmit: SubmitHandler<T> = async (data) => {
-    console.log("🚀 ~ handleSubmit ~ data:", data);
+    //console.log("🚀 ~ handleSubmit ~ data:", data);
     try {
       if (!data) return;
       await onSubmit(data);
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     }
   };
 

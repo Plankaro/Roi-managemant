@@ -42,7 +42,7 @@ interface Product {
         const existingItem = state.cartItems.find((item) => item.id === action.payload.id);
 
         if (!existingItem) {
-            console.log("adding cart item")
+            //console.log("adding cart item")
             state.cartItems.push({
               ...action.payload,
               selectedVariant: action.payload.variants[0].id,
@@ -53,7 +53,7 @@ interface Product {
         
       },
       updateVariant: (state, action: PayloadAction<{ productId: string, variantId: string }>) => {
-        console.log("Updating variant for item with ID:", action.payload.productId);
+        //console.log("Updating variant for item with ID:", action.payload.productId);
         const { productId, variantId } = action.payload;
         const cartItem = state.cartItems.find((item) => item.id === productId);
         if (cartItem) {
@@ -81,14 +81,14 @@ interface Product {
       
       },
       removeItem: (state, action: PayloadAction<string>) => {
-        console.log("Removing item with ID:", action.payload);
+        //console.log("Removing item with ID:", action.payload);
         state.cartItems = state.cartItems.filter((item) => item.id != action.payload);
-        console.log("Removed cartItems:", state.cartItems);
+        //console.log("Removed cartItems:", state.cartItems);
       },
       removeall: (state)=>{
         state.cartItems = [];
         state.TotalPrice = 0;
-        console.log("Cart cleared")
+        //console.log("Cart cleared")
       }
     }
   });

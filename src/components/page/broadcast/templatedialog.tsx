@@ -28,7 +28,7 @@ export default function TemplateBuilder({
   const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-console.log(selectedTemplate)
+//console.log(selectedTemplate)
 
 
   const handleTemplateSelect = () => {

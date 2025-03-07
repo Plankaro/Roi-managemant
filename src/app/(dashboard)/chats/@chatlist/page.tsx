@@ -57,13 +57,13 @@ const ChatLists = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const user = session?.data?.user?.user
   const {selectedProspect,prospects} = useSelector((state: RootState) => state.Prospect);
-  console.log(prospects)
+  //console.log(prospects)
 
   
   useEffect(() => {
     if (data) {
       dispatch(addProspect(data));
-      console.log("added");
+      //console.log("added");
     }
   }, [data, dispatch]);
 
@@ -77,7 +77,7 @@ const ChatLists = () => {
     );
   });
 
-  console.log(selectedProspect)
+  //console.log(selectedProspect)
   return (
     <div className={`md:max-w-md md:flex bg-backgroundColor  ${selectedProspect ? "hidden" : "flex"} w-full border rounded-[20px] xl:basis-2/5 md:basis-4/12 border-primary backdrop-blur-xl flex-col h-full overflow-hidden  `}>
       <div className="p-4">

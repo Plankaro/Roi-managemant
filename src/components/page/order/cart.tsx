@@ -43,7 +43,7 @@ function Cart({ id, refetch }: { id: string; refetch: () => void }) {
   const [shippingFee, setShippingFee] = useState(0)
   const [discount, setDiscount] = useState(0)
   const [createOrder] = useCreateOrderMutation()
-  console.log("gh", ShopifyCustomer)
+  //console.log("gh", ShopifyCustomer)
   const [shippingAddress, setShippingAddress] = useState({
     firstName: "",
     lastName: "",
@@ -125,7 +125,7 @@ function Cart({ id, refetch }: { id: string; refetch: () => void }) {
             price: variant?.price || 0,
           }
         })
-        console.log(id, itemsTobeCheckout, finalAmount, shippingAddress)
+        //console.log(id, itemsTobeCheckout, finalAmount, shippingAddress)
         const promise = createOrder({
           customerId: ShopifyCustomer?.shopifyData?.id,
           Items: itemsTobeCheckout,
@@ -144,7 +144,7 @@ function Cart({ id, refetch }: { id: string; refetch: () => void }) {
           error: (error: any) => error?.data?.message || "An error occurred while placing the order.",
         })
         promise.then(() => refetch())
-        console.log(JSON.stringify(await promise, null, 2))
+        //console.log(JSON.stringify(await promise, null, 2))
       }
     } catch (error: any) {
       toast.error(error.message || "An error occurred while")

@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 export default function MessageStatus({ selectedBroadcast}: {selectedBroadcast:BroadcastDetailResult | undefined}) {
 
   if(!selectedBroadcast) return null
-  console.log(selectedBroadcast)
+  //console.log(selectedBroadcast)
 const {readCount,failedCount,skippedCount,deliveredCount} = selectedBroadcast
 
   const chartData = [

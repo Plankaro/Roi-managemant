@@ -11,7 +11,7 @@ export default function Page() {
   const { data:AllCustomersQuery,refetch:AllCustomersRefetch } = useGetAllShopifyContactsQuery({});
 
   const { data: starredCustomersQuery,refetch:starredCustomersRefetch } = useGetStarredCustomersQuery({});
-  console.log(starredCustomersQuery);
+  //console.log(starredCustomersQuery);
 const onSave=()=>{
   AllCustomersRefetch()
   starredCustomersRefetch()

@@ -15,7 +15,7 @@ export default function TemplateBuilder({ open, setOpen }: { open: boolean, setO
   const [selectedTemplate, setSelectedTemplate] = useState<any | null>(null)
   const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  console.log(templates)
+  //console.log(templates)
 
   useEffect(() => {
     if (templates && templates.length > 0) {

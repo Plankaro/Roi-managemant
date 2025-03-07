@@ -12,7 +12,7 @@ export async function handleCredentialsSignin({
 
 }) {
   try {
-    console.log({ email, password });
+    //console.log({ email, password });
     await signIn("credentials", { email, password, redirectTo: "/chats" });
   } catch (error) {
     if (error instanceof AuthError) {

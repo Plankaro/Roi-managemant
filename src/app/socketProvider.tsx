@@ -17,7 +17,7 @@ interface SocketProviderProps {
 const SocketProvider = ({ children }: SocketProviderProps) => {
 
   const session:any = useSession();
-  console.log(session)
+  //console.log(session)
 
 const user = session?.data?.user?.user
 const dispatch = useDispatch()
@@ -30,23 +30,23 @@ const dispatch = useDispatch()
   }), []);
 
   useEffect(() => {
-    console.log("Connecting to WebSocket...");
+    //console.log("Connecting to WebSocket...");
     socket.connect();
 
     socket.on("connect", () => {
-      console.log("✅ WebSocket Connected!");
+      //console.log("✅ WebSocket Connected!");
       
       // Subscribe automatically (replace with dynamic phone number if needed)
       const phoneNumber = user?.buisness?.whatsapp_mobile??"";
-      console.log(user)
-      console.log(phoneNumber) // Replace with dynamic number if necessary
+      //console.log(user)
+      //console.log(phoneNumber) // Replace with dynamic number if necessary
       socket.emit("subscribe", phoneNumber);
-      console.log(`🔔 Subscribed to ${phoneNumber}`);
+      //console.log(`🔔 Subscribed to ${phoneNumber}`);
     });
 
     // Listen for incoming messages
     socket.on("messages", (data) => {
-      console.log("📩 New Messages:", data);
+      //console.log("📩 New Messages:", data);
       dispatch(setChats([data]));
       dispatch(updateLastChat(data));
      ; // Append new messages
@@ -54,14 +54,14 @@ const dispatch = useDispatch()
 
     // Listen for new prospect events
     socket.on("prospect", (data) => {
-      console.log("👤 New Prospect Created:", data);
+      //console.log("👤 New Prospect Created:", data);
       dispatch(addProspect([data]));
       
       
     });
 
     return () => {
-      console.log("❌ Disconnecting WebSocket...");
+      //console.log("❌ Disconnecting WebSocket...");
       socket.disconnect();
     };
   }, [socket]);

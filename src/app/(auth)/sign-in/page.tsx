@@ -15,10 +15,10 @@ export default function Home() {
                 toast.error("Invalid credentials or unverified account");
                 return;
             }
-            console.log(result);
+            //console.log(result);
             update();
         } catch (error) {
-            console.log(error);
+            //console.log(error);
         }
     }
 

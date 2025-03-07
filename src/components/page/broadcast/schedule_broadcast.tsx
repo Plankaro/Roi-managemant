@@ -34,7 +34,7 @@ function ScheduleBroadcast({
     const newSchedule = { ...schedule, date: selectedDate };
     setSchedule(newSchedule);
 
-    console.log(newSchedule);
+    //console.log(newSchedule);
 
     // Automatically open time picker if today's date is selected.
     if (selectedDate.toDateString() === new Date().toDateString()) {

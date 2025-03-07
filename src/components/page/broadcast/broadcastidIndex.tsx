@@ -17,14 +17,14 @@ import Link from "next/link"
 export default function BroadcastDetails({id}:{id:string}) {
 
   const { data, isLoading,refetch }: { data?: BroadcastDetailResult; isLoading: boolean,refetch:()=>void } = useGetBroadcastByIdQuery(id);
-  console.log(data)
+  //console.log(data)
   
   let totalOrderPrice = 0;
 
   if (Array.isArray(data?.Order) && data.Order.length > 0) {
     totalOrderPrice = calculateTotalPrice(data.Order);
   }
-  console.log(totalOrderPrice);
+  //console.log(totalOrderPrice);
   const roi = data?.price ? (totalOrderPrice / Number(data.price)).toFixed(3) : "0.000";
 
 
@@ -84,7 +84,7 @@ const handleDownload = async () => {
         // Create an Excel sheet
          exportJsonToExcel(formattedData);
     } else {
-        console.log("No data available to download.");
+        //console.log("No data available to download.");
     }
 };
 

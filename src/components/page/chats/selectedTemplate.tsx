@@ -68,7 +68,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  console.log(selectedTemplate)
+  //console.log(selectedTemplate)
 
   useEffect(() => {
     if (selectedTemplate) {
@@ -140,7 +140,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
   if (!selectedTemplate) {
     return <div>No template selected</div>
   }
-  console.log(selectedTemplate.components)
+  //console.log(selectedTemplate.components)
 
   const handleInputChange = (
     section: "header" | "body" | "buttons",
@@ -165,7 +165,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     const file = event.target.files?.[0]
  
     if (file) {
-      console.log(file.size)
+      //console.log(file.size)
       if(file.size>5*1024*1024) {
         toast.error("File size should be less than 5MB")
         return
@@ -186,7 +186,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
         // Set the header value with the uploaded link
         handleInputChange("header", 0, "value", link)
       } catch (error) {
-        console.log(error)
+        //console.log(error)
       }
     }
   }
@@ -287,7 +287,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
           buttons: previewButtons,
         },
       }
-      console.log(logData)
+      //console.log(logData)
       const response = await sendTemplate(logData)
       dispatch(setChats([response.data]))
       

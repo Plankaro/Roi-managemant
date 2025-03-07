@@ -60,7 +60,7 @@ function ProspectId({ id }: { id: string }) {
   const { data,refetch } = useGetSpecificShopifyContactsQuery(id);
 
 
-  console.log(data);
+  //console.log(data);
 
   const [createProspect] = useCreateProspectMutation();
 
@@ -75,14 +75,14 @@ function ProspectId({ id }: { id: string }) {
       dispatch(addProspect([response.data]));
       dispatch(selectProspect(response.data));
       router.push(`/chats`);
-      console.log("Prospect created successfully");
+      //console.log("Prospect created successfully");
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleeditDetails = async (body: any) => {
-    console.log(body)
+    //console.log(body)
     try {
       const santized = updateProspectSchema.safeParse(body);
 
@@ -90,10 +90,10 @@ function ProspectId({ id }: { id: string }) {
         toast.error("Invalid field value");
         return;
       }
-      console.log(data?.DbData?.id)
+      //console.log(data?.DbData?.id)
       if (!data?.DbData?.id) return;
       const promise = updateProspect({ id: data?.DbData?.id, body });
-      console.log(await promise);
+      //console.log(await promise);
       toast.promise(promise, {
         loading: "Updating...",
         success: "Details updated successfully!",
@@ -101,11 +101,12 @@ function ProspectId({ id }: { id: string }) {
           error?.data?.message || "An unexpected error occurred.",
       });
       const prospect: any = await promise;
-      console.log(data);
+      //console.log(data);
       dispatch(addProspect([prospect.data]));
       refetch();
       return prospect;
     } catch (error) {
+
       console.log(error);
     }
   };

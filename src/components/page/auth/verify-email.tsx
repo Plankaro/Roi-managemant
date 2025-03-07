@@ -30,7 +30,7 @@ function VerifyEmail({ id }: VerifyEmailProps) {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-token/${id}`
         );
-        console.log("Verification response:", response.data);
+        //console.log("Verification response:", response.data);
         setData(response.data);
         toast.success("Email verified successfully!");
         

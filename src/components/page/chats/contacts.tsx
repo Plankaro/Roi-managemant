@@ -39,8 +39,8 @@ export default function ScrollableContactDialog({
   const handleChatClick = async () => {
     if (selectedContact !== null && selectedContact?.phone) {
       try {
-        console.log(`Starting chat with contact ID: ${selectedContact.id}`);
-        console.log(selectedContact);
+        //console.log(`Starting chat with contact ID: ${selectedContact.id}`);
+        //console.log(selectedContact);
 
         await createProspect({
           shopify_id:selectedContact.id.match(/\d+$/)[0],
@@ -52,7 +52,7 @@ export default function ScrollableContactDialog({
         refetch();
         
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       }
       finally{
         setOpen(false);

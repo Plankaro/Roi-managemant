@@ -114,7 +114,7 @@ export default function CreateBroadcastCampaign() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
      try {
-       console.log("Form data:", data);
+       //console.log("Form data:", data);
        
        
        const datas =  broadcast(data).unwrap();
@@ -125,7 +125,7 @@ export default function CreateBroadcastCampaign() {
        refetch()
       
      } catch (error) {
-      console.log(error);
+      //console.log(error);
      }
     } 
     
@@ -134,13 +134,13 @@ export default function CreateBroadcastCampaign() {
   const validateForm = async () => {
     let validate = false;
     const isValid = await form.trigger();
-    console.log(isValid); // Triggers validation manually
-console.log(form.formState.errors)
+    //console.log(isValid); // Triggers validation manually
+//console.log(form.formState.errors)
     if (!isValid) {
       const errors = form.formState.errors;
       const errorFields = Object.keys(errors.templateForm || {}).join(", ");
-      console.log(form.watch("templateForm"))
-      console.log(errors)
+      //console.log(form.watch("templateForm"))
+      //console.log(errors)
 
       toast.error(`Invalid or template fields: ${errorFields}`);
       return validate;
@@ -157,7 +157,7 @@ console.log(form.formState.errors)
     if (!isValid) return;
     // Test message functionality goes here
     const formvalues = form.getValues();
-    console.log("Form data:", formvalues);
+    //console.log("Form data:", formvalues);
 
     const ValidPhoneNumber = isValidPhoneNumber(formvalues?.testphoneno ?? "");
     if (!ValidPhoneNumber) {
@@ -174,7 +174,7 @@ console.log(form.formState.errors)
   };
 
   const onError = (errors: any) => {
-    console.log("Validation errors:", errors);
+    //console.log("Validation errors:", errors);
     if (errors.templateForm) {
       toast.error("invalid or empty fields in add content form");
     }
@@ -183,14 +183,14 @@ console.log(form.formState.errors)
   const handlecheckoutDialog = async(value: boolean) => {
     if (value===true) {
       const isValid = await validateForm();
-      console.log(isValid);
+      //console.log(isValid);
       if (!isValid) return;
         
     }
     setCheckoutDialog(value);
   }
 
-  console.log(selectedTemplate);
+  //console.log(selectedTemplate);
   return (
     <ScrollArea className="  text-white p-4 h-[calc(100vh-100px)] ">
       <Form {...form}>
@@ -399,7 +399,7 @@ console.log(form.formState.errors)
                 control={form.control}
                 name="utmParameters"
                 render={({ field, fieldState }) => {
-                  console.log("FieldState Error:", fieldState.error); // Debugging log
+                  //console.log("FieldState Error:", fieldState.error); // Debugging log
 
                   return (
                     <FormItem className="space-y-2 py-2">

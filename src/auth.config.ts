@@ -28,7 +28,7 @@ async function refreshAccessToken(token: any) {
 //console.log(response);
         const tokens = response.data;
 
-    console.log(response.data)
+    ////console.log(response.data)
 
         return {
             ...token,
@@ -36,7 +36,7 @@ async function refreshAccessToken(token: any) {
             refresh_token: tokens.refresh_token// Fall back to old refresh token
         };
     } catch (error) {
-        //console.log(error);
+        ////console.log(error);
 
         return {
             ...token,
@@ -81,7 +81,7 @@ export default {
                     return data;
                 } catch (error) {
                     if (axios.isAxiosError(error) && error.response?.status === 403) {
-                        console.log("An error occurred")
+                        //console.log("An error occurred")
                         throw new CredentialsSignin({ message: "Email not verified" });
                       }
                    throw new CredentialsSignin({"cause": "Invalid credentials"});
@@ -122,12 +122,12 @@ export default {
             }
 
             if (Date.now() < token.accessTokenExpires) {
-                console.log("**** returning previous token ******");
+                //console.log("**** returning previous token ******");
                 return token;
             }
 
           
-            console.log("**** Update Refresh token ******");
+            //console.log("**** Update Refresh token ******");
             
             return refreshAccessToken(token);
         },

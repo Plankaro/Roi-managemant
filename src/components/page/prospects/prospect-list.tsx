@@ -15,6 +15,7 @@ import type { CustomerProspect, CustomerProspectList } from "@/zod/types";
 import Link from "next/link";
 import ShopifyLogo from "@/components/icons/shopify";
 import { useCreateStarredCustomerMutation } from "@/store/features/apislice";
+import toast from "react-hot-toast";
 
 export default function ProspectList({
   prospects,
@@ -90,13 +91,19 @@ export default function ProspectList({
   //     return newSet
   //   })
   // }
-  const toogleStar = (prospect_id:string,event:any)=>{
+  const toogleStar = async(prospect_id:string,event:any)=>{
     try {
       event.preventDefault()
       event.stopPropagation()
   
-      createStarredCustomer({ customerId: prospect_id })
-      console.log("starred")
+      const promise = createStarredCustomer({ customerId: prospect_id })
+      toast.promise(promise,{
+        loading: "updating...",
+        success: "Starred updated successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      })
+      //console.log("starred")
       onSave()
     } catch (error) {
       console.log(error)

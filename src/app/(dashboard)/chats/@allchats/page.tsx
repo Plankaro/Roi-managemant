@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 "use client";
-import { z } from 'zod';
+import { z } from "zod";
 import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import { UserRound } from "lucide-react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+import FlashResponsePopup from "@/components/page/chats/flashresponse";
 import {
   Select,
   SelectContent,
@@ -43,7 +44,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDispatch } from "react-redux";
-import { addProspect, clearlastChat, clearSelectedProspects } from "@/store/features/prospect";
+import {
+  addProspect,
+  clearlastChat,
+  clearSelectedProspects,
+} from "@/store/features/prospect";
 import { getLastOnlineStatus } from "@/lib/last_online";
 
 import { MdOutlineVideoLibrary } from "react-icons/md";
@@ -51,7 +56,7 @@ import Messages from "@/components/page/chats/message";
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import TemplateBuilder from "@/components/page/chats/templatedialog";
 import { clearChats, setChats } from "@/store/features/chatSlice";
-import { updateProspectSchema } from '@/zod/chats/chat';
+import { updateProspectSchema } from "@/zod/chats/chat";
 import {
   useSendMediaMutation,
   useUploadFilesMutation,
@@ -60,27 +65,29 @@ import {
   useSendTextMutation,
   useUpdateProspectMutation,
   useGetProspectQuery,
-  useDeleteChatsMutation
+  useDeleteChatsMutation,
 } from "@/store/features/apislice";
 import toast from "react-hot-toast";
 import EditableField from "@/components/page/chats/editablediv";
 type FileType = "image" | "video" | "document";
-import { useChangeBlockStatusMutation } from '@/store/features/apislice';
-import { getTimeDifference } from '@/lib/timetill';
+import { useChangeBlockStatusMutation } from "@/store/features/apislice";
+import { getTimeDifference } from "@/lib/timetill";
 
-import { getChatsForProspect } from '@/components/page/broadcast/getchats';
+import { getChatsForProspect } from "@/components/page/broadcast/getchats";
+import { useGetFlashResponseQuery } from "@/store/features/apislice";
 
 interface FileUploadProps {
   onFileSelect: (file: File, type: FileType) => void;
 }
 
-
 const AllChats = () => {
   const [fileType, setFileType] = useState<FileType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
+  const {data: flashResponse} = useGetFlashResponseQuery({})
+  
 
-  const{ selectedProspect, }= useSelector(
+  const { selectedProspect } = useSelector(
     (state: RootState) => state.Prospect
   );
 
@@ -93,33 +100,37 @@ const AllChats = () => {
       dispatch(setChats(chats));
     }
   });
-  
-
 
   const [message, setMessage] = useState("");
+  const [showFlashPopup, setShowFlashPopup] = useState(false)
   const [sendText, { isLoading }] = useSendTextMutation();
 
   const [uploadFiles, { isLoading: isuploadingfile }] =
     useUploadFilesMutation();
   const [sendMedia, { isLoading: isSendingMedia }] = useSendMediaMutation();
-  const [updateProspect, { isLoading: isUpdatingProspect }] = useUpdateProspectMutation();
-  const [changeBlockStatus, { isLoading: isChangingBlockStatus }] = useChangeBlockStatusMutation();
+  const [updateProspect, { isLoading: isUpdatingProspect }] =
+    useUpdateProspectMutation();
+  const [changeBlockStatus, { isLoading: isChangingBlockStatus }] =
+    useChangeBlockStatusMutation();
   const { data } = useGetSpecficProspectQuery({});
   const [deleteChats] = useDeleteChatsMutation();
 
-  console.log(selectedProspect);
+  //console.log(selectedProspect);
   const [takeOver, settakeOver] = useState(false);
   const [show, setShow] = useState(false);
   const [dialog, setDialog] = useState(false);
-  console.log(dialog);
+  //console.log(dialog);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  console.log("select",selectedProspect)
+  const [searchTerm, setSearchTerm] = useState("")
+  //console.log("select", selectedProspect);
   const lastOnlineStatus = getLastOnlineStatus(
     selectedProspect?.last_Online as Date
   );
 
-  const getDifference = getTimeDifference( selectedProspect?.last_Online as Date)
+  const getDifference = getTimeDifference(
+    selectedProspect?.last_Online as Date
+  );
   const dispatch = useDispatch();
 
   const handleSendMessage = async () => {
@@ -190,28 +201,46 @@ const AllChats = () => {
           error?.data?.message || "An unexpected error occurred.",
       });
 
-      console.log(await sendMediaPromise);
+      //console.log(await sendMediaPromise);
       // dispatch(setChats([await sendMediaPromise]));
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     }
   };
 
-  const handleBlockStatusChange = async(id:string)=>{
+  useEffect(() => {
+    if (message.startsWith("/")) {
+     
+      setShowFlashPopup(true)
+    }else{
+      setShowFlashPopup(false)
+    }
+  }, [message])
+
+  const handleSelectResponse = (response:any) => {
+    //console.log("response",response)
+    setMessage(response.message)
+    setShowFlashPopup(false)
+   
+    }
+    //console.log(flashResponse)
+  
+
+  const handleBlockStatusChange = async (id: string) => {
     try {
-      const changeBlockpromise =  changeBlockStatus({id:id});
+      const changeBlockpromise = changeBlockStatus({ id: id });
       toast.promise(changeBlockpromise, {
-        loading: `${selectedProspect?.is_blocked?"Unblocking":"Blocking"} `,
-        success: `${selectedProspect?.is_blocked?"Unblocked":"Blocked"} successfully!`,
+        loading: `${selectedProspect?.is_blocked ? "Unblocking" : "Blocking"} `,
+        success: `${
+          selectedProspect?.is_blocked ? "Unblocked" : "Blocked"
+        } successfully!`,
         error: (error: any) =>
           error?.data?.message || "An unexpected error occurred.",
-      })
-      const data = await changeBlockpromise
-      dispatch(addProspect([data.data]))
-    } catch (error) {
-      
-    }
-  }
+      });
+      const data = await changeBlockpromise;
+      dispatch(addProspect([data.data]));
+    } catch (error) {}
+  };
 
   const handleDocumentUpload = () => {
     if (fileInputRef.current) {
@@ -225,68 +254,67 @@ const AllChats = () => {
       profileInputRef.current.accept = "image/*";
       profileInputRef.current.click();
     }
-  }
+  };
   const handleProfileImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-   try {
-     const file = event.target.files?.[0];
-     if (!file) {
-       console.log("No file selected");
-       return;
-     }
-     if (file.size > 5 * 1024 * 1024) {
-       toast.error("File size should be less than 5MB");
-       return;
-     }
- 
-     // Prepare file for upload
-     const formData = new FormData();
-     formData.append("file", file);
- 
-     const uploadPromise = uploadFiles(formData).unwrap();
-     toast.promise(uploadPromise, {
-       loading: "Uploading...",
-       success: "File uploaded successfully!",
-       error: (error: any) =>
-         error?.data?.message || "An unexpected error occurred.",
-     });
-     const data = await uploadPromise;
-     const link = data[0].link; 
-    const update:any = await updateProspect({id:selectedProspect?.id, body:{image:link}});
-   
-    dispatch(addProspect([update.data]))
- 
-   } catch (error) {
-    console.log(error)
-   }
-  
-  
+    try {
+      const file = event.target.files?.[0];
+      if (!file) {
+        //console.log("No file selected");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size should be less than 5MB");
+        return;
+      }
+
+      // Prepare file for upload
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const uploadPromise = uploadFiles(formData).unwrap();
+      toast.promise(uploadPromise, {
+        loading: "Uploading...",
+        success: "File uploaded successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      });
+      const data = await uploadPromise;
+      const link = data[0].link;
+      const update: any = await updateProspect({
+        id: selectedProspect?.id,
+        body: { image: link },
+      });
+
+      dispatch(addProspect([update.data]));
+    } catch (error) {
+      //console.log(error);
+    }
   };
 
-  const handleeditDetails = async(body:any) => {
+  const handleeditDetails = async (body: any) => {
     try {
       const santized = updateProspectSchema.safeParse(body);
       if (!santized.success) {
         toast.error("Invalid field value");
-        return
-       
+        return;
       }
-      const promise =  updateProspect({id:selectedProspect?.id, body});
-      toast.promise(promise,{
+      const promise = updateProspect({ id: selectedProspect?.id, body });
+      toast.promise(promise, {
         loading: "Updating...",
         success: "Details updated successfully!",
         error: (error: any) =>
           error?.data?.message || "An unexpected error occurred.",
-      })
-      const prospect:any = await promise
-      console.log(data)
-      dispatch(addProspect([prospect.data]))
-      return prospect
+      });
+      const prospect: any = await promise;
+      //console.log(data);
+      dispatch(addProspect([prospect.data]));
+      return prospect;
     } catch (error) {
-      console.log(error)
+      //console.log(error);
     }
-  }
+  };
 
   const handleMediaUpload = () => {
     if (fileInputRef.current) {
@@ -295,27 +323,24 @@ const AllChats = () => {
     }
   };
 
+  const handleDeleteChats = async (id: string) => {
+    try {
+      const promise = deleteChats({ prospect_id: id });
+      toast.promise(promise, {
+        loading: "Deleting...",
+        success: "Chats deleted successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      });
 
+      const data = await promise;
 
-
-const handleDeleteChats=async(id: string)=>{
-  try {
-    const promise = deleteChats({prospect_id: id});
-    toast.promise(promise, {
-      loading: "Deleting...",
-      success: "Chats deleted successfully!",
-      error: (error: any) =>
-        error?.data?.message || "An unexpected error occurred.",
-    })
-  
-    const data = await promise
-
-    dispatch(clearChats(id));
-    dispatch(clearlastChat(id));
-  } catch (error) {
-    console.log(error)
-  }
-}
+      dispatch(clearChats(id));
+      dispatch(clearlastChat(id));
+    } catch (error) {
+      //console.log(error);
+    }
+  };
 
   return (
     <>
@@ -337,7 +362,7 @@ const handleDeleteChats=async(id: string)=>{
                   className="flex items-center gap-4"
                   onClick={() => setShow(!show)}
                 >
-                  <div className="relative flex items-center  gap-5">
+                  <div className="relative flex items-center sm:gap-5 gap-1">
                     <button
                       className=" md:hidden flex"
                       onClick={() => dispatch(clearSelectedProspects())}
@@ -352,7 +377,7 @@ const handleDeleteChats=async(id: string)=>{
                       />
                     </Avatar>
                   </div>
-                  <div className="relative flex items-center md:gap-10 gap-5 bg">
+                  <div className="relative flex items-center md:gap-10 sm:gap-5 gap-3 bg">
                     <h3 className="sm:text-lg text-sm font-semibold text-white">
                       {selectedProspect?.name || selectedProspect?.phoneNo}
                     </h3>
@@ -363,7 +388,7 @@ const handleDeleteChats=async(id: string)=>{
                       }`}
                     >
                       <Hourglass className="sm:w-4 sm:h-4 w-3 h-3" />
-                      <span className="sm:text-sm text-xs">
+                      <span className="sm:text-sm text-[8px]">
                         {getDifference}
                       </span>
                     </div>
@@ -440,7 +465,7 @@ const handleDeleteChats=async(id: string)=>{
                 </div>
               </div>
             ) : getDifference ? (
-              <div className="p-4 border-t border-primary bg-primary rounded-b-[20px]">
+              <div className="p-4 border-t border-primary bg-primary rounded-b-[20px] relative">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -499,7 +524,6 @@ const handleDeleteChats=async(id: string)=>{
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                
                   </Button>
                   <Input
                     placeholder="Type a message..."
@@ -514,23 +538,30 @@ const handleDeleteChats=async(id: string)=>{
                   >
                     Send
                   </Button>
+                  <FlashResponsePopup
+                    responses={flashResponse}
+                    open={showFlashPopup}
+                    onClose={() => setShowFlashPopup(false)}
+                    onSelect={handleSelectResponse}
+                    searchTerm={message}
+                  />
                 </div>
               </div>
             ) : (
               <div className="p-4 border-t border-primary bg-[#4064AC80] ">
                 <div className="flex items-center gap-2 text-white justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <PlusCircle  className="h-6 w-6" />
-                    You can&apos;t message this user as WhatsApp blocks business messages after 24 hours of no reply.
+                  <div className="flex items-center gap-2 md:text-sm text-[8px]">
+                   
+                    You can&apos;t message this user as WhatsApp blocks business
+                    messages after 24 hours of no reply.
                   </div>
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 capitalize"
                     onClick={() => {
                       setDialog(true);
-                      
                     }}
                   >
-                   Send Templates
+                    Send Templates
                   </Button>
                 </div>
               </div>

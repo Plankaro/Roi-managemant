@@ -12,11 +12,11 @@ export default function BroadcastDashboard({ selectedBroadcast }: { selectedBroa
       ? selectedBroadcast?.scheduledDate
       : selectedBroadcast?.createdAt || Date.now()
   );
-  console.log(selectedBroadcast);
+  //console.log(selectedBroadcast);
 
 
   const formattedCreatedDate = format(createdDate, "P, p")
-console.log("selected",selectedBroadcast);
+//console.log("selected",selectedBroadcast);
   return (
     <div className=" w-full">
       <Card className="  text-white bg-transparent border-primary border sm:p-6 p-2">

@@ -29,7 +29,7 @@ interface ProductProps {
 
 export default function ProductInventory({products}: {products: ProductProps[],loading: boolean}) {
 
-  console.log(products)
+  //console.log(products)
   const dispatch = useDispatch()
   const cartItems = useSelector((state: any) => state.cart.cartItems)
 

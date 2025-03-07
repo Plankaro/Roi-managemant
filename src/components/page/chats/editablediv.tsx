@@ -46,7 +46,7 @@ export default function EditableField({
       if (!result) return
       setIsEditing(false)
     } catch (error) {
-      console.log(error)
+      //console.log(error)
     }
   }
   

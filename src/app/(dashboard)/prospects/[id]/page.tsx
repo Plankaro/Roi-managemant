@@ -5,7 +5,7 @@ import React from 'react'
 
 async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  console.log(id)
+  //console.log(id)
   return (
    <ProspectId id = {id}/>
   )

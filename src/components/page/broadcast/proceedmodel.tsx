@@ -49,7 +49,7 @@ function BroadcastPopup({ children,open,onOpenChange,selectedTemplate,form,submi
     return format(parsedDate, "yyyy-MM-dd HH:mm:ssXXX");
   }
 
-  console.log(formData);
+  //console.log(formData);
  
   const dateToBroadcast = formData?.schedule?.schedule
   ? mergeDateTime(`${formData.schedule.date}`, `${formData.schedule.time || '00:00'}`)

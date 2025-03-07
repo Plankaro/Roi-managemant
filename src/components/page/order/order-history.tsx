@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react"
 import { format } from 'date-fns';
 
 export default function HistoryView({order,isLoading}:{order:any,isLoading:boolean}) {
-  console.log(order)
+  //console.log(order)
   if (isLoading) {
     return(
       <div className="xl:w-[320px] w-full rounded-3xl border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white">

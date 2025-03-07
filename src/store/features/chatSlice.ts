@@ -105,20 +105,14 @@ const chatSlice = createSlice({
     },
 
     clearChats: (state, action: PayloadAction<string>) => {
-      console.log("clearChats action triggered with prospect id:", action.payload);
+      //console.log("clearChats action triggered with prospect id:", action.payload);
     
       const groupIndex = state.chats.findIndex(
         (group) => group.prospectId === action.payload
       );
       
       if (groupIndex !== -1) {
-        console.log(
-          "Found prospect chat group at index",
-          groupIndex,
-          "before clearing:",
-          JSON.parse(JSON.stringify(state.chats[groupIndex]))
-        );
-        
+    
         // Replace the entire group object with a new one that has an empty chats array
         state.chats[groupIndex] = {
           // ...state.chats[groupIndex],
@@ -126,12 +120,7 @@ const chatSlice = createSlice({
           chats: []
         };
         
-        console.log(
-          "Chats have been cleared for prospect id:",
-          action.payload,
-          "Updated prospect chat group:",
-          JSON.parse(JSON.stringify(state.chats[groupIndex]))
-        );
+        
       } else {
         console.warn("No prospect chat group found for id:", action.payload);
       }

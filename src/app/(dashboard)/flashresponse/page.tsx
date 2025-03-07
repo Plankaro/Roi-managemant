@@ -4,26 +4,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Edit, Trash2, ArrowLeft, Plus, PencilIcon, Zap } from "lucide-react";
-import Link from "next/link";
+import { Search, Trash2, Plus, PencilIcon, Zap } from "lucide-react";
 import FlashResponseCreateModal from "@/components/page/flashresponse/flash-response-create-modal";
 import FlashResponseEditModal from "@/components/page/flashresponse/flash-response-edit-modal";
 
-import { useDeleteFlashResponseMutation,useGetFlashResponseQuery,useUpdateFlashResponseMutation,useDeleteChatsMutation, useCreateBroadcastMutation, useCreateFlashResponseMutation } from "@/store/features/apislice";
+import { useDeleteFlashResponseMutation,useGetFlashResponseQuery,useUpdateFlashResponseMutation, useCreateFlashResponseMutation } from "@/store/features/apislice";
 
 // Sample flash responses data
 
 
 export default function FlashResponsesPage() {
-    const {data:flashresponse,isLoading} = useGetFlashResponseQuery({})
-    console.log(flashresponse)
+    const {data:flashresponse} = useGetFlashResponseQuery({})
+    //console.log(flashresponse)
     const [createMutation] = useCreateFlashResponseMutation()
     const [deleteMutation] = useDeleteFlashResponseMutation()
     const [updateMutation] = useUpdateFlashResponseMutation()
 
   const [searchQuery, setSearchQuery] = useState("");
  
-console.log(flashresponse)
+//console.log(flashresponse)
   const filteredResponses = flashresponse && flashresponse.filter(
     (response:any) =>
       response.heading.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -31,6 +30,7 @@ console.log(flashresponse)
       response.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  
   const handleAddResponse = async (newResponse:any) => {
    await createMutation(newResponse)
    
@@ -42,7 +42,7 @@ console.log(flashresponse)
   
   };
   const handleEditResponse = async (updatedResponse: any) => {
-    console.log("update",updatedResponse)
+    //console.log("update",updatedResponse)
     await updateMutation({id:updatedResponse.id,body:{
         heading:updatedResponse.heading,
         message:updatedResponse.message,
@@ -56,12 +56,10 @@ console.log(flashresponse)
 
   return (
     <main className="">
-      <div className=" md:p-6">
+      <div className=" md:p-6 ">
         <div className="flex md:items-center gap-3 md:flex-row flex-col justify-between mb-6">
           <div className="flex items-center">
-            <Link href="/" className="mr-4 text-white hover:text-indigo-300">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
+        
             <h1 className="text-2xl font-bold text-white">Flash Response</h1>
           </div>
 
@@ -95,7 +93,7 @@ console.log(flashresponse)
           <h2 className="text-xl font-bold text-white mb-2">No Flash Responses Added Yet!</h2>
           <p className="text-center text-gray-300 mb-6 max-w-md">
             It looks like you haven&apos;t created any Flash Responses yet. Flash Responses help you send pre-configured messages
-            instantly, making conversations faster and more efficient. Start by clicking 'New Response&apos; and set up your
+            instantly, making conversations faster and more efficient. Start by clicking &apos;New Response&apos; and set up your
             first quick reply now!
           </p>
           <FlashResponseCreateModal onSave={handleAddResponse}>
@@ -108,14 +106,14 @@ console.log(flashresponse)
           <div>
             {filteredResponses?.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
-                No flash responses found matching "{searchQuery}"
+                No flash responses found matching &quot;{searchQuery}&quot;
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4  overflow-scroll max-h-[calc(100vh-200px)] no-scrollbar">
                 {filteredResponses?.map((response:any) => (
                   <div
                     key={response.id}
-                    className="bg-backgroundColor border h-[281px] border-primary rounded-lg space-y-3 p-3"
+                    className="bg-backgroundColor border relative  h-[250px] border-primary rounded-lg space-y-3 p-3"
                   >
                
                     <div className="p-4">
@@ -127,10 +125,11 @@ console.log(flashresponse)
                           Category: {response.category}
                         </div>
                       </div>
-                      <p className="text-white text-sm mb-4 line-clamp-3 h-[60px]">
+                      <p className="text-white text-sm mb-4 line-clamp-3 h-[70px]">
                         {response.message}
                       </p>
-                      <div className="flex justify-between items-center mt-2 border-t border-[#D9D9D933] py-2">
+                      <div className="">
+                      <div className="flex justify-between items-center mt-4 border-t border-[#D9D9D933] py-2 ">
                         <div className="text-sm text-white flex flex-col">
                             <span className="text-blue-500">Created by </span>
                           <span>{response?.creator?.name??""}</span>
@@ -153,6 +152,7 @@ console.log(flashresponse)
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </button>
                         </div>
+                      </div>
                       </div>
                     </div>
                   </div>

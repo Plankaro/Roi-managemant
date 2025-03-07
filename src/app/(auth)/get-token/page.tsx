@@ -21,7 +21,7 @@ const GetTokenPage = () => {
                         error?.data?.message || 'An unexpected error occurred.',
                 }
             );
-            console.log(await response); // Log the resolved value
+            //console.log(await response); // Log the resolved value
         } catch (error: any) {
             // This block might not be necessary since toast.promise handles the errors
             toast.error(error?.data?.message || 'An unexpected error occurred.');

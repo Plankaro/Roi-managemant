@@ -13,7 +13,7 @@ import axios from "axios";
 function ResetpasswordComponent({ id }: { id: string }) {
   const [loading, setIsLoading] = useState(false);
   async function onSubmit(values: ResetPasswordFormValues) {
-    console.log(id); // Ensure `id` is properly available in the scope.
+    //console.log(id); // Ensure `id` is properly available in the scope.
 
     setIsLoading(true);
     try {
@@ -31,7 +31,7 @@ function ResetpasswordComponent({ id }: { id: string }) {
       });
 
       const data = await promise; // Wait for the mutation to resolve
-      console.log("Password Reset Response:", data);
+      //console.log("Password Reset Response:", data);
     } catch (error: any) {
       // This block handles unexpected issues not caught by `toast.promise`.
       toast.error(error?.data?.message || "An unexpected error occurred.");

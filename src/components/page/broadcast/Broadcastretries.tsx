@@ -18,7 +18,7 @@ export default function BroadcastAndRetries({
   const [createBroadcastRetry] = useCreateBroadcastRetryMutation();
   const { data,refetch } = useGetRetryBroadcastQuery(selectedBroadcast?.id);
 
-  console.log(data);
+  //console.log(data);
 
   const handleCreateBroadcastRetry = async () => {
     try {
@@ -42,7 +42,7 @@ export default function BroadcastAndRetries({
     <Card className="w-full h-fit bg-transparent border-primary text-white p-6">
       <div className="flex items-center justify-between my-5 ">
         <h2 className="text-xl font-semibold mb-4">Broadcast status</h2>
-        <Button className="bg-blue-500 px-5 py-2" onClick={handleCreateBroadcastRetry}>Add retries</Button>
+        <Button className="bg-blue-500 hover:bg-blue-600 px-5 py-2" onClick={handleCreateBroadcastRetry}>Add retries</Button>
       </div>
       <ScrollArea className="w-full whitespace-nowrap border-primary border p-4 rounded-sm">
         <div className="space-y-4 ">
