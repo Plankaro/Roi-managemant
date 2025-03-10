@@ -108,7 +108,7 @@ function SelectContactDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="md:max-w-2xl md:p-5 p-3 max-w-[90vw] md:h-[85vh] h-[80vh] md:overflow-hidden overflow-auto no-scrollbar rounded-sm bg-blue-50">
+      <DialogContent className="md:max-w-2xl md:p-5 p-3 max-w-[90vw] md:h-[85vh] h-[80vh]  overflow-auto no-scrollbar rounded-sm bg-blue-50">
         <DialogHeader>
           <DialogTitle className="text-lg md:text-2xl  font-bold text-blue-800">
             Select Recipients

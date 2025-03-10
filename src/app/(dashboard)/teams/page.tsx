@@ -1,15 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import {
   Search,
   Plus,
   Edit2,
   Trash2,
-  Phone,
   Mail,
-  ArrowLeft,
-  MoreVertical,
   Pencil,
   CircleEllipsis,
 } from "lucide-react";
@@ -22,8 +18,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { useGetTeamQuery } from "@/store/features/apislice";
 
 export default function Dashboard() {
+  const { data } = useGetTeamQuery({});
+  console.log(data);
   return (
     <div className="">
       <div className=" ">
@@ -37,10 +37,12 @@ export default function Dashboard() {
                 placeholder="Search here..."
               />
             </div>
-            <Button className="bg-blue-500  hover:bg-blue-600 text-white rounded-full flex items-center gap-1 px-4 py-2 h-9">
-              <Plus className="h-4 w-4" />
-              <span className="text-sm">New Agents</span>
-            </Button>
+            <Link href={"/teams/create"}>
+              <Button className="bg-blue-500  hover:bg-blue-600 text-white rounded-full flex items-center gap-1 px-4 py-2 h-9">
+                <Plus className="h-4 w-4" />
+                <span className="text-sm">New Agents</span>
+              </Button>
+            </Link>
           </div>
         </header>
         <div className="relative w-full block my-6 md:hidden md:w-64">
@@ -52,16 +54,20 @@ export default function Dashboard() {
         </div>
 
         <div className=" no-scrollbar overflow-y-scroll h-[calc(100vh-200px)] ">
-          <div className="md:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ">
-            {Array.from({ length: 12 }).map((_, index) => (
-              <AgentCard key={index} />
-            ))}
+          <div className="md:grid hidden  xl:grid-col-4 lg:grid-cols-3 md:grid-cols-2  gap-5">
+            {data && data?.agents && <AgentCard data={data.admin} />}
+            {data &&
+              data?.agents.map((data, index) => (
+                <AgentCard key={index} data={data} />
+              ))}
           </div>
 
           <div className=" md:hidden grid-cols-1 space-y-2">
-            {Array.from({ length: 12 }).map((_, index) => (
-              <AgentListItem key={index} />
-            ))}
+            {data && data?.agents && <AgentListItem data={data.admin} />}
+            {data &&
+              data?.agents.map((data, index) => (
+                <AgentListItem key={index} data={data} />
+              ))}
           </div>
         </div>
       </div>
@@ -69,13 +75,15 @@ export default function Dashboard() {
   );
 }
 
-function AgentCard() {
+function AgentCard({ data }: { data: any }) {
   return (
-    <div className="bg-backgroundColor border  border-primary rounded-xl p-6 relative">
+    <div className={`${data?.role === "ADMIN" ? "bg-gradient-to-b from-[rgba(203,28,101,0.3)] to-[rgba(30,30,128,0.3)]":"bg-backgroundColor"}  border  border-primary rounded-xl p-6 relative`}>
       <div className="absolute top-4 right-4 flex flex-col gap-3">
+        <Link href={`/teams/${data?.id}`}>
         <button className="text-gray-400  rounded-full p-2 hover:bg-primary hover:text-white">
           <Edit2 className="h-4 w-4" />
         </button>
+        </Link>
         <button className="text-red-500 hover:text-red-400 rounded-full p-2">
           <Trash2 className="h-4 w-4" />
         </button>
@@ -84,26 +92,31 @@ function AgentCard() {
       <div className="flex flex-col items-center">
         <div className="relative mb-4 w-20 h-20">
           <Image
-            src="https://github.com/shadcn.png"
+            src={
+              data?.image ||
+              "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png"
+            }
             alt="Agent profile"
             fill
             className="rounded-full  object-cover border-2 border-[#4C2A87]"
           />
         </div>
 
-        <h3 className="text-xl font-semibold text-white mb-1">Gautam Thakur</h3>
+        <h3 className="text-xl font-semibold text-white mb-1">{data?.name}</h3>
         <span className="px-4 py-1 bg-black/30 rounded-full text-xs text-gray-300 mb-4">
-          Agent
+          {data?.role}
         </span>
 
-        <div className="w-full space-y-3">
-          <div className="flex items-center text-sm text-gray-300">
+        <div className="w-full space-y-3 flex items-center justify-center">
+          {/* <div className="flex items-center text-sm text-gray-300">
             <Phone className="h-4 w-4 mr-2 text-gray-400" />
             <span>+919876543210</span>
-          </div>
-          <div className="flex items-center text-sm text-gray-300">
-            <Mail className="h-4 w-4 mr-2 text-gray-400" />
-            <span>emailfake@gmail.com</span>
+          </div> */}
+          
+            <div className="flex items-center text-sm text-gray-300">
+              <Mail className="h-4 w-4 mr-2 text-gray-400" />
+              <span>{data?.email}</span>
+           
           </div>
         </div>
       </div>
@@ -111,24 +124,27 @@ function AgentCard() {
   );
 }
 
-function AgentListItem() {
+function AgentListItem({ data }: { data: any }) {
   return (
     <div className="bg-[#0A0A1B] rounded-lg py-4 px-5 border border-primary relative overflow-hidden">
       <span className="absolute top-0  right-2 bg-blue-600 text-white text-sm px-3 py-1 rounded-lg">
-        Admin
+        {data?.role}
       </span>
 
       <div className="flex items-center mt-4 gap-3 mb-4">
         <div className="flex items-center gap-4">
           <Image
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces"
+            src={
+              data?.image ||
+              "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png"
+            }
             alt="Profile"
             width={40}
             height={40}
             className="rounded-full"
           />
           <h2 className="md:text-base text-sm  font-semibold text-white">
-            Gautam Thakur
+            {data?.name}
           </h2>
         </div>
         <DropdownMenu>
@@ -150,16 +166,16 @@ function AgentListItem() {
         </DropdownMenu>
       </div>
 
-      <div className="flex sm:flex-row flex-col gap-6">
+      <div className="">
         <div className="flex items-center gap-2 text-gray-400">
           <Mail size={18} />
-          <span>ekedfdfd@gmail.com</span>
-        </div>
-        <div className="flex items-center gap-2 text-gray-400">
-          <Phone size={18} />
-          <span>+919876543210</span>
+          <span>{data?.email}</span>
         </div>
       </div>
+      {/* <div className="flex items-center gap-2 text-gray-400">
+          <Phone size={18} />
+          <span>+919876543210</span>
+        </div> */}
     </div>
   );
 }

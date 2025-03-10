@@ -4,7 +4,15 @@ import baseQuery from "./basequery";
 
 export const apiSlice = createApi({
   baseQuery,
-  tagTypes: ["Prospect", "shopifyCustomer", "getbroadcastbyid", "getchatsById","flashresponse","getbroadcastbyid",], // Define tags for invalidation
+  tagTypes: [
+    "Prospect",
+    "shopifyCustomer",
+    "getbroadcastbyid",
+    "getchatsById",
+    "flashresponse",
+    "getbroadcastbyid",
+    
+  ], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
       query: (body) => ({
@@ -256,7 +264,6 @@ export const apiSlice = createApi({
     }),
     updateFlashResponse: builder.mutation({
       query: ({ id, body }) => ({
-        
         url: `/flashresponse/${id}`,
         method: "PATCH",
         body,
@@ -264,11 +271,43 @@ export const apiSlice = createApi({
       invalidatesTags: ["flashresponse"], // Invalidate the 'flashresponse' tag after updating
     }),
     deleteFlashResponse: builder.mutation<void, { id: string }>({
-    query: ({ id }) => ({
-      url: `/flashresponse/${id}`,
-      method: "DELETE",
+      query: ({ id }) => ({
+        url: `/flashresponse/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["flashresponse"],
     }),
-    invalidatesTags: ["flashresponse"],
+    createTeam: builder.mutation({
+      query: (body) => ({
+        url: "/agents",
+        method: "POST",
+        body,
+      }),
+    }),
+    getTeam: builder.query({
+      query: () => ({
+        url: "/agents",
+        method: "GET",
+      }),
+    }),
+    getSpecificTeam: builder.query({
+      query: (id) => ({
+        url: `/agents/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateTeam: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/agents/${id}`,
+        method: "PATCH",
+        body,
+      }),
+    }),
+    deleteTeam: builder.mutation<void, { id: string }>({
+      query: ({ id }) => ({
+        url: `/agents/${id}`,
+        method: "DELETE",
+      }),
     }),
   }),
 });
@@ -310,4 +349,9 @@ export const {
   useGetFlashResponseQuery,
   useUpdateFlashResponseMutation,
   useDeleteFlashResponseMutation,
+  useCreateTeamMutation,
+  useGetTeamQuery,
+  useDeleteTeamMutation,
+  useUpdateTeamMutation,
+  useGetSpecificTeamQuery,
 } = apiSlice;

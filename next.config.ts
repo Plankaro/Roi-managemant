@@ -39,6 +39,11 @@ const nextConfig: NextConfig = {
           protocol: 'https',
           hostname: 'wallpapercave.com',
           pathname: '/**', // '**' is a glob pattern to match any path under /v/
+        },
+        {
+          protocol: 'https',
+          hostname: 'businessreflex.se',
+          pathname: '/**', // '**' is a glob pattern to match any path under /v/
         }
         
 

@@ -33,3 +33,28 @@ export function exportJsonToExcel(data:any, sheetName = "Sheet1", fileName = "ou
 
   //console.log(`Excel file '${fileName}' has been created successfully.`);
 }
+
+export function exportSelectedFieldsToExcel(
+  data: any,
+  sheetName = "Sheet1",
+  fileName = "credentials.xlsx"
+) {
+  if (typeof data !== "object" || data === null) {
+    console.error("Invalid data: Must be a non-null object.");
+    return;
+  }
+
+  // Extract only the required fields
+  const filteredData = [
+    {
+      Name: data.name || "",
+      Email: data.email || "",
+      Password: data.password || "",
+    },
+  ];
+
+  const ws = XLSX.utils.json_to_sheet(filteredData); // Convert to worksheet
+  const wb = XLSX.utils.book_new(); // Create workbook
+  XLSX.utils.book_append_sheet(wb, ws, sheetName); // Add sheet
+  XLSX.writeFile(wb, fileName); // Download file
+}

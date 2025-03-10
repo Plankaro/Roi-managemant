@@ -66,7 +66,7 @@ const AuthForm = <T extends FieldValues>({
       if (!data) return;
       await onSubmit(data);
     } catch (error) {
-      //console.log(error);
+      console.log(error);
     }
   };
 
