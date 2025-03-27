@@ -18,13 +18,15 @@ const GetTokenPage = () => {
                     loading: 'Loading...',
                     success: 'Verification link sent successfully!',
                     error: (error: any) =>
-                        error?.data?.message || 'An unexpected error occurred.',
+                        error?.response.data?.message,
                 }
             );
+            const data = await response;
+            console.log("Response:", data);
             //console.log(await response); // Log the resolved value
         } catch (error: any) {
             // This block might not be necessary since toast.promise handles the errors
-            toast.error(error?.data?.message || 'An unexpected error occurred.');
+           
             console.error("Error:", error);
         }finally {
             setIsLoading(false);

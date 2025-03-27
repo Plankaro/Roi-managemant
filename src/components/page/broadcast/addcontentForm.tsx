@@ -48,7 +48,7 @@ function AddContentForm({
 
           segmentAltValue: string
         }[],
-        buttons: [] as { type: string; value: string; isEditable: boolean }[],
+        buttons: [] as {index:number; type: string; value: string; isEditable: boolean }[],
       }
 
       selectedTemplate.components.forEach((component: any) => {
@@ -102,11 +102,11 @@ function AddContentForm({
             }))
           }
         } else if (component.type === "BUTTONS" && component.buttons) {
-          newFormData.buttons = component.buttons.map((button: any) => ({
+          newFormData.buttons = component.buttons.map((button: any,index:number) => ({
             type: button.type,
-
+            index: index,
             value: "",
-            isEditable: /{{.+?}}/.test(button.type === "URL" ? button.url || "" : button.example?.[0] || ""),
+            isEditable: button?.example?true: false,
             text: button.text ?? "jhh",
           }))
         }
@@ -151,7 +151,7 @@ function AddContentForm({
     } else if (section === "body") {
       newData.body[index] = { ...formData.body[index], [key]: value }
     } else if (section === "buttons") {
-      newData.buttons[index] = { ...formData.buttons[index], [key]: value }
+      newData.buttons[index] = { ...formData?.buttons[index], [key]: value }
     }
     setFormData(newData)
   }
@@ -501,7 +501,7 @@ function AddContentForm({
                     </div>
                   )}
                   {component.type === "BUTTONS" &&
-                    formData.buttons.map((button: any, buttonIndex: any) => (
+                    formData?.buttons?.map((button: any, buttonIndex: any) => (
                       <div key={`button-${buttonIndex}`} className="space-y-3">
                         <h3 className="text-base font-medium">
                           {button.type === "URL" ? "CTA Button" : button.type === "COPY_CODE" ? "Copy Code" : ""}

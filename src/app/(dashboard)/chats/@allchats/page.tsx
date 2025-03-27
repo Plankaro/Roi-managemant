@@ -375,6 +375,10 @@ const AllChats = () => {
                         alt={selectedProspect?.name ?? ""}
                         className="object-cover"
                       />
+                      <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
+                     >
+                        {selectedProspect?.name?.slice(0, 2).toUpperCase()??"" }
+                      </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="relative flex items-center md:gap-10 sm:gap-5 gap-3 bg">
@@ -598,8 +602,9 @@ const AllChats = () => {
                         alt="Profile"
                         className="h-16 w-16"
                       />
-                      <AvatarFallback>
-                        {selectedProspect?.name ?? ""}
+                      <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
+                     >
+                        {selectedProspect?.name?.slice(0, 2).toUpperCase()??"" }
                       </AvatarFallback>
                     </Avatar>
                     <input

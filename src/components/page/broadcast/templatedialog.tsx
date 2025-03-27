@@ -24,6 +24,7 @@ export default function TemplateBuilder({
   setSelectedTemplate,
 }: DialogContentProps) {
   const { data: templates, isLoading } = useGetAllTemplatesQuery({});
+  console.log(templates);
 
   const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -103,7 +104,7 @@ export default function TemplateBuilder({
             <SelectedPreview selectedTemplate={selectedTemplate} />
             <div className="flex justify-end">
               <Button
-                className="bg-blue-500 hover:bg-blue-600 text-white"
+                className="bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center"
                 size="lg"
                 onClick={handleTemplateSelect}
               >

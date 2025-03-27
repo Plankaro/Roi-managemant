@@ -202,6 +202,7 @@ export const Templateschema = z
   const buttonSchema = z.object({
     type: z.string(),
     value: z.string(),
+    index: z.number(),
     isEditable: z.boolean(),
     text:z.string(),
   }).superRefine((data, ctx) => {

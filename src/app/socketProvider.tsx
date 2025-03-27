@@ -41,7 +41,7 @@ const dispatch = useDispatch()
       //console.log(user)
       //console.log(phoneNumber) // Replace with dynamic number if necessary
       socket.emit("subscribe", phoneNumber);
-      //console.log(`🔔 Subscribed to ${phoneNumber}`);
+      console.log(`🔔 Subscribed to ${phoneNumber}`);
     });
 
     // Listen for incoming messages

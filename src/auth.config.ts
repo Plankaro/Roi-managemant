@@ -93,6 +93,7 @@ export default {
         authorized({ request: { nextUrl }, auth }) {
             const isLoggedIn = !!auth?.user;
             const { pathname } = nextUrl;
+            console.log(pathname);
             
             // Allow any route that starts with one of the auth route prefixes.
             if (authRoute.some((route) => pathname.startsWith(route))) {
