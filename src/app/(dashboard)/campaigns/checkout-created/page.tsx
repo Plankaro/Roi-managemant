@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import FilterForm from "@/components/page/campaigns/campaign-filter";
 import { useForm } from "react-hook-form";
 import {
@@ -13,9 +13,9 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { campaignSchema } from "@/zod/campaigns/checkout-create-campaign";
+import { CampaignSchema } from "@/zod/campaigns/checkout-create-campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import type { z } from "zod";
 import { Input } from "@/components/ui/input";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -29,22 +29,57 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
+import NumericInput from "@/components/ui/numericInput";
 
-type CampaignFormValues = z.infer<typeof campaignSchema>;
+type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
 const OrderCreated = () => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
 
   const form = useForm<CampaignFormValues>({
-    resolver: zodResolver(campaignSchema),
-  });
+    resolver: zodResolver(CampaignSchema),
+    defaultValues: {
+      name: "",
+      reply_action: "transfer",
+      filter: {
+        is_order_tag_filter_enabled: false,
+        is_product_tag_filter_enabled: false,
+        is_customer_tag_filter_enabled: false,
+        is_discount_code_filter_enabled: false,
+        is_payment_gateway_filter_enabled: false,
+        is_payment_option_filter_enabled: false,
+        is_send_to_unsub_customer_filter_enabled: false,
+        is_order_amount_filter_enabled: false,
+        is_discount_amount_filter_enabled: false,
+        is_order_delivery_filter_enabled: false,
+        is_order_count_filter_enabled: false,
+      },
+      type: "promotional",
 
+      trigger_type: "AFTER_EVENT",
+      is_discount_given: false,
+      discount: 1,
+      coupon_code: "",
+      discount_type: "AMOUNT",
+      filter_condition_match: false,
+      new_checkout_abandonment_filter: false,
+      new_checkout_abandonment_type: "AFTER_EVENT",
+      // Provide empty objects as defaults for the time fields so they're not undefined:
+      new_checkout_abandonment_time: { time: 1, unit: "minutes" },
+      new_order_creation_filter: false,
+      new_order_creation_type: "AFTER_EVENT",
+      new_order_creation_time: { time: 1, unit: "minutes" },
+      related_order_created: false,
+      related_order_cancelled: false,
+    },
+  });
   const onSubmit = (data: CampaignFormValues) => {
     console.log(data);
     // Handle form submission logic here
   };
 
+  console.log(form.getValues(), form.formState.errors);
   const dropdownOptions = [
     {
       type: "Customer full name",
@@ -100,14 +135,13 @@ const OrderCreated = () => {
                   </FormLabel>
 
                   <FormControl>
-                    <Select disabled defaultValue="checkout_create">
+                    <Select {...field}>
                       <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
                         <SelectValue placeholder="Select a Category" />
                       </SelectTrigger>
                       <SelectContent className="bg-blue-50 ">
-                        <SelectItem value="checkout_create">
-                          On Checkout Create
-                        </SelectItem>
+                        <SelectItem value="promotional">Promotional</SelectItem>
+                        <SelectItem value="utility">Utility</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -119,41 +153,32 @@ const OrderCreated = () => {
 
           {/* Filter Selection Dialog */}
           <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
-            <FormField
-              control={form.control}
-              name="filter"
-              render={({}) => (
-                <FormItem className="space-y-3 basis-1/2">
-                  <FormLabel className="md:text-2xl text-lg">
-                    Data Filters
-                  </FormLabel>
-                  <FormDescription>
-                    Select filters to narrow down campaign recipients
-                  </FormDescription>
-                  <FormControl>
-                    <Dialog
-                      open={isFilterDialogOpen}
-                      onOpenChange={setIsFilterDialogOpen}
+            <div className="space-y-3 basis-1/2">
+              <label className="md:text-2xl text-lg">Data Filters</label>
+              <p className="text-sm text-gray-500">
+                Select filters to narrow down campaign recipients
+              </p>
+              <div>
+                <Dialog
+                  open={isFilterDialogOpen}
+                  onOpenChange={setIsFilterDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      className="bg-blue-600 hover:bg-blue-700"
                     >
-                      <DialogTrigger asChild>
-                        <Button
-                          type="button"
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          Open Filter Form
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="w-[90vw] max-w-[1200px] h-[80vh] p-0 border-0 bg-blue-50">
-                        <div className="h-full overflow-hidden">
-                          <FilterForm form={form} />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      Open Filter Form
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="w-[90vw] max-w-[1200px] h-[80vh] p-0 border-0 bg-blue-50">
+                    <div className="h-full overflow-hidden">
+                      <FilterForm form={form} errors={form.formState.errors} />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
 
             <FormField
               control={form.control}
@@ -218,7 +243,7 @@ const OrderCreated = () => {
           <div className="space-y-4">
             <FormField
               control={form.control}
-              name="checkoutCreatedCampaign.isdiscountgiven"
+              name="is_discount_given"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                   <FormControl>
@@ -237,14 +262,12 @@ const OrderCreated = () => {
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="checkoutCreatedCampaign.discount_type"
+                name="discount_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Discount Type</FormLabel>
                     <Select
-                      disabled={
-                        !form.watch("checkoutCreatedCampaign.isdiscountgiven")
-                      }
+                      disabled={form.watch("is_discount_given") === false}
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
@@ -254,244 +277,312 @@ const OrderCreated = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="amount">Amount</SelectItem>
-                        <SelectItem value="percentage">Percentage</SelectItem>
+                        <SelectItem value="AMOUNT">Amount</SelectItem>
+                        <SelectItem value="PERCENTAGE">Percentage</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name="checkoutCreatedCampaign.discount"
+                name="discount"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Enter Discount Amount</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="0.00"
-                        {...field}
-                        disabled={
-                          !form.watch("checkoutCreatedCampaign.isdiscountgiven")
-                        }
-                      />
+                      <NumericInput {...field} />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
           </div>
+          <FormField
+            control={form.control}
+            name="reply_action"
+            defaultValue="transfer"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-2xl">Select reply action</FormLabel>
+                <p className="text-xs text-gray-400">
+                  Auto-reply bot for responses. If the user replies within 72
+                  hours of getting the message.
+                </p>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
+                      <SelectValue placeholder="Transfer Bot" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="transfer">Transfer Bot</SelectItem>
+                    <SelectItem value="welcome-bot">Welcome bot</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
           <div className="space-y-4">
-              <h3 className="text-lg font-medium">Exit Criteria</h3>
-              <p className="text-sm text-muted-foreground">
-                Participants will leave this campaign if, at the moment the message is sent, any of the chosen
-                conditions are met.
-              </p>
+            <h3 className="text-lg font-medium">Exit Criteria</h3>
+            <p className="text-sm text-muted-foreground">
+              Participants will leave this campaign if, at the moment the
+              message is sent, any of the chosen conditions are met.
+            </p>
 
-              {/* Abandoned Checkout */}
-              <FormField
-                control={form.control}
-                name="checkoutCreatedCampaign.new_checkout_abandonment_filter"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange}  variant="blue"
-                      className="border border-white"/>
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>A customer has abandoned their recent checkout</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              {form.watch("checkoutCreatedCampaign.new_checkout_abandonment_filter") && (
-                <div className=" space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="checkoutCreatedCampaign.new_checkout_abandonment_type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>When to trigger</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select option" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="after_event">Immediately after event</SelectItem>
-                            <SelectItem value="CUSTOM">Custom time after event</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-
-                  {form.watch("checkoutCreatedCampaign.new_checkout_abandonment_type") === "CUSTOM" && (
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="checkoutCreatedCampaign.new_checkout_abandonment_time"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Time</FormLabel>
-                            <FormControl>
-                              <Input type="number" placeholder="Enter time" {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="checkoutCreatedCampaign.new_checkout_abandonment_unit"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Unit</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select unit" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="minutes">Minutes</SelectItem>
-                                <SelectItem value="hours">Hours</SelectItem>
-                                <SelectItem value="days">Days</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
-                </div>
+            {/* Abandoned Checkout */}
+            <FormField
+              control={form.control}
+              name="new_checkout_abandonment_filter"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      variant="blue"
+                      className="border border-white"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      A customer has abandoned their recent checkout
+                    </FormLabel>
+                  </div>
+                </FormItem>
               )}
+            />
 
-              {/* Created Order */}
-              <FormField
-                control={form.control}
-                name="checkoutCreatedCampaign.new_order_creation_filter"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange}  variant="blue"
-                      className="border border-white"/>
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Customer has submitted a new order</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              {form.watch("checkoutCreatedCampaign.new_order_creation_filter") && (
-                <div className=" space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="checkoutCreatedCampaign.new_order_creation_type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>When to trigger</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select option" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="after_event">Immediately after event</SelectItem>
-                            <SelectItem value="CUSTOM">Custom time after event</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-
-                  {form.watch("checkoutCreatedCampaign.new_order_creation_type") === "CUSTOM" && (
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="checkoutCreatedCampaign.new_order_creation_time"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Time</FormLabel>
-                            <FormControl>
-                              <Input type="number" placeholder="Enter time" {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="checkoutCreatedCampaign.new_order_creation_unit"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Unit</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select unit" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="minutes">Minutes</SelectItem>
-                                <SelectItem value="hours">Hours</SelectItem>
-                                <SelectItem value="days">Days</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+            {form.watch("new_checkout_abandonment_filter") && (
+              <div className=" space-y-4">
+                <FormField
+                  control={form.control}
+                  name="new_checkout_abandonment_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>When to trigger</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select option" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="AFTER_EVENT">
+                            Immediately after event
+                          </SelectItem>
+                          <SelectItem value="CUSTOM">
+                            Custom time after event
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
                   )}
-                </div>
+                />
+
+                {form.watch("new_checkout_abandonment_type") === "CUSTOM" && (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="new_checkout_abandonment_time.time"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Time</FormLabel>
+                          <FormControl>
+                          <NumericInput {...field}/>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="new_checkout_abandonment_time.unit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unit</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select unit" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="minutes">Minutes</SelectItem>
+                              <SelectItem value="hours">Hours</SelectItem>
+                              <SelectItem value="days">Days</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Created Order */}
+            <FormField
+              control={form.control}
+              name="new_order_creation_filter"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      variant="blue"
+                      className="border border-white"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Customer has submitted a new order</FormLabel>
+                  </div>
+                </FormItem>
               )}
+            />
 
-              {/* Order Cancelled */}
-              <FormField
-                control={form.control}
-                name="checkoutCreatedCampaign.related_order_cancelled"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange}  variant="blue"
-                      className="border border-white"/>
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>The concerned order is cancelled</FormLabel>
-                    </div>
-                  </FormItem>
+            {form.watch("new_order_creation_filter") && (
+              <div className=" space-y-4">
+                <FormField
+                  control={form.control}
+                  name="new_order_creation_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>When to trigger</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select option" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="AFTER_EVENT">
+                            Immediately after event
+                          </SelectItem>
+                          <SelectItem value="CUSTOM">
+                            Custom time after event
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+
+                {form.watch("new_order_creation_type") === "CUSTOM" && (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="new_order_creation_time.time"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Time</FormLabel>
+                          <FormControl>
+                          <NumericInput {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="new_order_creation_time.unit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unit</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select unit" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="minutes">Minutes</SelectItem>
+                              <SelectItem value="hours">Hours</SelectItem>
+                              <SelectItem value="days">Days</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 )}
-              />
+              </div>
+            )}
 
-              {/* Order Fulfilled */}
-              <FormField
-                control={form.control}
-                name="checkoutCreatedCampaign.related_order_created"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange}  variant="blue"
-                      className="border border-white"/>
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>The concerned order is fulfilled</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Order Cancelled */}
+            <FormField
+              control={form.control}
+              name="related_order_cancelled"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      variant="blue"
+                      className="border border-white"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>The concerned order is cancelled</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
 
-            <div className="flex justify-end space-x-4">
-              <Button variant="outline" type="button" className="bg-transparent border-primary">
-                Exit
-              </Button>
-              <Button type="submit" className="bg-blue-500 text-white">Save & Launch</Button>
-            </div>
+            {/* Order Fulfilled */}
+            <FormField
+              control={form.control}
+              name="related_order_created"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      variant="blue"
+                      className="border border-white"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>The concerned order is fulfilled</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-4">
+            <Button
+              variant="outline"
+              type="button"
+              className="bg-transparent border-primary"
+            >
+              Exit
+            </Button>
+            <Button type="submit" className="bg-blue-500 text-white">
+              Save & Launch
+            </Button>
+          </div>
         </form>
       </Form>
     </ScrollArea>

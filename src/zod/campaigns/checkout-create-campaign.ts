@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { isEmpty } from "lodash";
-import {  Templateschema } from "../broadcast/form";
+import { z } from "zod"
+import { isEmpty } from "lodash"
+import { Templateschema } from "../broadcast/form"
 
 export const OrderMethod = z.enum([
   "confirmed",
@@ -13,12 +13,13 @@ export const OrderMethod = z.enum([
   "attemped_delivery",
   "failed_delivery",
   "delivered",
-]);
+])
 
-export const PaymentOptionType = z.enum(["PAID", "UNPAID"]);
-export const TriggerType = z.enum(["BETWEEN_TRIGGER_TO_EVENT", "CUSTOM"]);
+export const DiscountType = z.enum(["PERCENTAGE", "AMOUNT"])
+export const PaymentOptionType = z.enum(["PAID", "UNPAID"])
+export const TriggerType = z.enum(["AFTER_EVENT", "CUSTOM"])
 
-const FilterSchema = z
+export const FilterSchema = z
   .object({
     // Order Tags
     is_order_tag_filter_enabled: z.boolean().default(false),
@@ -45,7 +46,7 @@ const FilterSchema = z
 
     // Payment Options
     is_payment_option_filter_enabled: z.boolean().default(false),
-    payment_options_type: PaymentOptionType.optional().nullable(),
+    payment_options_type: z.string().optional().nullable(),
 
     // Unsubscribed Customers
     is_send_to_unsub_customer_filter_enabled: z.boolean().default(false),
@@ -82,60 +83,219 @@ const FilterSchema = z
 
     // Order Delivery
     is_order_delivery_filter_enabled: z.boolean().default(false),
-    order_method: OrderMethod.optional().nullable(),
+    order_method: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
-    const addIssue = (path: string[], message: string) => {
+    // Order Tags
+    if (
+      data.is_order_tag_filter_enabled &&
+      isEmpty(data.order_tag_filter_all) &&
+      isEmpty(data.order_tag_filter_any) &&
+      isEmpty(data.order_tag_filter_none)
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path,
-        message,
-      });
-    };
-
-    if (data.is_order_tag_filter_enabled && isEmpty(data.order_tag_filter_all) && isEmpty(data.order_tag_filter_any) && isEmpty(data.order_tag_filter_none)) {
-      addIssue(["order_tag_filter_all", "order_tag_filter_any", "order_tag_filter_none"], "At least one order tag filter must be provided when order tag filter is enabled.");
+        path: ["is_order_tag_filter_enabled"],
+        message: "At least one order tag filter must be provided when order tag filter is enabled.",
+      })
     }
 
-    if (data.is_product_tag_filter_enabled && isEmpty(data.product_tag_filter_all) && isEmpty(data.product_tag_filter_any) && isEmpty(data.product_tag_filter_none)) {
-      addIssue(["product_tag_filter_all", "product_tag_filter_any", "product_tag_filter_none"], "At least one product tag filter must be provided when product tag filter is enabled.");
+    // Product Tags
+    if (
+      data.is_product_tag_filter_enabled &&
+      isEmpty(data.product_tag_filter_all) &&
+      isEmpty(data.product_tag_filter_any) &&
+      isEmpty(data.product_tag_filter_none)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["is_product_tag_filter_enabled"],
+        message: "At least one product tag filter must be provided when product tag filter is enabled.",
+      })
     }
 
-    if (data.is_customer_tag_filter_enabled && isEmpty(data.customer_tag_filter_all) && isEmpty(data.customer_tag_filter_any) && isEmpty(data.customer_tag_filter_none)) {
-      addIssue(["customer_tag_filter_all", "customer_tag_filter_any", "customer_tag_filter_none"], "At least one customer tag filter must be provided when customer tag filter is enabled.");
+    // Customer Tags
+    if (
+      data.is_customer_tag_filter_enabled &&
+      isEmpty(data.customer_tag_filter_all) &&
+      isEmpty(data.customer_tag_filter_any) &&
+      isEmpty(data.customer_tag_filter_none)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["is_customer_tag_filter_enabled"],
+        message: "At least one customer tag filter must be provided when customer tag filter is enabled.",
+      })
     }
 
-    if (data.is_payment_gateway_filter_enabled && isEmpty(data.payment_gateway_filter_any) && isEmpty(data.payment_gateway_filter_none)) {
-      addIssue(["payment_gateway_filter_any", "payment_gateway_filter_none"], "At least one payment gateway filter must be provided when payment gateway filter is enabled.");
+    // Payment Gateways
+    if (
+      data.is_payment_gateway_filter_enabled &&
+      isEmpty(data.payment_gateway_filter_any) &&
+      isEmpty(data.payment_gateway_filter_none)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["is_payment_gateway_filter_enabled"],
+        message: "At least one payment gateway filter must be provided when payment gateway filter is enabled.",
+      })
     }
 
+    // Payment Options: (Optional - only if you require a value when enabled)
+    // Uncomment and adjust if needed:
+    if (data.is_payment_option_filter_enabled && isEmpty(data.payment_options_type)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["is_payment_option_filter_enabled"],
+        message: "Payment option type must be provided when payment option filter is enabled.",
+      })
+    }
+
+    // Unsubscribed Customers: (Optional - only if you require a value when enabled)
+    if (data.is_send_to_unsub_customer_filter_enabled && isEmpty(data.send_to_unsub_customer)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["is_send_to_unsub_customer_filter_enabled"],
+        message: "Unsubscribed customer value must be provided when filter is enabled.",
+      })
+    }
+
+    // Order Amount
     if (data.is_order_amount_filter_enabled) {
       if (isEmpty(data.order_amount_filter_type)) {
-        addIssue(["order_amount_filter_type"], "Order amount filter type must be provided when order amount filter is enabled.");
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_amount_filter_enabled"],
+          message: "Order amount filter type must be provided when order amount filter is enabled.",
+        })
       } else if (data.order_amount_filter_type === "greater" && isEmpty(data.order_amount_filter_greater_or_equal)) {
-        addIssue(["order_amount_filter_greater_or_equal"], "Value for 'greater or equal' must be provided when filter type is 'greater'.");
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_amount_filter_enabled"],
+          message: "Value for 'greater or equal' must be provided when filter type is 'greater'.",
+        })
       } else if (data.order_amount_filter_type === "less" && isEmpty(data.order_amount_filter_less_or_equal)) {
-        addIssue(["order_amount_filter_less_or_equal"], "Value for 'less or equal' must be provided when filter type is 'less'.");
-      } else if (data.order_amount_filter_type === "custom" && (isEmpty(data.order_amount_min) || isEmpty(data.order_amount_max))) {
-        addIssue(["order_amount_min", "order_amount_max"], "Both minimum and maximum values must be provided when filter type is 'custom'.");
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_amount_filter_enabled"],
+          message: "Value for 'less or equal' must be provided when filter type is 'less'.",
+        })
+      } else if (
+        data.order_amount_filter_type === "custom" &&
+        isEmpty(data.order_amount_min) &&
+        isEmpty(data.order_amount_max)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_amount_filter_enabled"],
+          message: "Both minimum and maximum values must be provided when filter type is 'custom'.",
+        })
       }
     }
-  });
 
+    // Discount Amount
+    if (data.is_discount_amount_filter_enabled) {
+      if (isEmpty(data.discount_amount_filter_type)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_discount_amount_filter_enabled"],
+          message: "Discount amount filter type must be provided when discount amount filter is enabled.",
+        })
+      } else if (
+        data.discount_amount_filter_type === "greater" &&
+        isEmpty(data.discount_amount_filter_greater_or_equal)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_discount_amount_filter_enabled"],
+          message: "Value for 'greater or equal' must be provided when filter type is 'greater'.",
+        })
+      } else if (data.discount_amount_filter_type === "less" && isEmpty(data.discount_amount_filter_less_or_equal)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_discount_amount_filter_enabled"],
+          message: "Value for 'less or equal' must be provided when filter type is 'less'.",
+        })
+      } else if (
+        data.discount_amount_filter_type === "custom" &&
+        isEmpty(data.discount_amount_min) &&
+        isEmpty(data.discount_amount_max)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_discount_amount_filter_enabled"],
+          message: "Both minimum and maximum values must be provided when filter type is 'custom'.",
+        })
+      }
+    }
 
-  const headerSchema = z
+    // Discount Codes
+    if (
+      data.is_discount_code_filter_enabled &&
+      isEmpty(data.discount_code_filter_any) &&
+      isEmpty(data.discount_code_filter_none)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["is_discount_code_filter_enabled"],
+        message: "At least one discount code filter must be provided when discount code filter is enabled.",
+      })
+    }
+
+    // Order Count
+    if (data.is_order_count_filter_enabled) {
+      if (isEmpty(data.order_count_filter_type)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_count_filter_enabled"],
+          message: "Order count filter type must be provided when order count filter is enabled.",
+        })
+      } else if (data.order_count_filter_type === "greater" && isEmpty(data.order_count_greater_or_equal)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_count_filter_enabled"],
+          message: "Value for 'greater or equal' must be provided when filter type is 'greater'.",
+        })
+      } else if (data.order_count_filter_type === "less" && isEmpty(data.order_count_less_or_equal)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_count_filter_enabled"],
+          message: "Value for 'less or equal' must be provided when filter type is 'less'.",
+        })
+      } else if (
+        data.order_count_filter_type === "custom" &&
+        isEmpty(data.order_count_min) &&
+        isEmpty(data.order_count_max)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["is_order_count_filter_enabled"],
+          message: "Both minimum and maximum values must be provided when filter type is 'custom'.",
+        })
+      }
+    }
+
+    // Order Delivery
+    if (data.is_order_delivery_filter_enabled && isEmpty(data.order_method)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["is_order_delivery_filter_enabled"],
+        message: "Order delivery status must be provided when order delivery filter is enabled.",
+      })
+    }
+  })
+
+const headerSchema = z
   .object({
     type: z.string().min(1, "Type is required"),
     value: z.string().optional(), // Make value optional initially
     isEditable: z.boolean(),
     fromsegment: z.boolean(),
     segmentname: z.string(),
-  
-    
   })
   .optional()
   .superRefine((data, ctx) => {
-    if (!data) return;
+    if (!data) return
 
     if (data.fromsegment) {
       if (!data.segmentname.trim()) {
@@ -143,10 +303,8 @@ const FilterSchema = z
           code: z.ZodIssueCode.custom,
           message: "Segement name is required",
           path: ["segmentname"],
-        });
+        })
       }
-      
-    
     } else {
       // Require value only when fromsegment is false
       if (!data.value || !data.value.trim()) {
@@ -154,18 +312,16 @@ const FilterSchema = z
           code: z.ZodIssueCode.custom,
           message: "Missing header value ",
           path: ["value"],
-        });
+        })
       }
     }
-  });
-  const bodyItemSchema = z
+  })
+const bodyItemSchema = z
   .object({
     parameter_name: z.string().min(1, "Parameter name is required"),
     value: z.string().optional(), // Make value optional initially
     fromsegment: z.boolean(),
     segmentname: z.string(),
-   
-   
   })
   .superRefine((data, ctx) => {
     if (data.fromsegment) {
@@ -174,10 +330,8 @@ const FilterSchema = z
           code: z.ZodIssueCode.custom,
           message: "Segment Name is required",
           path: ["segmentname"],
-        });
+        })
       }
-     
-     
     } else {
       // Require value only when fromsegment is false
       if (!data.value || !data.value.trim()) {
@@ -185,36 +339,36 @@ const FilterSchema = z
           code: z.ZodIssueCode.custom,
           message: "Missing value",
           path: ["value"],
-        });
+        })
       }
     }
-  });
+  })
 
-
-
-  const buttonSchema = z.object({
+const buttonSchema = z
+  .object({
     type: z.string(),
 
     value: z.string(),
     isEditable: z.boolean(),
-    text:z.string(),
+    text: z.string(),
     fromsegment: z.boolean(),
     segmentname: z.string(),
-  }).superRefine((data, ctx) => {
+  })
+  .superRefine((data, ctx) => {
     if (data.isEditable) {
       if (data.type.length < 1) {
         ctx.addIssue({
           path: ["type"],
           message: "Button type is required",
           code: "custom",
-        });
+        })
       }
       if (data.value.length < 1) {
         ctx.addIssue({
           path: ["value"],
           message: "Button value is required",
           code: "custom",
-        });
+        })
       }
     }
     if (data.fromsegment) {
@@ -223,10 +377,8 @@ const FilterSchema = z
           code: z.ZodIssueCode.custom,
           message: "Segment Name is required",
           path: ["segmentname"],
-        });
+        })
       }
-     
-     
     } else {
       // Require value only when fromsegment is false
       if (!data.value || !data.value.trim()) {
@@ -234,49 +386,137 @@ const FilterSchema = z
           code: z.ZodIssueCode.custom,
           message: "Missing value",
           path: ["value"],
-        });
+        })
       }
     }
-  });
-  
-  // Example usage
+  })
 
-  
+// Example usage
 
 export const TemplateFormSchema = z.object({
   header: headerSchema,
   body: z.array(bodyItemSchema),
   buttons: z.array(buttonSchema),
-});
+})
 
-export const campaignSchema = z.object({
-  name: z.string().min(1, "Campaign name is required"),
-  type: z.string().min(1, "Type is required"),
-  filter: FilterSchema,
-  templateForm:TemplateFormSchema,
-  template: Templateschema,
-  checkoutCreatedCampaign: z
-    .object({
-      trigger_type: TriggerType,
-      trigger_time: z.string().min(1, "Trigger time is required"),
-      template_name: z.string(),
-     
-      components: z.any(),
-      isdiscountgiven: z.boolean().default(true),
-      discount: z.number().optional(),
-      coupon_code: z.string().optional(),
-      discount_type: z.enum(["PERCENTAGE", "FIXED"]),
-      filter_condition_match: z.boolean(),
-      new_checkout_abandonment_filter: z.boolean(),
-      new_checkout_abandonment_type: TriggerType.optional(),
-      new_checkout_abandonment_time: z.string().optional(),
-      new_checkout_abandonment_unit:z.string().optional(),
-      new_order_creation_filter: z.boolean().optional(),
-      new_order_creation_type: TriggerType,
-      new_order_creation_time: z.string(),
-      new_order_creation_unit: z.string(),
-      related_order_created: z.boolean(),
-      related_order_cancelled: z.boolean(),
-    })
-    .optional(),
-});
+const TimeSchema = z.object({
+  time: z.number(),
+  unit: z.enum(["minutes", "hours", "days"]),
+})
+
+export const CampaignSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    reply_action: z.enum(["transfer", "welcome-bot"]),
+    filter: FilterSchema,
+    type: z.enum(["promotional", "utility"]),
+    templateForm: TemplateFormSchema,
+    template: Templateschema,
+    trigger_type: TriggerType,
+    is_discount_given: z.boolean().default(true),
+    discount: z.number(),
+    coupon_code: z.string().optional(),
+    discount_type: DiscountType,
+    filter_condition_match: z.boolean(),
+    new_checkout_abandonment_filter: z.boolean(),
+    new_checkout_abandonment_type: TriggerType,
+    new_checkout_abandonment_time: TimeSchema.optional(),
+    new_order_creation_filter: z.boolean(),
+    new_order_creation_type: TriggerType,
+    new_order_creation_time: TimeSchema.optional(),
+    related_order_created: z.boolean(),
+    related_order_cancelled: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    // Validate discount fields:
+    if (data.is_discount_given === true) {
+      if (data.discount == null) {
+        ctx.addIssue({
+          path: ["discount"],
+          message: "Discount amount is required when discount is given.",
+          code: "custom",
+        })
+      }
+      if (data.discount_type == null) {
+        ctx.addIssue({
+          path: ["discount_type"],
+          message: "Discount type is required when discount is given.",
+          code: "custom",
+        })
+      }
+    }
+
+    // Validate new_order_creation fields:
+    if (data.new_order_creation_filter === true) {
+      if (data.new_order_creation_type == null) {
+        ctx.addIssue({
+          path: ["new_order_creation_type"],
+          message: "New order creation type is required when filter is enabled.",
+          code: "custom",
+        })
+      } else if (data.new_order_creation_type === "CUSTOM") {
+        // Check if new_order_creation_time exists
+        if (!data.new_order_creation_time) {
+          ctx.addIssue({
+            path: ["new_order_creation_time"],
+            message: "New order creation time (with time and unit) is required when type is 'CUSTOM'.",
+            code: "custom",
+          })
+        } else {
+          // Validate each field inside the time object separately
+          if (!data.new_order_creation_time.unit) {
+            ctx.addIssue({
+              path: ["new_order_creation_time", "unit"],
+              message: "New order creation time unit is required when type is 'CUSTOM'.",
+              code: "custom",
+            })
+          }
+          if (data.new_order_creation_time.time == null) {
+            ctx.addIssue({
+              path: ["new_order_creation_time", "time"],
+              message: "New order creation time value is required when type is 'CUSTOM'.",
+              code: "custom",
+            })
+          }
+        }
+      }
+    }
+
+    // Validate new_checkout_abandonment fields:
+    if (data.new_checkout_abandonment_filter === true) {
+      if (data.new_checkout_abandonment_type == null) {
+        ctx.addIssue({
+          path: ["new_checkout_abandonment_type"],
+          message: "New checkout abandonment type is required when filter is enabled.",
+          code: "custom",
+        })
+      } else if (data.new_checkout_abandonment_type === "CUSTOM") {
+        // Check if new_checkout_abandonment_time exists
+        if (!data.new_checkout_abandonment_time) {
+          ctx.addIssue({
+            path: ["new_checkout_abandonment_time"],
+            message: "New checkout abandonment time (with time and unit) is required when type is 'CUSTOM'.",
+            code: "custom",
+  
+          })
+        } else {
+          // Validate each field inside the time object separately
+          if (!data.new_checkout_abandonment_time.unit) {
+            ctx.addIssue({
+              path: ["new_checkout_abandonment_time", "unit"],
+              message: "New checkout abandonment time unit is required when type is 'CUSTOM'.",
+              code: "custom",
+            })
+          }
+          if (data.new_checkout_abandonment_time.time == null) {
+            ctx.addIssue({
+              path: ["new_checkout_abandonment_time", "time"],
+              message: "New checkout abandonment time value is required when type is 'CUSTOM'.",
+              code: "custom",
+            })
+          }
+        }
+      }
+    }
+  })
+
