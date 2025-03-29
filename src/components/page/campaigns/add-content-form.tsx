@@ -323,7 +323,7 @@ function AddContentForm({
                                     Select Content from shopify segment
                                   </span>
                                 </div>
-                                {!formData.header.fromsegment ? (
+                                {!formData?.header?.fromsegment ? (
                                   <div className="space-y-3">
                                     <Input
                                       id="header-input"
@@ -402,46 +402,7 @@ function AddContentForm({
                                 />
                                 Select Content from shopify segment
                               </span>
-                              {formData?.header?.fromsegment && (
-                                <div className="w-full flex flex-col gap-3 lg:basis-1/2">
-                                  <label
-                                    htmlFor="header-alternative"
-                                    className={`text-sm font-medium  ${
-                                      errors?.templateForm?.header
-                                        ?.segmentAltValue
-                                        ? "text-red-500"
-                                        : "text-gray-400"
-                                    }`}
-                                  >
-                                    {selectedTemplate.parameter_format ===
-                                    "POSITIONAL"
-                                      ? "Enter fallback values for {{1}}"
-                                      : `Enter fallback values for {{${component.example?.header_text_named_params?.[0]?.param_name}}}`}
-                                  </label>
-                                  <div className="space-y-3">
-                                    <Input
-                                      id="header-alternative"
-                                      placeholder="Enter fallback value text "
-                                      value={formData?.header?.segmentAltValue}
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          "header",
-                                          0,
-                                          "segmentAltValue",
-                                          e.target.value
-                                        )
-                                      }
-                                      className={`border-blue-500 focus:ring-blue-500 xl:w-9/12 `}
-                                    />
-                                    {errors?.templateForm?.header
-                                      ?.segmentAltValue && (
-                                      <p className="text-red-500 text-xs mt-1">
-                                        You need fallback value for segments
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
+                             
                             </div>
                           )}
                         {["IMAGE", "VIDEO", "DOCUMENT"].includes(
@@ -555,7 +516,7 @@ function AddContentForm({
                                           }
                                         />
                                         Select Content from shopify segment
-                                        segment
+                                        
                                       </span>
                                     </div>
                                     {!param.fromsegment ? (
@@ -726,7 +687,7 @@ function AddContentForm({
                         //   </div>
                         <div
                         key={`buttons-${buttonIndex}`}
-                        className={`flex lg:flex-row flex-col gap-6 ${!button.isEditable && "hidden"}`}
+                        className={`flex lg:flex-row flex-col gap-6 ${button.isEditable ? "":"hidden"}`}
                       >
                         <div className="flex flex-col gap-2  lg:basis-1/2">
                           <div className={`  flex flex-col gap-3 `}>
@@ -766,18 +727,18 @@ function AddContentForm({
                                   }
                                 />
                                 Select Content from shopify segment
-                                segment
+                                
                               </span>
                             </div>
                             {!button.fromsegment ? (
                               <div className="space-y-3">
                                 <Input
-                                  id={`body-${buttonIndex}`}
+                                  id={`button-${buttonIndex}`}
                                   placeholder={`Enter value for ${button.parameter_name}`}
                                   value={button.value}
                                   onChange={(e) =>
                                     handleInputChange(
-                                      "body",
+                                      "buttons",
                                       buttonIndex,
                                       "value",
                                       e.target.value

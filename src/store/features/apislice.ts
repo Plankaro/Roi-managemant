@@ -309,6 +309,13 @@ export const apiSlice = createApi({
         method: "DELETE",
       }),
     }),
+    createCampaign: builder.mutation({
+      query: (body) => ({
+        url: "/campaign",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -354,4 +361,5 @@ export const {
   useDeleteTeamMutation,
   useUpdateTeamMutation,
   useGetSpecificTeamQuery,
+  useCreateCampaignMutation
 } = apiSlice;

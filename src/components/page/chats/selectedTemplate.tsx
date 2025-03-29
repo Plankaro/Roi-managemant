@@ -13,6 +13,7 @@ import { RootState } from "@/store/store"
 import { useSendTemplatesMutation } from "@/store/features/apislice"
 import { useDispatch } from "react-redux"
 import { setChats } from "@/store/features/chatSlice"
+import { ScrollArea } from "@radix-ui/react-scroll-area"
 
 interface TemplateComponent {
   type: string
@@ -68,7 +69,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  //console.log(selectedTemplate)
+  console.log(selectedTemplate)
 
   useEffect(() => {
     if (selectedTemplate) {
@@ -85,7 +86,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
             ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
             component.example?.header_handle
           ) {
-            newFormData.header.value = component.example.header_handle[0]
+            newFormData.header.value = component.example?.header_handle?.[0]
             newFormData.header.isEditable = true
           } else if (component.format === "TEXT") {
             if (
@@ -124,10 +125,11 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
             }))
           }
         } else if (component.type === "BUTTONS" && component.buttons) {
-          newFormData.buttons = component.buttons.map((button) => ({
+          newFormData.buttons = component.buttons.map((button,index) => ({
             type: button.type,
+            index: index,
             value: button.type === "URL" ? button.url || "" : button.example?.[0] || "",
-            isEditable: /{{.+?}}/.test(button.type === "URL" ? button.url || "" : button.example?.[0] || ""),
+            isEditable: button?.example?true: false,
             text:button.text ??"jhh",
           }))
         }
@@ -186,7 +188,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
         // Set the header value with the uploaded link
         handleInputChange("header", 0, "value", link)
       } catch (error) {
-        //console.log(error)
+        console.log(error)
       }
     }
   }
@@ -202,9 +204,27 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
     if (!selectedTemplate) return false
 
     // Check header
-    if (formData.header.isEditable && !formData.header.value) {
-      toast.error("Please fill in the header content")
-      return false
+    const headerComponent = selectedTemplate.components.find(
+      (comp) => comp.type === "HEADER"
+    );
+    
+    // Check if header is editable but empty (ignoring whitespace)
+    if (formData.header.isEditable && (!formData.header.value || formData.header.value.trim() === "")) {
+      toast.error("Please fill in the header content");
+      return false;
+    }
+    
+    // If a header component exists and its format is one of the media types,
+    // then ensure the header content is not the same as one of its default example texts.
+    if (
+      headerComponent &&
+      ["IMAGE", "VIDEO", "DOCUMENT"].includes(headerComponent.format || "") &&
+      headerComponent.example &&
+      Array.isArray(headerComponent.example.header_text) &&
+      headerComponent.example.header_text.some((text) => text === formData.header.value)
+    ) {
+      toast.error("Please fill in the header content");
+      return false;
     }
 
     // Check body parameters
@@ -307,13 +327,21 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
 
   const renderPreview = () => {
     const previewContent = selectedTemplate.components.map((component, index) => {
+   
       switch (component.type) {
         case "HEADER":
           if (
             ["IMAGE", "VIDEO", "DOCUMENT"].includes(component.format || "") &&
             formData.header.value
           ) {
-            const headerContent = formData.header.value
+            console.log("formData.header.value:", formData.header.value);
+            console.log("component.example.header_handle[0]:", component.example?.header_handle?.[0]);
+            
+            const headerContent =
+              formData.header.value.trim().length > 0
+                ? formData.header.value
+                : (component.example?.header_handle?.[0] ?? "");
+          console.log(headerContent)
             return (
               <div key={`preview-header-${index}`} className="mb-3">
                 {component.format === "IMAGE" &&
@@ -418,8 +446,8 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] xl:grid-cols-[1.2fr,1fr] gap-6">
-      <div className="space-y-6 h-[90%]">
+    <ScrollArea className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] xl:grid-cols-[1.2fr,1fr] gap-6">
+      <div className="space-y-6 ">
         <Card className="bg-white shadow-none border-0 h-full overflow-y-scroll no-scrollbar">
           <CardContent className="p-6 ">
             <h2 className="text-xl font-semibold mb-6">Add Content</h2>
@@ -570,7 +598,7 @@ const SelectedTemplateForm: React.FC<TemplateProps> = ({ selectedTemplate }) => 
           </Button>
         </div>
       </div>
-    </div>
+    </ScrollArea>
   )
 }
 

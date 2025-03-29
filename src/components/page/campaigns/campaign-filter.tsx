@@ -1,57 +1,46 @@
+"use client"
+
+import type React from "react"
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@/components/ui/form';
-import { OrderMethod, PaymentOptionType } from '@/zod/campaigns/checkout-create-campaign';
+import { useState, useEffect } from "react"
+import { Search, X } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { OrderMethod, PaymentOptionType } from "@/zod/campaigns/checkout-create-campaign"
+import NumericInput from "@/components/ui/numericInput"
 
 interface FilterFormProps {
-  form: any;
+  form: any
 }
 
 const formatEnumValue = (value: string): string => {
   return value
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ")
+}
 
-const FilterSection = ({ title, children, enabled, onToggle, visible = true, id }: any) => (
-  <div 
+const FilterSection = ({ title, children, enabled, onToggle, visible = true, id, error }: any) => (
+  <div
     id={id}
-    className={`filter-section space-y-2 border-b border-gray-200 py-4 last:border-0 ${!visible ? 'hidden' : ''}`}
+    className={`filter-section space-y-2 border-b border-gray-200 py-4 last:border-0 ${!visible ? "hidden" : ""}`}
     data-title={title.toLowerCase()}
   >
     <FormItem className="flex flex-row items-center space-x-3 space-y-0">
       <FormControl>
         <Checkbox checked={enabled} onCheckedChange={onToggle} />
       </FormControl>
-      <FormLabel className="text-base font-semibold">{title}</FormLabel>
+      <FormLabel className={`text-base font-semibold ${error ? "text-red-500" : ""}`}>{title}</FormLabel>
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </FormItem>
     {enabled && <div className="pl-7">{children}</div>}
   </div>
-);
+)
 
 const TagInput = ({
   label,
@@ -59,28 +48,28 @@ const TagInput = ({
   fieldName,
   form,
 }: {
-  label: string;
-  placeholder: string;
-  fieldName: string;
-  form: any;
+  label: string
+  placeholder: string
+  fieldName: string
+  form: any
 }) => {
-  const [inputValue, setInputValue] = useState('');
-  const tags = form.watch(fieldName) || [];
+  const [inputValue, setInputValue] = useState("")
+  const tags = form.watch(fieldName) || []
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && inputValue.trim()) {
-      e.preventDefault();
+    if (e.key === "Enter" && inputValue.trim()) {
+      e.preventDefault()
       if (!tags.includes(inputValue.trim())) {
-        form.setValue(fieldName, [...tags, inputValue.trim()]);
+        form.setValue(fieldName, [...tags, inputValue.trim()])
       }
-      setInputValue('');
+      setInputValue("")
     }
-  };
+  }
 
   const removeTag = (tagToRemove: string) => {
-    const updatedTags = tags.filter((tag: string) => tag !== tagToRemove);
-    form.setValue(fieldName, updatedTags);
-  };
+    const updatedTags = tags.filter((tag: string) => tag !== tagToRemove)
+    form.setValue(fieldName, updatedTags)
+  }
 
   return (
     <div className="space-y-2">
@@ -96,25 +85,17 @@ const TagInput = ({
       </div>
       <div className="flex flex-wrap gap-1.5">
         {tags.map((tag: string) => (
-          <Badge
-            key={tag}
-            variant="secondary"
-            className="bg-blue-500 hover:bg-blue-500 py-2 px-3 text-white"
-          >
+          <Badge key={tag} variant="secondary" className="bg-blue-500 hover:bg-blue-500 py-2 px-3 text-white">
             {tag}
-            <button
-              type="button"
-              onClick={() => removeTag(tag)}
-              className="ml-1 "
-            >
+            <button type="button" onClick={() => removeTag(tag)} className="ml-1 ">
               <X className="h-3 w-3 text-white" />
             </button>
           </Badge>
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const AmountFilter = ({ form, fieldPrefix }: { form: any; fieldPrefix: string }) => (
   <div className="space-y-2">
@@ -124,7 +105,7 @@ const AmountFilter = ({ form, fieldPrefix }: { form: any; fieldPrefix: string })
         name={`filter.${fieldPrefix}_filter_type`}
         render={({ field }) => (
           <FormItem>
-            <Select onValueChange={field.onChange} value={field.value || ''}>
+            <Select onValueChange={field.onChange} value={field.value || ""}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select filter type" />
@@ -136,51 +117,52 @@ const AmountFilter = ({ form, fieldPrefix }: { form: any; fieldPrefix: string })
                 <SelectItem value="custom">Custom range</SelectItem>
               </SelectContent>
             </Select>
+            <FormMessage />
           </FormItem>
         )}
       />
 
-      {form.watch(`filter.${fieldPrefix}_filter_type`) === 'greater' && (
+      {form.watch(`filter.${fieldPrefix}_filter_type`) === "greater" && (
         <FormField
           control={form.control}
           name={`filter.${fieldPrefix}_filter_greater_or_equal`}
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
-                  type="number"
+                <NumericInput
                   placeholder="Enter amount"
                   {...field}
-                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                   className="border-gray-300"
+                  value={field.value === 0 ? "0" : field.value || ""}
                 />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
       )}
 
-      {form.watch(`filter.${fieldPrefix}_filter_type`) === 'less' && (
+      {form.watch(`filter.${fieldPrefix}_filter_type`) === "less" && (
         <FormField
           control={form.control}
           name={`filter.${fieldPrefix}_filter_less_or_equal`}
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
-                  type="number"
+                <NumericInput
                   placeholder="Enter amount"
                   {...field}
-                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                   className="border-gray-300"
+                  value={field.value === 0 ? "0" : field.value || ""}
                 />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
       )}
 
-      {form.watch(`filter.${fieldPrefix}_filter_type`) === 'custom' && (
+      {form.watch(`filter.${fieldPrefix}_filter_type`) === "custom" && (
         <div className="grid grid-cols-1 gap-2">
           <FormField
             control={form.control}
@@ -188,14 +170,14 @@ const AmountFilter = ({ form, fieldPrefix }: { form: any; fieldPrefix: string })
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Minimum"
+                  <NumericInput
+                    placeholder="Enter minimum"
                     {...field}
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                     className="border-gray-300"
+                    value={field.value === 0 ? "0" : field.value || ""}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -205,14 +187,14 @@ const AmountFilter = ({ form, fieldPrefix }: { form: any; fieldPrefix: string })
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Maximum"
+                  <NumericInput
+                    placeholder="Enter maximum"
                     {...field}
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
                     className="border-gray-300"
+                    value={field.value === 0 ? "0" : field.value || ""}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -220,46 +202,44 @@ const AmountFilter = ({ form, fieldPrefix }: { form: any; fieldPrefix: string })
       )}
     </div>
   </div>
-);
+)
 
 export default function FilterForm({ form }: FilterFormProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState("")
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    const sections = document.querySelectorAll('.filter-section');
-    if (searchTerm.trim() === '') {
-      setVisibleSections(new Set(Array.from(sections).map(section => section.id)));
-      return;
+    const sections = document.querySelectorAll(".filter-section")
+    if (searchTerm.trim() === "") {
+      setVisibleSections(new Set(Array.from(sections).map((section) => section.id)))
+      return
     }
 
-    const searchWords = searchTerm.toLowerCase().split(' ');
-    const visible = new Set<string>();
+    const searchWords = searchTerm.toLowerCase().split(" ")
+    const visible = new Set<string>()
 
     sections.forEach((section) => {
-      const sectionText = section.getAttribute('data-title') || '';
-      const matches = searchWords.every(word => sectionText.includes(word));
+      const sectionText = section.getAttribute("data-title") || ""
+      const matches = searchWords.every((word) => sectionText.includes(word))
       if (matches) {
-        visible.add(section.id);
+        visible.add(section.id)
       }
-    });
+    })
 
-    setVisibleSections(visible);
-  }, [searchTerm]);
+    setVisibleSections(visible)
+  }, [searchTerm])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+    setSearchTerm(e.target.value)
+  }
 
-  const isVisible = (sectionId: string) => visibleSections.has(sectionId);
+  const isVisible = (sectionId: string) => visibleSections.has(sectionId)
 
   return (
     <Card className="w-full bg-blue-50 shadow-lg border-0">
-      <CardHeader className="border-b  pb-4">
+      <CardHeader className="border-b pb-4">
         <CardTitle className="text-xl">Data Filters</CardTitle>
-        <CardDescription>
-          Narrow down campaign recipients with precise filters
-        </CardDescription>
+        <CardDescription>Narrow down campaign recipients with precise filters</CardDescription>
         <div className="relative mt-2">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
@@ -271,14 +251,15 @@ export default function FilterForm({ form }: FilterFormProps) {
         </div>
       </CardHeader>
       <CardContent className="p-4 py-10 b-0">
-        <div className="space-y-1 h-[70vh] no-scrollbar overflow-y-auto ">
+        <div className="space-y-1 h-[70vh] no-scrollbar overflow-y-auto">
           {/* Order Tags */}
           <FilterSection
             id="order-tags"
             title="Order Tags"
-            enabled={form.watch('filter.is_order_tag_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_order_tag_filter_enabled', checked)}
-            visible={isVisible('order-tags')}
+            enabled={form.watch("filter.is_order_tag_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_order_tag_filter_enabled", checked)}
+            visible={isVisible("order-tags")}
+            error={form.formState.errors.filter?.is_order_tag_filter_enabled?.message}
           >
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
               <TagInput
@@ -306,9 +287,10 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="customer-tags"
             title="Customer Tags"
-            enabled={form.watch('filter.is_customer_tag_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_customer_tag_filter_enabled', checked)}
-            visible={isVisible('customer-tags')}
+            enabled={form.watch("filter.is_customer_tag_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_customer_tag_filter_enabled", checked)}
+            visible={isVisible("customer-tags")}
+            error={form.formState.errors.filter?.is_customer_tag_filter_enabled?.message}
           >
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
               <TagInput
@@ -336,9 +318,10 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="product-tags"
             title="Product Tags"
-            enabled={form.watch('filter.is_product_tag_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_product_tag_filter_enabled', checked)}
-            visible={isVisible('product-tags')}
+            enabled={form.watch("filter.is_product_tag_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_product_tag_filter_enabled", checked)}
+            visible={isVisible("product-tags")}
+            error={form.formState.errors.filter?.is_product_tag_filter_enabled?.message}
           >
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
               <TagInput
@@ -366,9 +349,10 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="payment-gateways"
             title="Payment Gateways"
-            enabled={form.watch('filter.is_payment_gateway_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_payment_gateway_filter_enabled', checked)}
-            visible={isVisible('payment-gateways')}
+            enabled={form.watch("filter.is_payment_gateway_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_payment_gateway_filter_enabled", checked)}
+            visible={isVisible("payment-gateways")}
+            error={form.formState.errors.filter?.is_payment_gateway_filter_enabled?.message}
           >
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               <TagInput
@@ -390,16 +374,17 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="payment-options"
             title="Payment Options"
-            enabled={form.watch('filter.is_payment_option_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_payment_option_filter_enabled', checked)}
-            visible={isVisible('payment-options')}
+            enabled={form.watch("filter.is_payment_option_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_payment_option_filter_enabled", checked)}
+            visible={isVisible("payment-options")}
+            error={form.formState.errors.filter?.is_payment_option_filter_enabled?.message}
           >
             <FormField
               control={form.control}
               name="filter.payment_options_type"
               render={({ field }) => (
                 <FormItem>
-                  <Select onValueChange={field.onChange} value={field.value || ''}>
+                  <Select onValueChange={field.onChange} value={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select payment status" />
@@ -410,6 +395,7 @@ export default function FilterForm({ form }: FilterFormProps) {
                       <SelectItem value={PaymentOptionType.enum.UNPAID}>Unpaid</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -419,9 +405,10 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="order-amount"
             title="Order Amount"
-            enabled={form.watch('filter.is_order_amount_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_order_amount_filter_enabled', checked)}
-            visible={isVisible('order-amount')}
+            enabled={form.watch("filter.is_order_amount_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_order_amount_filter_enabled", checked)}
+            visible={isVisible("order-amount")}
+            error={form.formState.errors.filter?.is_order_amount_filter_enabled?.message}
           >
             <AmountFilter form={form} fieldPrefix="order_amount" />
           </FilterSection>
@@ -430,9 +417,10 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="discount-amount"
             title="Discount Amount"
-            enabled={form.watch('filter.is_discount_amount_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_discount_amount_filter_enabled', checked)}
-            visible={isVisible('discount-amount')}
+            enabled={form.watch("filter.is_discount_amount_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_discount_amount_filter_enabled", checked)}
+            visible={isVisible("discount-amount")}
+            error={form.formState.errors.filter?.is_discount_amount_filter_enabled?.message}
           >
             <AmountFilter form={form} fieldPrefix="discount_amount" />
           </FilterSection>
@@ -441,9 +429,10 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="order-count"
             title="Order Count"
-            enabled={form.watch('filter.is_order_count_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_order_count_filter_enabled', checked)}
-            visible={isVisible('order-count')}
+            enabled={form.watch("filter.is_order_count_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_order_count_filter_enabled", checked)}
+            visible={isVisible("order-count")}
+            error={form.formState.errors.filter?.is_order_count_filter_enabled?.message}
           >
             <AmountFilter form={form} fieldPrefix="order_count" />
           </FilterSection>
@@ -452,16 +441,17 @@ export default function FilterForm({ form }: FilterFormProps) {
           <FilterSection
             id="order-delivery"
             title="Order Delivery Status"
-            enabled={form.watch('filter.is_order_delivery_filter_enabled')}
-            onToggle={(checked: boolean) => form.setValue('filter.is_order_delivery_filter_enabled', checked)}
-            visible={isVisible('order-delivery')}
+            enabled={form.watch("filter.is_order_delivery_filter_enabled")}
+            onToggle={(checked: boolean) => form.setValue("filter.is_order_delivery_filter_enabled", checked)}
+            visible={isVisible("order-delivery")}
+            error={form.formState.errors.filter?.is_order_delivery_filter_enabled?.message}
           >
             <FormField
               control={form.control}
               name="filter.order_method"
               render={({ field }) => (
                 <FormItem>
-                  <Select onValueChange={field.onChange} value={field.value || ''}>
+                  <Select onValueChange={field.onChange} value={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select delivery status" />
@@ -475,6 +465,7 @@ export default function FilterForm({ form }: FilterFormProps) {
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -482,5 +473,6 @@ export default function FilterForm({ form }: FilterFormProps) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
+

@@ -1,12 +1,13 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
+"use client"
 
-interface NumericInputProps
-  extends Omit<React.ComponentPropsWithoutRef<"input">, "onChange"> {
-  value: number;
-  onChange: (newValue: number) => void;
-  placeholder?: string;
-  className?: string;
+import type React from "react"
+import { Input } from "@/components/ui/input"
+
+interface NumericInputProps extends Omit<React.ComponentPropsWithoutRef<"input">, "onChange" | "value"> {
+  value: number
+  onChange: (newValue: number) => void
+  placeholder?: string
+  className?: string
 }
 
 const NumericInput: React.FC<NumericInputProps> = ({
@@ -16,27 +17,33 @@ const NumericInput: React.FC<NumericInputProps> = ({
   className = "border-gray-300",
   ...props
 }) => {
-  const stringValue = value.toString();
+  // Convert to string safely, handling undefined/null values
+  const stringValue = value !== undefined && value !== null ? value.toString() : ""
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value
+    // Only allow digits
+    if (/^\d*$/.test(rawValue)) {
+      // If empty, pass 0; otherwise, convert to number and remove leading zeros
+      const newValue = rawValue === "" ? 0 : Number(rawValue.replace(/^0+(?=\d)/, ""))
+      onChange(newValue)
+    }
+  }
 
   return (
     <Input
       type="text"
+      
       inputMode="numeric"
       pattern="[0-9]*"
       placeholder={placeholder}
       value={stringValue}
-      onChange={(e) => {
-        const rawValue = e.target.value;
-        // Only allow digits
-        if (/^\d*$/.test(rawValue)) {
-          const newStr = rawValue === "" ? "0" : rawValue.replace(/^0+(?=\d)/, "");
-          onChange(Number(newStr));
-        }
-      }}
+      onChange={handleChange}
       className={className}
       {...props}
     />
-  );
-};
+  )
+}
 
-export default NumericInput;
+export default NumericInput
+
