@@ -8,15 +8,18 @@ interface NumericInputProps extends Omit<React.ComponentPropsWithoutRef<"input">
   onChange: (newValue: number) => void
   placeholder?: string
   className?: string
+  disabled?: boolean
 }
 
 const NumericInput: React.FC<NumericInputProps> = ({
   value,
+  disabled,
   onChange,
   placeholder = "Enter amount",
   className = "border-gray-300",
   ...props
 }) => {
+  console.log(disabled)
   // Convert to string safely, handling undefined/null values
   const stringValue = value !== undefined && value !== null ? value.toString() : ""
 
@@ -41,6 +44,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
       onChange={handleChange}
       className={className}
       {...props}
+      disabled={disabled}
     />
   )
 }

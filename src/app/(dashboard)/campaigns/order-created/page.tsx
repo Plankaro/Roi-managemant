@@ -1,44 +1,30 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import FilterForm from "@/components/page/campaigns/campaign-filter";
-import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormMessage,
-  FormLabel,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { CampaignSchema } from "@/zod/campaigns/checkout-create-campaign";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { z } from "zod";
-import { Input } from "@/components/ui/input";
-import TemplateBuilder from "@/components/page/broadcast/templatedialog";
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
-import AddContentForm from "@/components/page/campaigns/add-content-form";
-import toast from "react-hot-toast";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Checkbox } from "@/components/ui/checkbox";
-import NumericInput from "@/components/ui/numericInput";
-import { useCreateCampaignMutation } from "@/store/features/apislice";
+import { useState } from "react"
+import FilterForm from "@/components/page/campaigns/campaign-filter"
+import { useForm } from "react-hook-form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage, FormLabel } from "@/components/ui/form"
+import { Button } from "@/components/ui/button"
+import { CampaignSchema } from "@/zod/campaigns/order-create-campaign"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { z } from "zod"
+import { Input } from "@/components/ui/input"
+import TemplateBuilder from "@/components/page/broadcast/templatedialog"
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
+import AddContentForm from "@/components/page/campaigns/add-content-form"
+import toast from "react-hot-toast"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { ScrollArea } from "@radix-ui/react-scroll-area"
+import { Checkbox } from "@/components/ui/checkbox"
+import NumericInput from "@/components/ui/numericInput"
+import { useCreateCampaignMutation } from "@/store/features/apislice"
 
-type CampaignFormValues = z.infer<typeof CampaignSchema>;
+type CampaignFormValues = z.infer<typeof CampaignSchema>
 
-const CheckoutCreated = () => {
-  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
-  const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
-  const [createCampaign] = useCreateCampaignMutation();
+const OrderCreated = () => {
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
+  const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false)
+  const [createCampaign] = useCreateCampaignMutation()
 
   const form = useForm<CampaignFormValues>({
     resolver: zodResolver(CampaignSchema),
@@ -105,10 +91,7 @@ const CheckoutCreated = () => {
       type: "promotional",
       trigger_type: "AFTER_CAMPAIGN_CREATED",
       trigger_time: { time: 1, unit: "minutes" },
-      is_discount_given: false,
-      discount: 1,
-      coupon_code: "",
-      discount_type: "AMOUNT",
+     
       filter_condition_match: false,
       new_checkout_abandonment_filter: false,
       new_checkout_abandonment_type: "AFTER_EVENT",
@@ -116,7 +99,7 @@ const CheckoutCreated = () => {
       new_order_creation_filter: false,
       new_order_creation_type: "AFTER_EVENT",
       new_order_creation_time: { time: 1, unit: "minutes" },
-      related_order_created: false,
+      related_order_fullfilled: false,
       related_order_cancelled: false,
       // Initialize templateForm with default values
       templateForm: {
@@ -131,26 +114,26 @@ const CheckoutCreated = () => {
         buttons: [],
       },
     },
-  });
+  })
 
-  console.log(form.getValues());
+  console.log(form.getValues())
   const onSubmit = async (data: CampaignFormValues) => {
     try {
-      const promise = createCampaign({ ...data, trigger: "CHECKOUT_CREATED" });
+      const promise = createCampaign({...data,trigger:"ORDER_CREATED"})
       await toast.promise(promise, {
         loading: "Creating campaign...",
         success: "Campaign created successfully!",
         error: "Error creating campaign.",
-      });
-      console.log(await promise);
+      })
+      console.log(await promise)
       // Additional logic after campaign creation can go here
     } catch (error) {
       // Optionally handle the error further if needed
-      console.error("Campaign creation failed:", error);
+      console.error("Campaign creation failed:", error)
     }
-  };
+  }
 
-  const isDiscountavailable = form.watch("is_discount_given");
+ 
 
   const dropdownOptions = [
     {
@@ -166,42 +149,47 @@ const CheckoutCreated = () => {
       value: "customer_phone",
     },
     {
-      type: "Cart total items",
-      value: "cart_total_items",
+      type: "order total items",
+      value: "order_total_items",
     },
     {
-      type: "Cart total price",
-      value: "cart_total_price",
+      type: "order total price",
+      value: "order_total_price",
     },
     {
       type: "Cart items",
       value: "cart_items",
     },
-    ...(isDiscountavailable
-      ? [
-          {
-            type: "Discount code",
-            value: "discount_code",
-          },
-          {
-            type: "Discount amount",
-            value: "discount_amount",
-          },
-        ]
-      : []),
+    {
+        type:"Order id",
+        value:"order_id"
+    },
+    {
+        type:"Shipping address",
+        value:"shipping_address"
+    },
+    {
+        type:"Order date",
+        value:"order_date"
+    }
+   
   ];
-
+  
   const urldropdownOptions = [
     {
-      type: "Abandoned Checkout URL",
-      value: "abandon_checkout_url",
+      type: "Order Status Link",
+      value: "Order Status Link",
+    },
+    {
+        type:"COD to checkout link",
+        value:"cod_to_checkout_link"
     },
     {
       type: "Shop URL",
       value: "shop_url",
     },
   ];
-
+  
   return (
     <ScrollArea className="h-[calc(100vh-100px)] overflow-auto no-scrollbar">
       <Form {...form}>
@@ -216,9 +204,7 @@ const CheckoutCreated = () => {
               name="name"
               render={({ field }) => (
                 <FormItem className="space-y-3 basis-1/2">
-                  <FormLabel className="md:text-2xl text-lg">
-                    Campaign Name
-                  </FormLabel>
+                  <FormLabel className="md:text-2xl text-lg">Campaign Name</FormLabel>
 
                   <FormControl>
                     <Input
@@ -236,9 +222,7 @@ const CheckoutCreated = () => {
               name="type"
               render={({ field, fieldState }) => (
                 <FormItem className="space-y-3 basis-1/2">
-                  <FormLabel className=" md:text-2xl text-lg">
-                    Trigger Type
-                  </FormLabel>
+                  <FormLabel className=" md:text-2xl text-lg">Trigger Type</FormLabel>
 
                   <FormControl>
                     <Select {...field}>
@@ -261,19 +245,11 @@ const CheckoutCreated = () => {
           <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
             <div className="space-y-3 basis-1/2">
               <label className="md:text-2xl text-lg">Data Filters</label>
-              <p className="text-sm text-gray-500">
-                Select filters to narrow down campaign recipients
-              </p>
+              <p className="text-sm text-gray-500">Select filters to narrow down campaign recipients</p>
               <div>
-                <Dialog
-                  open={isFilterDialogOpen}
-                  onOpenChange={setIsFilterDialogOpen}
-                >
+                <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
+                    <Button type="button" className="bg-blue-600 hover:bg-blue-700">
                       Open Filter Form
                     </Button>
                   </DialogTrigger>
@@ -283,8 +259,7 @@ const CheckoutCreated = () => {
                     </div>
                     {form.formState.errors.filter && (
                       <p className="text-red-500 text-sm">
-                        There is an error in the filter fields. Please review
-                        your inputs.
+                        There is an error in the filter fields. Please review your inputs.
                       </p>
                     )}
                   </DialogContent>
@@ -297,10 +272,8 @@ const CheckoutCreated = () => {
               name="template"
               render={({ field, fieldState }) => (
                 <FormItem className="py-2 md:text-2xl text-lg text-white basis-1/2">
-                  <FormLabel className="text-lg">Select Template</FormLabel>
-                  <FormDescription className="text-gray-400">
-                    Select a template for broadcast messages
-                  </FormDescription>
+                  <FormLabel>Select Template</FormLabel>
+                  <FormDescription className="text-gray-400">Select a template for broadcast messages</FormDescription>
                   <FormControl>
                     <div>
                       <Button
@@ -315,7 +288,7 @@ const CheckoutCreated = () => {
                         setOpen={setTemplateSelectionDialog}
                         selectedTemplate={field.value}
                         setSelectedTemplate={(template) => {
-                          field.onChange(template);
+                          field.onChange(template)
                           // Initialize templateForm when template is selected
                           if (template) {
                             form.setValue("templateForm", {
@@ -328,7 +301,7 @@ const CheckoutCreated = () => {
                               },
                               body: [],
                               buttons: [],
-                            });
+                            })
                           }
                         }}
                       />
@@ -346,9 +319,7 @@ const CheckoutCreated = () => {
               name="templateForm"
               render={({ field }) => (
                 <FormItem className="py-2">
-                  <FormLabel className="md:text-2xl text-lg  text-white">
-                    Add Content
-                  </FormLabel>
+                  <FormLabel className="md:text-2xl text-lg  text-white">Add Content</FormLabel>
                   <FormControl>
                     <AddContentForm
                       urldropdownOptions={urldropdownOptions}
@@ -372,22 +343,15 @@ const CheckoutCreated = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select option" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                        Immediate
-                      </SelectItem>
-                      <SelectItem value="CUSTOM">
-                        Custom time after event
-                      </SelectItem>
+                      <SelectItem value="AFTER_CAMPAIGN_CREATED">Immediate</SelectItem>
+                      <SelectItem value="CUSTOM">Custom time after event</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -415,10 +379,7 @@ const CheckoutCreated = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Unit</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select unit" />
@@ -436,68 +397,7 @@ const CheckoutCreated = () => {
             </div>
           )}
 
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="is_discount_given"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      variant="blue"
-                      className="border border-white"
-                    />
-                  </FormControl>
-                  <FormLabel className="font-medium">Add Discount</FormLabel>
-                </FormItem>
-              )}
-            />
-            {form.watch("is_discount_given") === true && (
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="discount_type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Discount Type</FormLabel>
-                      <Select
-                        disabled={form.watch("is_discount_given") === false}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="AMOUNT">Amount</SelectItem>
-                          <SelectItem value="PERCENTAGE">Percentage</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="discount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Enter Discount Amount</FormLabel>
-                      <FormControl>
-                        <NumericInput {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-          </div>
+       
           <FormField
             control={form.control}
             name="reply_action"
@@ -506,13 +406,9 @@ const CheckoutCreated = () => {
               <FormItem>
                 <FormLabel className="text-2xl">Select reply action</FormLabel>
                 <p className="text-xs text-gray-400">
-                  Auto-reply bot for responses. If the user replies within 72
-                  hours of getting the message.
+                  Auto-reply bot for responses. If the user replies within 72 hours of getting the message.
                 </p>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
                       <SelectValue placeholder="Transfer Bot" />
@@ -529,8 +425,8 @@ const CheckoutCreated = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Exit Criteria</h3>
             <p className="text-sm text-muted-foreground">
-              Participants will leave this campaign if, at the moment the
-              message is sent, any of the chosen conditions are met.
+              Participants will leave this campaign if, at the moment the message is sent, any of the chosen conditions
+              are met.
             </p>
 
             {/* Abandoned Checkout */}
@@ -548,9 +444,7 @@ const CheckoutCreated = () => {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      A customer has abandoned their recent checkout
-                    </FormLabel>
+                    <FormLabel>A customer has abandoned their recent checkout</FormLabel>
                   </div>
                 </FormItem>
               )}
@@ -564,22 +458,15 @@ const CheckoutCreated = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="AFTER_EVENT">
-                            Immediately after event
-                          </SelectItem>
-                          <SelectItem value="CUSTOM">
-                            Custom time after event
-                          </SelectItem>
+                          <SelectItem value="AFTER_EVENT">Immediately after event</SelectItem>
+                          <SelectItem value="CUSTOM">Custom time after event</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormItem>
@@ -607,10 +494,7 @@ const CheckoutCreated = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
@@ -659,22 +543,15 @@ const CheckoutCreated = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="AFTER_EVENT">
-                            Immediately after event
-                          </SelectItem>
-                          <SelectItem value="CUSTOM">
-                            Custom time after event
-                          </SelectItem>
+                          <SelectItem value="AFTER_EVENT">Immediately after event</SelectItem>
+                          <SelectItem value="CUSTOM">Custom time after event</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormItem>
@@ -702,10 +579,7 @@ const CheckoutCreated = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
@@ -747,9 +621,9 @@ const CheckoutCreated = () => {
             />
 
             {/* Order Fulfilled */}
-            <FormField
+            <FormField  
               control={form.control}
-              name="related_order_created"
+              name="related_order_fullfilled"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                   <FormControl>
@@ -769,11 +643,7 @@ const CheckoutCreated = () => {
           </div>
 
           <div className="flex justify-end space-x-4">
-            <Button
-              variant="outline"
-              type="button"
-              className="bg-transparent border-primary"
-            >
+            <Button variant="outline" type="button" className="bg-transparent border-primary">
               Exit
             </Button>
             <Button type="submit" className="bg-blue-500 text-white">
@@ -783,7 +653,8 @@ const CheckoutCreated = () => {
         </form>
       </Form>
     </ScrollArea>
-  );
-};
+  )
+}
 
-export default CheckoutCreated;
+export default OrderCreated
+

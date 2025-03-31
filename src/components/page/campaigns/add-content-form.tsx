@@ -619,72 +619,7 @@ function AddContentForm({
                     {component.type === "BUTTONS" &&
                       formData?.buttons?.map(
                         (button: any, buttonIndex: any) => (
-                        //   <div
-                        //     key={`button-${buttonIndex}`}
-                        //     className="space-y-3 flex flex-col"
-                        //   >
-                        //     <div className="flex items-center justify-between">
-                        //       <h3 className="text-base font-medium">
-                        //         {button.type === "URL"
-                        //           ? "CTA Button"
-                        //           : button.type === "COPY_CODE"
-                        //           ? "Copy Code"
-                        //           : ""}
-                        //       </h3>
-                        //       <span className="flex items-center  gap-3 md:text-sm  text-xs font-medium text-white">
-                        //         <Checkbox
-                        //           className="border border-white"
-                        //           variant="blue"
-                        //           checked={formData?.header?.fromsegment}
-                        //           onCheckedChange={(checked) => {
-                        //             handleInputChange(
-                        //               "buttons",
-                        //               buttonIndex,
-                        //               "fromsegment",
-                        //               checked
-                        //             );
-                        //           }}
-                        //         />
-                        //         Select Content from shopify segment
-                        //       </span>
-                        //     </div>
-                        //     {(button.type === "URL" ||
-                        //       button.type === "COPY_CODE") && (
-                        //       <>
-                        //         <div>
-                        //           <p className="text-sm text-muted-foreground text-gray-400">
-                        //             Enter the{" "}
-                        //             {button.type === "URL"
-                        //               ? "URL for the CTA Button"
-                        //               : "code to copy"}
-                        //           </p>
-                        //         </div>
-                        //         <Input
-                        //           placeholder={
-                        //             button.type === "URL"
-                        //               ? "Enter URL"
-                        //               : "Enter code to copy"
-                        //           }
-                        //           value={button.value}
-                        //           disabled={!button.isEditable}
-                        //           onChange={(e) =>
-                        //             handleInputChange(
-                        //               "buttons",
-                        //               buttonIndex,
-                        //               "value",
-                        //               e.target.value
-                        //             )
-                        //           }
-                        //           className={`border-blue-500 focus:ring-blue-500 xl:w-1/2 ${
-                        //             errors?.templateForm?.buttons?.[buttonIndex]
-                        //               ?.value
-                        //               ? "border-red-500 ring-1 ring-red-500"
-                        //               : ""
-                        //           }`}
-                        //         />
-                        //       </>
-                        //     )}
-                        //   </div>
+                        
                         <div
                         key={`buttons-${buttonIndex}`}
                         className={`flex lg:flex-row flex-col gap-6 ${button.isEditable ? "":"hidden"}`}
@@ -716,7 +651,7 @@ function AddContentForm({
                                   className="border-white "
                                   variant="blue"
                                   disabled={button.type==="URL"?false:true}
-                                  checked={button.type==="URL"?false:button?.fromsegment}
+                                  checked={button.type==="URL"?button?.fromsegment:false}
                                   onCheckedChange={(checked) =>
                                     handleInputChange(
                                       "buttons",

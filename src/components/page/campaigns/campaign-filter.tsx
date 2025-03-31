@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { OrderMethod, PaymentOptionType } from "@/zod/campaigns/checkout-create-campaign"
 import NumericInput from "@/components/ui/numericInput"
+import { ScrollArea } from "@radix-ui/react-scroll-area"
 
 interface FilterFormProps {
   form: any
@@ -251,7 +252,7 @@ export default function FilterForm({ form }: FilterFormProps) {
         </div>
       </CardHeader>
       <CardContent className="p-4 py-10 b-0">
-        <div className="space-y-1 h-[70vh] no-scrollbar overflow-y-auto">
+        <ScrollArea className="space-y-1 h-[60vh] no-scrollbar overflow-y-auto">
           {/* Order Tags */}
           <FilterSection
             id="order-tags"
@@ -470,7 +471,7 @@ export default function FilterForm({ form }: FilterFormProps) {
               )}
             />
           </FilterSection>
-        </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   )

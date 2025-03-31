@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -19,11 +20,28 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { useGetTeamQuery } from "@/store/features/apislice";
+import { useGetTeamQuery,useDeleteTeamMutation } from "@/store/features/apislice";
+import toast from "react-hot-toast";
 
 export default function Dashboard() {
   const { data } = useGetTeamQuery({});
   console.log(data);
+  const [deleteTeam] = useDeleteTeamMutation();
+
+  
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this team?")) {
+      const promise = deleteTeam({ id });
+      toast.promise(promise, {
+        loading: "Deleting...",
+        success: "Team deleted successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      });
+    }
+  };
+
   return (
     <div className="">
       <div className=" ">
@@ -35,6 +53,7 @@ export default function Dashboard() {
               <Input
                 className="pl-10 bg-[#1e1e3f]  border-none rounded-full text-sm h-9 text-white"
                 placeholder="Search here..."
+
               />
             </div>
             <Link href={"/teams/create"}>
@@ -55,18 +74,18 @@ export default function Dashboard() {
 
         <div className=" no-scrollbar overflow-y-scroll h-[calc(100vh-200px)] ">
           <div className="md:grid hidden  xl:grid-col-4 lg:grid-cols-3 md:grid-cols-2  gap-5">
-            {data && data?.agents && <AgentCard data={data.admin} />}
+            {data && data?.admin && <AgentCard data={data.admin} handleDelete={handleDelete}/>}
             {data &&
-              data?.agents.map((data, index) => (
-                <AgentCard key={index} data={data} />
+              data?.agents.map((data:any, index:any) => (
+                <AgentCard key={index} data={data} handleDelete={handleDelete}/>
               ))}
           </div>
 
           <div className=" md:hidden grid-cols-1 space-y-2">
-            {data && data?.agents && <AgentListItem data={data.admin} />}
+            {data && data?.admin && <AgentListItem data={data.admin} handleDelete={handleDelete}/>}
             {data &&
-              data?.agents.map((data, index) => (
-                <AgentListItem key={index} data={data} />
+              data?.agents.map((data:any, index:any) => (
+                <AgentListItem key={index} data={data} handleDelete={handleDelete}/>
               ))}
           </div>
         </div>
@@ -75,7 +94,7 @@ export default function Dashboard() {
   );
 }
 
-function AgentCard({ data }: { data: any }) {
+function AgentCard({ data,handleDelete }: { data: any,handleDelete:any }) {
   return (
     <div className={`${data?.role === "ADMIN" ? "bg-gradient-to-b from-[rgba(203,28,101,0.3)] to-[rgba(30,30,128,0.3)]":"bg-backgroundColor"}  border  border-primary rounded-xl p-6 relative`}>
       <div className="absolute top-4 right-4 flex flex-col gap-3">
@@ -84,7 +103,7 @@ function AgentCard({ data }: { data: any }) {
           <Edit2 className="h-4 w-4" />
         </button>
         </Link>
-        <button className="text-red-500 hover:text-red-400 rounded-full p-2">
+        <button className="text-red-500 hover:text-red-400 rounded-full p-2" onClick={() => handleDelete(data?.id)}>
           <Trash2 className="h-4 w-4" />
         </button>
       </div>
@@ -124,7 +143,7 @@ function AgentCard({ data }: { data: any }) {
   );
 }
 
-function AgentListItem({ data }: { data: any }) {
+function AgentListItem({ data,handleDelete }: { data: any,handleDelete:any }) {
   return (
     <div className="bg-[#0A0A1B] rounded-lg py-4 px-5 border border-primary relative overflow-hidden">
       <span className="absolute top-0  right-2 bg-blue-600 text-white text-sm px-3 py-1 rounded-lg">
@@ -141,7 +160,7 @@ function AgentListItem({ data }: { data: any }) {
             alt="Profile"
             width={40}
             height={40}
-            className="rounded-full"
+            className="rounded-full aspect-square"
           />
           <h2 className="md:text-base text-sm  font-semibold text-white">
             {data?.name}
@@ -158,7 +177,7 @@ function AgentListItem({ data }: { data: any }) {
               <Pencil className="mr-2 h-4 w-4" />
               <span>Edit</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer text-red-500">
+            <DropdownMenuItem className="cursor-pointer text-red-500" onClick={()=>handleDelete(data?.id)}>
               <Trash2 className="mr-2 h-4 w-4" />
               <span>Delete</span>
             </DropdownMenuItem>

@@ -416,10 +416,8 @@ export const CampaignSchema = z
     template: Templateschema,
     trigger_type: CampaignTriggerType,
     trigger_time: TimeSchema.optional(),
-    is_discount_given: z.boolean().default(true),
-    discount: z.number(),
-    coupon_code: z.string().optional(),
-    discount_type: DiscountType,
+    
+   
     filter_condition_match: z.boolean(),
     new_checkout_abandonment_filter: z.boolean(),
     new_checkout_abandonment_type: TriggerType,
@@ -427,27 +425,12 @@ export const CampaignSchema = z
     new_order_creation_filter: z.boolean(),
     new_order_creation_type: TriggerType,
     new_order_creation_time: TimeSchema.optional(),
-    related_order_created: z.boolean(),
+    related_order_fullfilled: z.boolean(),
     related_order_cancelled: z.boolean(),
   })
   .superRefine((data, ctx) => {
-    // Validate discount fields:
-    if (data.is_discount_given === true) {
-      if (data.discount == null) {
-        ctx.addIssue({
-          path: ["discount"],
-          message: "Discount amount is required when discount is given.",
-          code: "custom",
-        })
-      }
-      if (data.discount_type == null) {
-        ctx.addIssue({
-          path: ["discount_type"],
-          message: "Discount type is required when discount is given.",
-          code: "custom",
-        })
-      }
-    }
+   
+    
 
     // Validate new_order_creation fields:
     if (data.new_order_creation_filter === true) {
