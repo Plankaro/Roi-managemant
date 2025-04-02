@@ -316,6 +316,12 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    getCampaign:builder.query({
+      query: () => ({
+        url: "/campaign",
+        method: "GET",
+      }),
+    })
   }),
 });
 
@@ -361,5 +367,6 @@ export const {
   useDeleteTeamMutation,
   useUpdateTeamMutation,
   useGetSpecificTeamQuery,
-  useCreateCampaignMutation
+  useCreateCampaignMutation,
+  useGetCampaignQuery
 } = apiSlice;

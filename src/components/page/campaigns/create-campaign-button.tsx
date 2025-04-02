@@ -73,6 +73,11 @@ export function CreateCampaignButton({ className }: CreateCampaignButtonProps) {
                     Order Tag Added
                   </DropdownMenuItem>
                 </Link>
+                <Link href="/campaigns/order-cancelled">
+                  <DropdownMenuItem className="px-4 py-2 text-white hover:bg-blue-900 focus:bg-blue-900 focus:text-white">
+                    Order Cancelled
+                  </DropdownMenuItem>
+                </Link>
               </div>
             </motion.div>
           </DropdownMenuContent>
