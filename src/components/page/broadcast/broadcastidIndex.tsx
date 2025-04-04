@@ -116,7 +116,7 @@ const handleDownload = async () => {
             </div>
           ))}
         </div>
-        <BentoGrid className="gap-3 md:px-3">
+        <BentoGrid className="gap-3 md:px-3 grid-cols-1 lg:grid-cols-8 ">
   {gridComponents.map((gridComponent, i) => (
     <BentoGridItem
       key={i}

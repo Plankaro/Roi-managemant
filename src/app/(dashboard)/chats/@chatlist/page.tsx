@@ -57,7 +57,7 @@ const ChatLists = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const user = session?.data?.user?.user
   const {selectedProspect,prospects} = useSelector((state: RootState) => state.Prospect);
-  //console.log(prospects)
+  console.log(data)
 
   
   useEffect(() => {

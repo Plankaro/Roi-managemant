@@ -33,7 +33,7 @@ export const sidebarItems = [
   { icon: IoMegaphone, label: "Campaigns:", slug: "/campaigns" },
   { icon: BetweenHorizonalEnd, label: "Broadcast", slug: "/broadcast" },
   { icon: AIBuilder, label: "AI Builder", slug: "/ai-builder" },
-  { icon: LineChart, label: "Analytics", slug: "/analytics" },
+  { icon: LineChart, label: "Analytics", slug: "/" },
   { icon: RiAccountPinBoxFill, label: "Prospects", slug: "/prospects" },
   { icon: Users, label: "Teams", slug: "/teams" },
 ];
