@@ -27,6 +27,7 @@ import { RootState } from "@/store/store"
 import { useSendTemplatesMutation } from "@/store/features/apislice"
 import { useDispatch, useSelector } from "react-redux"
 import { setChats } from "@/store/features/chatSlice"
+import toast from "react-hot-toast";
 
 
 
@@ -85,8 +86,18 @@ export default function TemplateBuilder({
       recipientNo: selectedProspect?.phoneNo
     }
     console.log(payload);
-    const response = await sendTemplate(payload)
+    const response =  sendTemplate(payload)
+    toast.promise(response, {
+      loading: "Sending...",
+      success: "Message sent successfully!",
+      error: (error: any) =>
+        error?.data?.message || "An unexpected error occurred.",
+    })
+
+    const chat = (await response).data
+    dispatch(setChats([chat]))
     console.log(response)
+    setOpen(false)
     
   };
 

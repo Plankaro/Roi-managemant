@@ -180,7 +180,7 @@ function Messages({ isLoading }: { isLoading: boolean }) {
                                 {chat.footer_text}
                               </div>
                             )}
-                          <div className="flex gap-2 mt-2">
+                          <div className="flex flex-col gap-2 mt-2">
                             {chat?.Buttons &&
                               chat.Buttons.length > 0 &&
                               chat.Buttons.map((button: any, index: any) => {
@@ -188,7 +188,7 @@ function Messages({ isLoading }: { isLoading: boolean }) {
                                   return (
                                     <Button
                                       key={index}
-                                      className="bg-primary-100 w-full text-black"
+                                      className="bg-primary-100 w-full text-black hover:bg-primary hover:text-white"
                                     >
                                       <a
                                         href={button.value}
@@ -203,7 +203,7 @@ function Messages({ isLoading }: { isLoading: boolean }) {
                                   return (
                                     <Button
                                       key={index}
-                                      className="bg-primary-100 w-full text-black"
+                                      className="bg-primary-100 w-full text-black hover:bg-primary hover:text-white"
                                     >
                                       {button.text}
                                     </Button>
