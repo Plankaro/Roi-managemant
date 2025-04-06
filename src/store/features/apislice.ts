@@ -1,6 +1,7 @@
 // src/api/apiSlice.ts
 import { createApi } from "@reduxjs/toolkit/query/react";
 import baseQuery from "./basequery";
+import { Filters } from "./prospect";
 
 export const apiSlice = createApi({
   baseQuery,
@@ -96,11 +97,21 @@ export const apiSlice = createApi({
     }),
 
     getProspect: builder.query({
-      query: () => ({
-        url: "/prospects",
-        method: "GET",
-      }),
-      providesTags: ["Prospect"], // Provide the 'Prospect' tag
+      query: (filters: Filters) => {
+        const queryParams = new URLSearchParams();
+    
+        Object.entries(filters).forEach(([key, values]) => {
+          values.forEach((value: string) => {
+            queryParams.append(key, value);
+          });
+        });
+    
+        return {
+          url: `/prospects?${queryParams.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Prospect"],
     }),
     getSpecficProspect: builder.query({
       query: (id) => ({
@@ -284,6 +295,13 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    asignChat: builder.mutation({
+      query: (body) => ({
+        url: "/agents/assign-chat",
+        method: "POST",
+        body,
+      }),
+    }),
     getTeam: builder.query({
       query: () => ({
         url: "/agents",
@@ -321,7 +339,8 @@ export const apiSlice = createApi({
         url: "/campaign",
         method: "GET",
       }),
-    })
+    }),
+
   }),
 });
 
@@ -368,5 +387,6 @@ export const {
   useUpdateTeamMutation,
   useGetSpecificTeamQuery,
   useCreateCampaignMutation,
-  useGetCampaignQuery
+  useGetCampaignQuery,
+  useAsignChatMutation
 } = apiSlice;

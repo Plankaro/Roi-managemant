@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { find, findIndex, merge } from "lodash";
 
@@ -42,10 +43,40 @@ export type Prospect = {
   chats?: Chat[]; // Added property to store one chat (e.g., latest chat)
 };
 
+enum ConversationStatus {
+  READ = "read",
+  UNREAD = "unread",
+}
+
+enum AssignmentStatus {
+  ASSIGNED = "assigned",
+  UNASSIGNED = "unassigned",
+}
+
+export enum Lead {
+  LEAD = "LEAD",
+  LOST = "LOST",
+  NEGOTIATION = "NEGOTIATION",
+  OTHER = "OTHER",
+}
+
+
+export interface Filters {
+  conversation_status: ConversationStatus[]
+  Agents : string[]
+  assignment_status: AssignmentStatus[]
+  broadcast  : string[]
+  campaigns   : string[]
+  engagement_status: string[]
+  tags: string[]
+
+}
+
 interface ProspectState {
   prospects: Prospect[]; // List of all prospects
   selectedProspect: Prospect | null; // Holds the selected prospect
   openMenuModal: boolean;
+  filters : Filters
 
 }
 
@@ -53,6 +84,17 @@ const initialState: ProspectState = {
   prospects: [],
   selectedProspect: null,
   openMenuModal: false,
+  filters: {
+    tags: [],
+    conversation_status: [],
+    Agents: [],
+    assignment_status: [],
+    broadcast: [],
+    campaigns: [],
+    engagement_status: []
+  }
+  
+
 
 };
 
@@ -89,6 +131,10 @@ const ProspectSlice = createSlice({
           state.prospects.push(incomingProspect);
         }
       });
+    },
+
+    setProspect: (state, action: PayloadAction<Prospect[]>) => {
+      state.prospects = action.payload;
     },
 
     // Select a prospect
@@ -135,7 +181,48 @@ const ProspectSlice = createSlice({
       } else {
         console.warn("No prospect found with id:", action.payload);
       }
-    }
+    },
+
+    // Update filters
+    toggleFilterOption: (state, action: PayloadAction<{ filterKey: keyof Filters; value: string }>) => {
+      const { filterKey, value } = action.payload
+
+      // Special handling for filters that should only allow one selection
+      if (filterKey === "assignment_status" || filterKey === "conversation_status") {
+        const currentValues = state.filters[filterKey] as string[]
+
+        // If the value is already selected, deselect it
+        if (currentValues.includes(value)) {
+          state.filters[filterKey] = [] as any
+        } else {
+          // Otherwise, replace the entire array with just this value
+          state.filters[filterKey] = [value] as any
+        }
+      } else {
+        // For other filters, keep the existing multi-select behavior
+        const currentValues = state.filters[filterKey] as string[]
+
+        if (currentValues.includes(value)) {
+          state.filters[filterKey] = currentValues.filter((v) => v !== value) as any
+        } else {
+          state.filters[filterKey] = [...currentValues, value] as any
+        }
+      }
+    },
+
+
+    
+    clearAllFilters: (state) => {
+      state.filters = {
+        tags: [],
+        conversation_status: [],
+        Agents: [],
+        assignment_status: [],
+        broadcast: [],
+        campaigns: [],
+        engagement_status: [],
+      }
+    },
     
     
   },
@@ -148,7 +235,10 @@ export const {
   clearSelectedProspects,
   toggleMenuModal,
   updateLastChat,
-  clearlastChat
+  clearlastChat,
+  toggleFilterOption,
+  clearAllFilters,
+  setProspect,
 } = ProspectSlice.actions;
 
 export default ProspectSlice.reducer;

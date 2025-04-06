@@ -75,6 +75,10 @@ import { getTimeDifference } from "@/lib/timetill";
 
 import { getChatsForProspect } from "@/components/page/broadcast/getchats";
 import { useGetFlashResponseQuery } from "@/store/features/apislice";
+import AssignmentDropdown from "@/components/page/chats/assignmentdropdown";
+
+import { useSession } from "next-auth/react";
+import TagsSelect from "@/components/page/chats/tag-section";
 
 interface FileUploadProps {
   onFileSelect: (file: File, type: FileType) => void;
@@ -84,8 +88,9 @@ const AllChats = () => {
   const [fileType, setFileType] = useState<FileType | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
-  const {data: flashResponse} = useGetFlashResponseQuery({})
-  
+  const { data: flashResponse } = useGetFlashResponseQuery({});
+  const session:any = useSession();
+  const user = session?.data?.user?.user;
 
   const { selectedProspect } = useSelector(
     (state: RootState) => state.Prospect
@@ -102,7 +107,7 @@ const AllChats = () => {
   });
 
   const [message, setMessage] = useState("");
-  const [showFlashPopup, setShowFlashPopup] = useState(false)
+  const [showFlashPopup, setShowFlashPopup] = useState(false);
   const [sendText, { isLoading }] = useSendTextMutation();
 
   const [uploadFiles, { isLoading: isuploadingfile }] =
@@ -112,7 +117,7 @@ const AllChats = () => {
     useUpdateProspectMutation();
   const [changeBlockStatus, { isLoading: isChangingBlockStatus }] =
     useChangeBlockStatusMutation();
-  const { data } = useGetSpecficProspectQuery({});
+
   const [deleteChats] = useDeleteChatsMutation();
 
   //console.log(selectedProspect);
@@ -122,7 +127,7 @@ const AllChats = () => {
   //console.log(dialog);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
   //console.log("select", selectedProspect);
   const lastOnlineStatus = getLastOnlineStatus(
     selectedProspect?.last_Online as Date
@@ -210,21 +215,18 @@ const AllChats = () => {
 
   useEffect(() => {
     if (message.startsWith("/")) {
-     
-      setShowFlashPopup(true)
-    }else{
-      setShowFlashPopup(false)
+      setShowFlashPopup(true);
+    } else {
+      setShowFlashPopup(false);
     }
-  }, [message])
+  }, [message]);
 
-  const handleSelectResponse = (response:any) => {
+  const handleSelectResponse = (response: any) => {
     //console.log("response",response)
-    setMessage(response.message)
-    setShowFlashPopup(false)
-   
-    }
-    //console.log(flashResponse)
-  
+    setMessage(response.message);
+    setShowFlashPopup(false);
+  };
+  //console.log(flashResponse)
 
   const handleBlockStatusChange = async (id: string) => {
     try {
@@ -375,9 +377,9 @@ const AllChats = () => {
                         alt={selectedProspect?.name ?? ""}
                         className="object-cover"
                       />
-                      <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
-                     >
-                        {selectedProspect?.name?.slice(0, 2).toUpperCase()??"" }
+                      <AvatarFallback className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center">
+                        {selectedProspect?.name?.slice(0, 2).toUpperCase() ??
+                          ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -400,49 +402,7 @@ const AllChats = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-white hover:text-white/90 hover:bg-white/10"
-                      >
-                        <EllipsisVertical className="h-10 w-10" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="bg-blue-500 border-0 py-2 text-white ove"
-                    >
-                      <DropdownMenuItem>
-                        <Link
-                          href={`/orders/${selectedProspect.shopify_id}`}
-                          className="flex  pr-14 gap-5"
-                        >
-                          <Image
-                            src="/icons/shopify.png"
-                            alt="shopify"
-                            width={21}
-                            height={21}
-                          />
-                          <span>Create Order</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      {/* <DropdownMenuItem className="mt-6 "> */}
-                      <div className="flex mt-6 pr-14 gap-5">
-                        <UserRound className="pl-2" />
-                        <span>Assign To</span>
-                      </div>
-                      {/* </DropdownMenuItem> */}
-                      <DropdownMenuItem className="ml-3 my-3">
-                        Agent 1
-                      </DropdownMenuItem>
-                      <div className="flex absolute bottom-0 right-0  left-0 items-center  gap-2 px-4 py-3 text-white bg-[#1E2A47] cursor-pointer">
-                        <User className="h-4 w-4" />
-                        <span>Assigned</span>
-                      </div>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <AssignmentDropdown />
                 </div>
               </div>
             </div>
@@ -451,123 +411,126 @@ const AllChats = () => {
             <Messages isLoading={isChatsLoading} />
 
             {/* Input */}
-            {selectedProspect.is_blocked ? (
-              <div className="p-4 border-t border-primary bg-[#4064AC80] ">
-                <div className="flex items-center gap-2 text-white justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <ShieldCheck className="h-6 w-6" />
-                    <p>The user is blocked</p>
-                  </div>
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 capitalize"
-                    onClick={() =>
-                      handleBlockStatusChange(selectedProspect?.id)
-                    }
-                  >
-                    Unblock
-                  </Button>
-                </div>
-              </div>
-            ) : getDifference ? (
-              <div className="p-4 border-t border-primary bg-primary rounded-b-[20px] relative">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept={
-                    fileType === "document"
-                      ? ".pdf,.doc,.docx,.txt"
-                      : "image/*,video/*"
-                  }
-                />
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:text-white/90  hover:bg-white/10 aspect-square"
-                  >
-                    <DropdownMenu
-                      open={dropdownOpen}
-                      onOpenChange={setDropdownOpen}
+            {selectedProspect.assignedToId === user.id ? (
+              selectedProspect.is_blocked ? (
+                <div className="p-4 border-t border-primary bg-[#4064AC80]">
+                  <div className="flex items-center gap-2 text-white justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                      <ShieldCheck className="h-6 w-6" />
+                      <p>The user is blocked</p>
+                    </div>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700 capitalize"
+                      onClick={() =>
+                        handleBlockStatusChange(selectedProspect?.id)
+                      }
                     >
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="bg-transparent hover:bg-transparent hover:text-white"
-                        >
-                          <PlusCircle />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-blue-500 text-white border-0">
-                        <DropdownMenuItem
-                          className="flex gap-2"
-                          onClick={() => {
-                            setDialog(true);
-                            setDropdownOpen(false);
-                          }}
-                        >
-                          <LayoutGrid />
-                          Templates
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="flex gap-2"
-                          onClick={handleDocumentUpload}
-                        >
-                          <FileText />
-                          Documents
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="flex gap-2"
-                          onClick={handleMediaUpload}
-                        >
-                          <MdOutlineVideoLibrary />
-                          Photos & Videos
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </Button>
-                  <Input
-                    placeholder="Type a message..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="bg-white/5 border-none hover:right-0 focus-visible:ring-0 text-white placeholder:text-gray-400"
-                  />
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 capitalize"
-                    onClick={handleSendMessage}
-                    disabled={message.length === 0}
-                  >
-                    Send
-                  </Button>
-                  <FlashResponsePopup
-                    responses={flashResponse}
-                    open={showFlashPopup}
-                    onClose={() => setShowFlashPopup(false)}
-                    onSelect={handleSelectResponse}
-                    searchTerm={message}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="p-4 border-t border-primary bg-[#4064AC80] ">
-                <div className="flex items-center gap-2 text-white justify-between">
-                  <div className="flex items-center gap-2 md:text-sm text-[8px]">
-                   
-                    You can&apos;t message this user as WhatsApp blocks business
-                    messages after 24 hours of no reply.
+                      Unblock
+                    </Button>
                   </div>
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 capitalize"
-                    onClick={() => {
-                      setDialog(true);
-                    }}
-                  >
-                    Send Templates
-                  </Button>
                 </div>
+              ) : getDifference ? (
+                <div className="p-4 border-t border-primary bg-primary rounded-b-[20px] relative">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept={
+                      fileType === "document"
+                        ? ".pdf,.doc,.docx,.txt"
+                        : "image/*,video/*"
+                    }
+                  />
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:text-white/90 hover:bg-white/10 aspect-square"
+                    >
+                      <DropdownMenu
+                        open={dropdownOpen}
+                        onOpenChange={setDropdownOpen}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="bg-transparent hover:bg-transparent hover:text-white"
+                          >
+                            <PlusCircle />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-blue-500 text-white border-0">
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={() => {
+                              setDialog(true);
+                              setDropdownOpen(false);
+                            }}
+                          >
+                            <LayoutGrid />
+                            Templates
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={handleDocumentUpload}
+                          >
+                            <FileText />
+                            Documents
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="flex gap-2"
+                            onClick={handleMediaUpload}
+                          >
+                            <MdOutlineVideoLibrary />
+                            Photos & Videos
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </Button>
+                    <Input
+                      placeholder="Type a message..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="bg-white/5 border-none hover:right-0 focus-visible:ring-0 text-white placeholder:text-gray-400"
+                    />
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700 capitalize"
+                      onClick={handleSendMessage}
+                      disabled={message.length === 0}
+                    >
+                      Send
+                    </Button>
+                    <FlashResponsePopup
+                      responses={flashResponse}
+                      open={showFlashPopup}
+                      onClose={() => setShowFlashPopup(false)}
+                      onSelect={handleSelectResponse}
+                      searchTerm={message}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 border-t border-primary bg-[#4064AC80]">
+                  <div className="flex items-center gap-2 text-white justify-between">
+                    <div className="flex items-center gap-2 md:text-sm text-[8px]">
+                      You can&apos;t message this user as WhatsApp blocks
+                      business messages after 24 hours of no reply.
+                    </div>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700 capitalize"
+                      onClick={() => setDialog(true)}
+                    >
+                      Send Templates
+                    </Button>
+                  </div>
+                </div>
+              )
+            ) : (
+              <div className="p-4 border-t border-primary text-white bg-[#4064AC80]">
+                This chat is not assigned to your account
               </div>
             )}
           </div>
@@ -602,9 +565,9 @@ const AllChats = () => {
                         alt="Profile"
                         className="h-16 w-16"
                       />
-                      <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
-                     >
-                        {selectedProspect?.name?.slice(0, 2).toUpperCase()??"" }
+                      <AvatarFallback className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center">
+                        {selectedProspect?.name?.slice(0, 2).toUpperCase() ??
+                          ""}
                       </AvatarFallback>
                     </Avatar>
                     <input
@@ -681,38 +644,8 @@ const AllChats = () => {
                   </div>
 
                   {/* Tags Section */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-center gap-3">
-                      <Select>
-                        <SelectTrigger className="w-[140px] bg-blue-600 text-white border-0">
-                          <SelectValue placeholder="Tags" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new-customer">
-                            New Customer
-                          </SelectItem>
-                          <SelectItem value="high-priority">
-                            High Priority
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="bg-blue-500/20 text-white hover:bg-blue-500/30"
-                      >
-                        New Customer
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="bg-blue-500/20 text-white hover:bg-blue-500/30"
-                      >
-                        High Priority
-                      </Button>
-                    </div>
+                  <div className="flex items-center justify-center gap-3">
+                    <TagsSelect />
                   </div>
                 </div>
 

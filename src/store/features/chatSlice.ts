@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { find, uniqBy } from "lodash";
+import {  uniqBy } from "lodash";
 
 // Define Chat Type
 export type Chat = {

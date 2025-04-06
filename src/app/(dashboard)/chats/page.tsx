@@ -63,9 +63,7 @@ const DashboardLayout = () => {
         <div className="md:flex items-center justify-between hidden">
           <div className="text-lg ml-3 font-semibold text-white">Filters</div>
           <div className="flex gap-6 items-center">
-            <p className="lg:text-base text-sm ml-3  text-white cursor-pointer">
-              Sort By: All{" "}
-            </p>
+           
          <Link  href={"/broadcast/create"}>
             <Button className="bg-blue-500 hover:bg-blue-400">
               <Plus className="h-4 w-4" />

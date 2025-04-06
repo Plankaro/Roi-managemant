@@ -15,7 +15,7 @@ import { useGetProspectQuery } from "@/store/features/apislice";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState,AppDispatch } from "@/store/store";
-import { selectProspect } from "@/store/features/prospect";
+import { clearSelectedProspects, selectProspect, setProspect } from "@/store/features/prospect";
 import FilterDropdown from "@/components/page/chats/filter-dropdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addProspect } from "@/store/features/prospect";
@@ -53,16 +53,20 @@ export function ChatListSkeleton() {
 const ChatLists = () => {
   const session:any = useSession();
   const dispatch = useDispatch<AppDispatch>();
-  const {data,isLoading} = useGetProspectQuery({})
+
   const [searchQuery, setSearchQuery] = useState("");
   const user = session?.data?.user?.user
-  const {selectedProspect,prospects} = useSelector((state: RootState) => state.Prospect);
-  console.log(data)
+  const {selectedProspect,prospects,filters} = useSelector((state: RootState) => state.Prospect);
+  console.log(JSON.stringify(filters))
+
+  const {data,isLoading} = useGetProspectQuery(filters)
 
   
   useEffect(() => {
     if (data) {
-      dispatch(addProspect(data));
+      dispatch(clearSelectedProspects())
+      dispatch(setProspect(data));
+
       //console.log("added");
     }
   }, [data, dispatch]);

@@ -1,182 +1,186 @@
-import { useState } from 'react';
-import { EllipsisVertical, Search, User, UserRound, CheckCircle2, XCircle } from 'lucide-react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
+import {
+  EllipsisVertical,
+  Search,
+  User,
+  UserRound,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import {
+  useGetTeamQuery,
+  useAsignChatMutation,
+} from "@/store/features/apislice";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { addProspect } from "@/store/features/prospect";
 
 // Mock data for agents with assignment status
-const agents = [
-  { id: 1, name: 'Agent Smith', assigned: true },
-  { id: 2, name: 'Agent Johnson', assigned: false },
-  { id: 3, name: 'Agent Brown', assigned: true },
-  { id: 4, name: 'Agent Jones', assigned: false },
-  { id: 5, name: 'Agent Davis', assigned: true },
-  { id: 6, name: 'Agent Wilson', assigned: false },
-  { id: 7, name: 'Agent Taylor', assigned: true },
-  { id: 8, name: 'Agent Anderson', assigned: false },
-];
 
 function AssignmentDropdown() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const session: any = useSession();
+  //console.log(session)
+  const dispatch = useDispatch();
+
+  const user = session?.data?.user?.user;
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: Teams } = useGetTeamQuery({});
+  const [assignChat] = useAsignChatMutation();
+
   const [assignedAgent, setAssignedAgent] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'assigned' | 'unassigned'>('all');
+  const { selectedProspect } = useSelector(
+    (state: RootState) => state.Prospect
+  );
 
+  console.log(selectedProspect);
+
+  const agents = Teams?.agents;
+
+  const assignedToMe = selectedProspect?.assignedToId === user.id;
   const filteredAgents = agents
-    .filter(agent =>
-      agent.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .filter(agent => {
-      if (filter === 'assigned') return agent.assigned;
-      if (filter === 'unassigned') return !agent.assigned;
-      return true;
-    });
+    ? agents.filter(
+        (agent: any) =>
+          agent.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          agent.id !== selectedProspect?.assignedToId // or selectedProspect?.assignedTo?.id if it's an object
+      )
+    : [];
 
-  const handleAssignToMe = () => {
-    setAssignedAgent('Current User');
+  //   const filteredAgents = agents
+  //     .filter((agent) =>
+  //       agent.name.toLowerCase().includes(searchQuery.toLowerCase())
+  //     )
+  //     .filter((agent) => {
+  //       if (filter === "assigned") return agent.assigned;
+  //       if (filter === "unassigned") return !agent.assigned;
+  //       return true;
+  //     });
+
+  
+
+  const handleAssignToAgent = async (agentid: string) => {
+    const promise = assignChat({
+      prospectId: selectedProspect?.id,
+      agentId: agentid,
+    }).unwrap();
+    try {
+      toast.promise(promise, {
+        loading: "Assigning...",
+        success: "Chat assigned successfully!",
+        error: (error: any) =>
+          error?.data?.message || "An unexpected error occurred.",
+      });
+      const prospect = await promise;
+// console.log(prospect)
+
+         dispatch(addProspect([prospect]));
+
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleAssignToAgent = (agentName: string) => {
-    setAssignedAgent(agentName);
-  };
+
 
   return (
-   
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
-            >
-              <EllipsisVertical className="h-6 w-6" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-64 bg-blue-500 text-white"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className=" text-white hover:bg-primary-700 transition-colors"
+        >
+          <EllipsisVertical className="h-6 w-6" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className="w-72 bg-[#1B2A48] border border-primary-700 rounded-lg shadow-xl"
+      >
+        <DropdownMenuItem className="focus:bg-primary-700 transition-colors p-4">
+          <a
+            href="/orders/123"
+            className="flex items-center gap-3 w-full text-white"
           >
-            <DropdownMenuItem className="focus:bg-blue-50">
-              <a
-                href="/orders/123"
-                className="flex items-center gap-3 w-full text-gray-700"
-              >
-                <img
-                  src="https://cdn.shopify.com/s/files/1/0533/2089/files/Shopify_icon.png"
-                  alt="shopify"
-                  className="w-5 h-5"
-                />
-                <span>Create Order</span>
-              </a>
-            </DropdownMenuItem>
-            
-            <DropdownMenuSeparator />
-            
-            <div className="px-2 py-1.5">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <UserRound className="h-4 w-4" />
-                <span>Assign To</span>
-              </div>
-            </div>
-            
-            <div className="p-2">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search agents..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 text-sm"
-                />
-              </div>
-            </div>
+            <Image
+              src="/icons/shopify.png"
+              alt="shopify"
+              width={21}
+              height={21}
+            />
+            <span className="font-medium">Create Order</span>
+          </a>
+        </DropdownMenuItem>
 
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2 rounded-none hover:bg-blue-50"
-              onClick={handleAssignToMe}
+        <DropdownMenuSeparator className="bg-primary-700" />
+
+        <div className="px-3 py-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-300" />
+            <Input
+              placeholder="Search agents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 text-sm bg-primary-800 border-primary-600 text-white placeholder:text-primary-400 focus:border-primary-500 focus:ring-primary-500"
+            />
+          </div>
+        </div>
+
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 rounded-none text-white hover:bg-primary-700 transition-colors px-3 py-2"
+          onClick={()=>handleAssignToAgent(user.id)}
+          disabled={assignedToMe}
+        >
+          <User className="h-4 w-4" />
+          <span className="text-sm">Assign to me</span>
+        </Button>
+
+        <DropdownMenuSeparator className="bg-primary-700" />
+
+        <div className="max-h-48 overflow-y-auto no-scrollbar scrollbar-thumb-primary-600 scrollbar-track-primary-800">
+          {filteredAgents.map((agent: any) => (
+            <DropdownMenuItem
+              key={agent.id}
+              className="focus:bg-primary-700 transition-colors px-3 py-2"
+              onClick={() => handleAssignToAgent(agent.id)}
             >
-              <User className="h-4 w-4" />
-              <span>Assign to me</span>
-            </Button>
-            
-            <DropdownMenuSeparator />
-            
-            <div className="h-40 overflow-y-auto">
-              {filteredAgents.map((agent) => (
-                <DropdownMenuItem
-                  key={agent.id}
-                  className="focus:bg-blue-50"
-                  onClick={() => handleAssignToAgent(agent.name)}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span className="pl-2">{agent.name}</span>
-                    {agent.assigned ? (
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-gray-400" />
-                    )}
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </div>
-
-            <DropdownMenuSeparator />
-
-            <div className="p-2 flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`flex-1 text-xs ${
-                  filter === 'all'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'hover:bg-blue-50'
-                }`}
-                onClick={() => setFilter('all')}
-              >
-                All
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`flex-1 text-xs ${
-                  filter === 'assigned'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'hover:bg-blue-50'
-                }`}
-                onClick={() => setFilter('assigned')}
-              >
-                Assigned
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`flex-1 text-xs ${
-                  filter === 'unassigned'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'hover:bg-blue-50'
-                }`}
-                onClick={() => setFilter('unassigned')}
-              >
-                Unassigned
-              </Button>
-            </div>
-
-            {assignedAgent && (
-              <div className="absolute bottom-0 right-0 left-0 flex items-center gap-2 px-4 py-2 bg-blue-500 text-white">
-                <User className="h-4 w-4" />
-                <span>Assigned to {assignedAgent}</span>
+              <div className="flex items-center justify-between w-full text-white">
+                <span className="text-sm">{agent.name}</span>
               </div>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuItem>
+          ))}
+        </div>
 
+        <DropdownMenuSeparator className="bg-primary-700" />
+
+        <div className="flex items-center gap-2 px-4 py-2.5  text-white rounded-b-lg">
+          <User className="h-4 w-4" />
+          <span className="text-sm font-medium">
+            {selectedProspect?.assignedToId !== null
+              ? `Assigned to ${
+                  assignedToMe
+                    ? "Current User"
+                    : selectedProspect?.assignedTo?.name
+                }`
+              : "Unassigned"}
+          </span>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
