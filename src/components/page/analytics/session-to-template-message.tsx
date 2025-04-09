@@ -1,4 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import analytics from "@/store/features/analytics";
+import { useGetEngagementAnalyticsQuery } from "@/store/features/apislice";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from "recharts"
 
 interface SessionStatsProps {
@@ -26,13 +30,18 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export default function SessionStats() {
+  const {analytics}=useSelector((state: RootState) => state);
+  const {data} = useGetEngagementAnalyticsQuery({
+    startDate: new Date(analytics.startDate).toISOString(),
+  endDate: new Date(analytics.endDate).toISOString(),
+  })
   const chartData = [
-    { name: 'Session Messages', value:100 },
-    { name: 'Template Messages', value: 200 }
+    { name: 'Session Messages', value: data?.sessionMessage??0 },
+    { name: 'Template Messages', value: data?.templateMessage??0 },
   ];
 
-  const totalMessages = chartData.reduce((acc, curr) => acc + curr.value, 0);
-  const average = ((100 / 200) * 100).toFixed(0);
+  const totalMessages = data?.totalMessages??0; 
+
 
   return (
     <Card className="bg-backgroundColor border border-primary  text-white">
@@ -40,7 +49,7 @@ export default function SessionStats() {
         <CardTitle className="flex items-center justify-between">
           <span>Session Messages to Template Messages</span>
           <div className="text-sm font-normal text-muted-foreground">
-            Session Messages: {544}
+            Session Messages: {data?.sessionMessage??0}
           </div>
         </CardTitle>
       </CardHeader>

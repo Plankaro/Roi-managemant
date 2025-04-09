@@ -1,15 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useGetEngagementAnalyticsQuery } from "@/store/features/apislice";
+import { RootState } from "@/store/store";
+
+import { useSelector } from "react-redux";
 import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from "recharts"
 
-interface MessageStatsProps {
-  data: {
-    sent: number;
-    delivered: number;
-    read: number;
-    replied: number;
-    failed: number;
-  }
-}
 
 const COLORS = ['#4ade80', '#fb923c', '#fbbf24', '#1e293b', '#ef4444'];
 
@@ -29,15 +25,20 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export default function MessageStats() {
+    const {analytics}=useSelector((state: RootState) => state);
+      const {data} = useGetEngagementAnalyticsQuery({
+        startDate: new Date(analytics.startDate).toISOString(),
+      endDate: new Date(analytics.endDate).toISOString(),
+      })
   const chartData = [
-    { name: 'Messages Sent', value: 200 },
-    { name: 'Messages Delivered', value: 400 },
-    { name: 'Messages Read', value:  400},
-    { name: 'Messages Replied', value: 311},
-    { name: 'Messages Failed', value: 334 }
+    { name: 'Messages Sent', value: (data?.sentMessage??0 + data?.deliveredMessage??0 + data?.readMessage??0) },
+    { name: 'Messages Delivered', value: (data?.deliveredMessage??0 + data?.readMessage??0) },
+    { name: 'Messages Read', value:  data?.readMessage??0 },
+    { name: 'Messages Skipped',value:data?.skippedMessage??0 },
+    { name: 'Messages Failed', value: data?.failedMessage??0 },
   ];
 
-  const totalMessages = chartData.reduce((acc, curr) => acc + curr.value, 0);
+  const totalMessages = data?.totalMessages??0;
 
   return (
     <Card className="bg-backgroundColor border border-primary  text-white ">
@@ -45,7 +46,7 @@ export default function MessageStats() {
         <CardTitle className="flex items-center justify-between">
           <span>Messages Sent to Messages Read</span>
           <div className="text-sm font-normal text-muted-foreground">
-            Messages Sent: 988
+            Messages Sent: {data?.sentMessage??0}
           </div>
         </CardTitle>
       </CardHeader>
@@ -60,7 +61,8 @@ export default function MessageStats() {
               <div className="flex lg:flex-col lg:gap-0 gap-3">
                 <span className="text-xs font-medium">{entry.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {((entry.value / totalMessages) * 100).toFixed(1)}%
+                { totalMessages ? ((entry.value / totalMessages) * 100).toFixed(1) : "0" }%
+
                 </span>
               </div>
             </div>

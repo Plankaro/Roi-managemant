@@ -14,13 +14,14 @@ import { useDeleteFlashResponseMutation,useGetFlashResponseQuery,useUpdateFlashR
 
 
 export default function FlashResponsesPage() {
-    const {data:flashresponse} = useGetFlashResponseQuery({})
+    const {data:flashresponse,isLoading} = useGetFlashResponseQuery({})
     //console.log(flashresponse)
     const [createMutation] = useCreateFlashResponseMutation()
     const [deleteMutation] = useDeleteFlashResponseMutation()
     const [updateMutation] = useUpdateFlashResponseMutation()
 
   const [searchQuery, setSearchQuery] = useState("");
+
  
 //console.log(flashresponse)
   const filteredResponses = flashresponse && flashresponse.filter(
@@ -30,6 +31,7 @@ export default function FlashResponsesPage() {
       response.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  console.log(filteredResponses)
   
   const handleAddResponse = async (newResponse:any) => {
    await createMutation(newResponse)
@@ -85,10 +87,10 @@ export default function FlashResponsesPage() {
           </div>
         </div>
 
-        {(flashresponse?.length ?? 0) === 0 ? (
-          <div className="absolute bottom-full left-0 right-0 bg-gradient-to-br from-indigo-950 to-purple-900 border-t border-white/10 rounded-t-lg shadow-lg p-8 flex flex-col items-center justify-center">
-          <div className="bg-yellow-500/20 p-4 rounded-full mb-4">
-            <Zap className="h-10 w-10 text-yellow-500" />
+        {!flashresponse  || flashresponse?.length === 0 ? (
+          <div className=" bottom-full left-0 right-0  rounded-t-lg  h-[60vh]  p-8 flex flex-col items-center justify-center">
+          <div className="p-4 rounded-full mb-4">
+            <Zap className="h-20 w-20 text-yellow-500" />
           </div>
           <h2 className="text-xl font-bold text-white mb-2">No Flash Responses Added Yet!</h2>
           <p className="text-center text-gray-300 mb-6 max-w-md">
@@ -97,7 +99,7 @@ export default function FlashResponsesPage() {
             first quick reply now!
           </p>
           <FlashResponseCreateModal onSave={handleAddResponse}>
-          <Button  className="bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Button  className="bg-blue-500 hover:bg-blue-600 text-white">
             + Create Flash Response
           </Button>
           </FlashResponseCreateModal>

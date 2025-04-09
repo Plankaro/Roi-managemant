@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import ConversionsAnalytics from "./conversion-ctr";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bentogrid";

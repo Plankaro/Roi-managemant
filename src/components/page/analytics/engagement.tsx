@@ -1,16 +1,26 @@
+"use client";
 import { BentoGrid, BentoGridItem } from '@/components/ui/bentogrid'
 import React from 'react'
 import MessageStats from './message-status';
 import SessionStats from './session-to-template-message';
+import { useSelector } from 'react-redux';
+import { useGetEngagementAnalyticsQuery } from '@/store/features/apislice';
+import { RootState } from '@/store/store';
+
 
 function EngagementAnalytics() {
+    const {analytics}=useSelector((state: RootState) => state);
+    const {data} = useGetEngagementAnalyticsQuery({
+      startDate: new Date(analytics.startDate).toISOString(),
+    endDate: new Date(analytics.endDate).toISOString(),
+    })
+    console.log(data);
     const metrics = [
-        { label: "Total Messages", value: "12" },
-        { label: "New leads Interacted", value: `12` },
-        { label: "Agents  interaction time", value: "12" },
-        { label: "Automated interaction time", value: "12" },
-        { label: "Total agents messages", value: "12" },
-        { label: "Total automated messages", value: "12" },
+        { label: "Template Messages", value: data?.templateMessage??0},
+        { label: "Session Messages", value: data?.sessionMessage??0 },
+        { label: "Leads", value: data?.customerCount??0 },
+        { label: "Engagement", value: data?.engagementCount??0 },  
+       
       ];
 const gridComponents = [
     <MessageStats key={"messagestats"}/>,
@@ -18,7 +28,7 @@ const gridComponents = [
 ]    
   return (
    <div className="overflow-scroll no-scrollbar h-[calc(100vh-250px)]">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6 ">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 ">
           {metrics.map((metric, index) => (
             <div
               key={index}

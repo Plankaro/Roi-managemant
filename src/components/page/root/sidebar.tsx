@@ -27,13 +27,13 @@ import { FaBoltLightning } from "react-icons/fa6";
 import { IoMegaphone } from "react-icons/io5";
 
 export const sidebarItems = [
-  
+  { icon: LineChart, label: "Analytics", slug: "/" },
   { icon: MessageSquare, label: "Chats", slug: "/chats" },
   { icon: FaBoltLightning, label: "Flash Response", slug: "/flashresponse" },
   { icon: IoMegaphone, label: "Campaigns:", slug: "/campaigns" },
   { icon: BetweenHorizonalEnd, label: "Broadcast", slug: "/broadcast" },
   { icon: AIBuilder, label: "AI Builder", slug: "/ai-builder" },
-  { icon: LineChart, label: "Analytics", slug: "/" },
+  
   { icon: RiAccountPinBoxFill, label: "Prospects", slug: "/prospects" },
   { icon: Users, label: "Teams", slug: "/teams" },
 ];

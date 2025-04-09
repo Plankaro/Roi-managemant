@@ -1,25 +1,41 @@
+"use client";
 import React from "react";
 import MessageCountChart from "./message-count";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bentogrid";
 import { EngagementComparisonChart } from "./message-automated-chart";
 import { AgentMessagesChart } from "./agent-message-analytics";
 import AbondnedAnalytics from "./abondned-chart";
+import { useGetChatAnalyticsQuery } from "@/store/features/apislice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
-const gridComponents = [
+
+
+
+function ChatAnalytics() {
+  const {analytics}=useSelector((state: RootState) => state);
+  const {data} = useGetChatAnalyticsQuery({
+    startDate: new Date(analytics.startDate).toISOString(),
+  endDate: new Date(analytics.endDate).toISOString(),
+  });
+
+  console.log(data);
+
+  const metrics = [
+    { label: "Total messages", value: "12" },
+    { label: "Session messages", value: `12` },
+    { label: "Engagement", value: "12" },
+    { label: "Automated interaction time", value: "12" },
+    { label: "Total agents messages", value: "12" },
+    { label: "Total automated messages", value: "12" },
+  ];
+
+  const gridComponents = [
     <MessageCountChart key="message-count" />,
     <EngagementComparisonChart key="engagement" />,
     <AgentMessagesChart key="agent"/>,
     <AbondnedAnalytics key = "abondned"/>
 ];
-function ChatAnalytics() {
-  const metrics = [
-    { label: "Total Messages", value: "12" },
-    { label: "New leads Interacted", value: `12` },
-    { label: "Agents  interaction time", value: "12" },
-    { label: "Automated interaction time", value: "12" },
-    { label: "Total agents messages", value: "12" },
-    { label: "Total automated messages", value: "12" },
-  ];
 
  
   return (

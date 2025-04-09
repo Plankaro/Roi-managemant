@@ -340,8 +340,39 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
-
-  }),
+    getEcommerceAnalytics: builder.query({
+      query: ({ startDate, endDate }) => ({
+        url: "/analytics/ecommerce",
+        params: { startDate, endDate },
+      }),
+    }),
+    getEngagementAnalytics: builder.query({
+      query: ({ startDate, endDate }) => ({
+        url: "/analytics/engagement",
+        params: { startDate, endDate },
+      }),
+    }),
+    getChatAnalytics: builder.query({
+      query: ({ startDate, endDate }) => ({
+        url: "/analytics/customers",
+        params: { startDate, endDate },
+      }),
+    }),
+    createTemplate: builder.mutation({
+      query: (body) => ({
+        url: "/template",
+        method: "POST",
+        body,
+      }),
+    }),
+    sendWhatsappMedia: builder.mutation({
+      query: (body) => ({
+        url: "/template/upload-media",
+        method: "POST",
+        body,
+      }),
+    }),
+  }),    
 });
 
 export const {
@@ -388,5 +419,11 @@ export const {
   useGetSpecificTeamQuery,
   useCreateCampaignMutation,
   useGetCampaignQuery,
-  useAsignChatMutation
+  useAsignChatMutation,
+  useGetEcommerceAnalyticsQuery,
+  useGetEngagementAnalyticsQuery,
+  useGetChatAnalyticsQuery,
+  useCreateTemplateMutation,
+  useSendWhatsappMediaMutation
+
 } = apiSlice;

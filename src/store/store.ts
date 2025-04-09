@@ -5,6 +5,7 @@ import chatReducer from "./features/chatSlice";
 import ProspectReducer from "./features/prospect";
 import cartReducer from "./features/cartSlice";
 import CustomerProspectReducer from "./features/customersSlice";
+import analyticsReducer from "./features/analytics";
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
     Prospect: ProspectReducer,
     cart: cartReducer,
     chat: chatReducer,
-    customerProspect: CustomerProspectReducer
+    customerProspect: CustomerProspectReducer,
+    analytics: analyticsReducer
 
   },
 

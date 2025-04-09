@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import { Search } from "lucide-react"
+import { Search, Megaphone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -11,41 +11,62 @@ import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useGetAllBroadcastsQuery } from "@/store/features/apislice"
-
+import { useState } from "react"
 
 export default function BroadcastPage() {
   const { data: broadcasts, isLoading } = useGetAllBroadcastsQuery({})
-  //console.log(broadcasts)
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const hasBroadcasts = broadcasts && broadcasts.length > 0
+const filteredBroadcasts = broadcasts && broadcasts.filter((broadcast: any) => broadcast.name.toLowerCase().includes(searchQuery.toLowerCase()));
   return (
-    <div className=" ">
-      <div className=" mx-auto p-4 space-y-6">
+    <div className="">
+      <div className="mx-auto p-4 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white">Broadcast</h1>
           <Link href="/broadcast/create">
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            +<span className="md:block hidden"> Broadcast Campaigns</span>
-          </Button></Link>
-          
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              +<span className="md:block hidden"> Broadcast Campaigns</span>
+            </Button>
+          </Link>
         </div>
 
-        {/* Search */}
-        <div className="relative bg-transparent border-white border-2 lg:w-1/2 rounded-lg ">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white" />
-          <Input placeholder="Search here..." className="pl-9 bg-transparent border-0 text-white " />
-        </div>
+        {/* Search - Only show if there are broadcasts */}
+        {hasBroadcasts && (
+          <div className="relative bg-transparent border-white border-2 lg:w-1/2 rounded-lg">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white" />
+            <Input placeholder="Search here..." className="pl-9 bg-transparent border-0 text-white"  value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+          </div>
+        )}
 
-        {/* Broadcast Grid */}
-        <ScrollArea className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 h-[calc(100vh-270px)] no-scrollbar overflow-y-auto">
-          {isLoading
-            ? // Skeleton loading state
-              Array(8)
-                .fill(0)
-                .map((_, i) => <BroadcastCardSkeleton key={i} />)
-            : // Actual content from API
-              broadcasts?.map((broadcast:any) => <BroadcastCard key={broadcast.id} broadcast={broadcast} />)}
-        </ScrollArea>
+        {/* Empty State */}
+        {!isLoading && !hasBroadcasts ? (
+          <div className="bottom-full left-0 right-0 rounded-t-lg h-[60vh] p-8 flex flex-col items-center justify-center">
+            <div className="p-4 rounded-full mb-4">
+              <Megaphone className="h-20 w-20 text-blue-500" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">No Broadcast Campaigns Yet!</h2>
+            <p className="text-center text-gray-300 mb-6 max-w-md">
+              It looks like you haven&apos;t created any Broadcast Campaigns yet. Broadcasts allow you to send messages
+              to multiple contacts at once, perfect for announcements, promotions, or updates. Start by clicking
+              &apos;Create Broadcast&apos; to reach your audience!
+            </p>
+            <Link href="/broadcast/create">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">+ Create Broadcast Campaign</Button>
+            </Link>
+          </div>
+        ) : (
+          /* Broadcast Grid */
+          <ScrollArea className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 h-[calc(100vh-270px)] no-scrollbar overflow-y-auto">
+            {isLoading
+              ? // Skeleton loading state
+                Array(8)
+                  .fill(0)
+                  .map((_, i) => <BroadcastCardSkeleton key={i} />)
+              : // Actual content from API
+                filteredBroadcasts?.map((filteredBroadcast: any) => <BroadcastCard key={filteredBroadcast.id} broadcast={filteredBroadcast} />)}
+          </ScrollArea>
+        )}
       </div>
     </div>
   )
@@ -60,11 +81,10 @@ function BroadcastCard({ broadcast }: { broadcast: any }) {
   const failedPercentage = Math.round((broadcast.failedCount / totalMessages) * 100)
 
   // Format dates
-  const createdDate = broadcast.isScheduled ? new Date(broadcast.scheduledDate) : new Date(broadcast.createdAt) || new Date()
+  const createdDate = broadcast.isScheduled
+    ? new Date(broadcast.scheduledDate)
+    : new Date(broadcast.createdAt) || new Date()
   const formattedCreatedDate = `${createdDate.toLocaleDateString()}, ${createdDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-
-  
-  
 
   return (
     <Link href={`/broadcast/${broadcast.id}`}>
@@ -77,9 +97,9 @@ function BroadcastCard({ broadcast }: { broadcast: any }) {
                 {broadcast.type || "Transactional"}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-1">
+            {/* <p className="text-sm text-muted-foreground line-clamp-1">
               {broadcast.description || "Content of the broadcast..."}
-            </p>
+            </p> */}
           </div>
 
           <div className="space-y-1">

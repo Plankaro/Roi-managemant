@@ -36,7 +36,7 @@ interface CampaignStats {
   status: string
 }
 
-export default function BroadcastPage() {
+export default function CampaignsPage() {
   const { data: Campaigns, isLoading } = useGetCampaignQuery({})
   const [search, setSearch] = useState("")
 
@@ -67,15 +67,15 @@ export default function BroadcastPage() {
           />
         </div>
 
-        {/* Broadcast Grid */}
+        {/* Campaigns Grid */}
         <div className="grid no-scrollbar grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 overflow-auto h-[calc(100vh-270px)]">
           {isLoading
             ? Array(8)
                 .fill(0)
-                .map((_, i) => <BroadcastCardSkeleton key={i} />)
-            : filteredCampaigns.map((broadcast: CampaignStats) => (
-                <div key={broadcast.id} className="h-full">
-                  <BroadcastCard broadcast={broadcast} />
+                .map((_, i) => <CampaignsCardSkeleton key={i} />)
+            : filteredCampaigns.map((Campaigns: CampaignStats) => (
+                <div key={Campaigns.id} className="h-full">
+                  <CampaignsCard Campaigns={Campaigns} />
                 </div>
               ))}
         </div>
@@ -84,14 +84,14 @@ export default function BroadcastPage() {
   )
 }
 
-function BroadcastCard({ broadcast }: { broadcast: CampaignStats }) {
+function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
   const {
     totalMessages,
     deliveredCount,
     readCount,
     skippedCount,
     failedCount,
-  } = broadcast
+  } = Campaigns
 
   const deliveredPercentage =
     totalMessages > 0 ? Math.round((deliveredCount / totalMessages) * 100) : 0
@@ -108,13 +108,13 @@ function BroadcastCard({ broadcast }: { broadcast: CampaignStats }) {
         {/* Title and Badge */}
         <div className="flex items-center justify-between">
           <h3 className="font-medium text-lg line-clamp-1">
-            {broadcast.name || "Marketing..."}
+            {Campaigns.name || "Marketing..."}
           </h3>
           <Badge
             variant="outline"
             className="bg-[#3b3b6b] text-white text-xs px-3 py-1 rounded-full border-none"
           >
-            {broadcast.type || "Promotional"}
+            {Campaigns.type || "Promotional"}
           </Badge>
         </div>
 
@@ -145,7 +145,7 @@ function BroadcastCard({ broadcast }: { broadcast: CampaignStats }) {
                 variant="ghost"
                 className="h-8 px-2 text-white hover:text-white flex items-center gap-1 hover:bg-blue-900/20"
               >
-                {broadcast.status || "ACTIVE"}
+                {Campaigns.status || "ACTIVE"}
                 <ChevronDown className="h-4 w-4 opacity-70" />
               </Button>
             </DropdownMenuTrigger>
@@ -169,7 +169,7 @@ function BroadcastCard({ broadcast }: { broadcast: CampaignStats }) {
         {/* Trigger Set */}
         <div className="flex justify-between items-center">
           <p className="text-blue-400 text-sm">Trigger Set</p>
-          <p className="text-sm">Checkout Create</p>
+          <p className="text-sm">{Campaigns.trigger}</p>
         </div>
 
         {/* Metrics */}
@@ -244,7 +244,7 @@ function MetricRow({
   )
 }
 
-function BroadcastCardSkeleton() {
+function CampaignsCardSkeleton() {
   return (
     <Card className="bg-backgroundColor border-primary text-white rounded-xl h-full">
       <CardContent className="p-6 space-y-4">
