@@ -25,17 +25,21 @@ import { useSession } from "next-auth/react";
 import { handleSignOut } from "@/app/(auth)/sign-in/action";
 import { FaBoltLightning } from "react-icons/fa6";
 import { IoMegaphone } from "react-icons/io5";
+import { CgTemplate } from "react-icons/cg";
 
 export const sidebarItems = [
   { icon: LineChart, label: "Analytics", slug: "/" },
   { icon: MessageSquare, label: "Chats", slug: "/chats" },
+  { icon: CgTemplate, label: "Templates", slug: "/templates" },
   { icon: FaBoltLightning, label: "Flash Response", slug: "/flashresponse" },
-  { icon: IoMegaphone, label: "Campaigns:", slug: "/campaigns" },
-  { icon: BetweenHorizonalEnd, label: "Broadcast", slug: "/broadcast" },
-  { icon: AIBuilder, label: "AI Builder", slug: "/ai-builder" },
-  
   { icon: RiAccountPinBoxFill, label: "Prospects", slug: "/prospects" },
   { icon: Users, label: "Teams", slug: "/teams" },
+  { icon: BetweenHorizonalEnd, label: "Broadcast", slug: "/broadcast" },
+  { icon: IoMegaphone, label: "Campaigns:", slug: "/campaigns" },
+ 
+  { icon: AIBuilder, label: "bots", slug: "/bots" },
+  
+  
 ];
 
 const Sidebar = () => {

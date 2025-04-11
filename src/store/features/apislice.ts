@@ -12,7 +12,7 @@ export const apiSlice = createApi({
     "getchatsById",
     "flashresponse",
     "getbroadcastbyid",
-    
+    "bots",
   ], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
@@ -99,13 +99,13 @@ export const apiSlice = createApi({
     getProspect: builder.query({
       query: (filters: Filters) => {
         const queryParams = new URLSearchParams();
-    
+
         Object.entries(filters).forEach(([key, values]) => {
           values.forEach((value: string) => {
             queryParams.append(key, value);
           });
         });
-    
+
         return {
           url: `/prospects?${queryParams.toString()}`,
           method: "GET",
@@ -334,7 +334,7 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-    getCampaign:builder.query({
+    getCampaign: builder.query({
       query: () => ({
         url: "/campaign",
         method: "GET",
@@ -354,7 +354,7 @@ export const apiSlice = createApi({
     }),
     getChatAnalytics: builder.query({
       query: ({ startDate, endDate }) => ({
-        url: "/analytics/customers",
+        url: "/analytics/chat",
         params: { startDate, endDate },
       }),
     }),
@@ -372,7 +372,35 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-  }),    
+    getAllTemplatesIncludingPending: builder.query({
+      query: () => ({
+        url: "/template",
+        method: "GET",
+      }),
+    }),
+    deleteTemplate: builder.mutation({
+      query: (name: string) => ({
+        url: `/template`,
+        method: "DELETE",
+        params: { name }, // sends ?name=template-name
+      }),
+    }),
+    findBots: builder.query({
+      query: () => ({
+        url: "/bot",
+        method: "GET",
+      }),
+      providesTags: ["bots"],
+    }),
+    createOrUpdateBot: builder.mutation({
+      query: (body) => ({
+        url: "/bot",
+        method: "POST",
+        body, // 👈 include the body here
+      }),
+      invalidatesTags: ["bots"],
+    }),
+  }),
 });
 
 export const {
@@ -424,6 +452,9 @@ export const {
   useGetEngagementAnalyticsQuery,
   useGetChatAnalyticsQuery,
   useCreateTemplateMutation,
-  useSendWhatsappMediaMutation
-
+  useSendWhatsappMediaMutation,
+  useGetAllTemplatesIncludingPendingQuery,
+  useDeleteTemplateMutation,
+  useFindBotsQuery,
+  useCreateOrUpdateBotMutation,
 } = apiSlice;

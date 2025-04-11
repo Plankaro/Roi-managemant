@@ -22,9 +22,8 @@ function ChatAnalytics() {
   console.log(data);
 
   const metrics = [
-    { label: "Total messages", value: "12" },
-    { label: "Session messages", value: `12` },
-    { label: "Engagement", value: "12" },
+   
+    { label: "Engagement", value: data?.totalEngagements??0 },
     { label: "Automated interaction time", value: "12" },
     { label: "Total agents messages", value: "12" },
     { label: "Total automated messages", value: "12" },
@@ -40,7 +39,7 @@ function ChatAnalytics() {
  
   return (
     <div className="overflow-scroll no-scrollbar h-[calc(100vh-250px)]">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6 ">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 ">
         {metrics.map((metric, index) => (
           <div
             key={index}

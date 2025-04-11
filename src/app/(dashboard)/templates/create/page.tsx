@@ -61,7 +61,7 @@ export default function TemplateForm() {
   const [headerPreview, setHeaderPreview] = useState<string>("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [uploadFiles] = useUploadFilesMutation();
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [createTemplate] = useCreateTemplateMutation();
   const [sendWhatsappMedia] = useSendWhatsappMediaMutation();

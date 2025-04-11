@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardHeader } from "@/components/ui/card";
+import { useGetChatAnalyticsQuery } from "@/store/features/apislice";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 import {
   Bar,
   BarChart,
@@ -22,17 +25,23 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 function ProfileChart() {
+  const {analytics}=useSelector((state: RootState) => state);
+    const {data:chat} = useGetChatAnalyticsQuery({
+      startDate: new Date(analytics.startDate).toISOString(),
+    endDate: new Date(analytics.endDate).toISOString(),
+    });
+  
   //   const totalProfit = revenue - expense;
 
   const data = [
     {
       name: "Total chat",
-      total: 300,
+      total: chat?.totalMessages??0,
       fill: "#4285F4", //
     },
     {
       name: "Automated Chat",
-      total: 200,
+      total: chat?.automatedMessages??0,
       fill: "#1E3A8A",
     },
   ];

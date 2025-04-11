@@ -411,8 +411,8 @@ const AllChats = () => {
             <Messages isLoading={isChatsLoading} />
 
             {/* Input */}
-            {selectedProspect.assignedToId === user.id ? (
-              selectedProspect.is_blocked ? (
+            {selectedProspect?.assignedToId === user?.id ? (
+              selectedProspect?.is_blocked ? (
                 <div className="p-4 border-t border-primary bg-[#4064AC80]">
                   <div className="flex items-center gap-2 text-white justify-between">
                     <div className="flex items-center gap-2 text-sm">
