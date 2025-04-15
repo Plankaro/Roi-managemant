@@ -28,19 +28,18 @@ import { IoMegaphone } from "react-icons/io5";
 import { CgTemplate } from "react-icons/cg";
 
 export const sidebarItems = [
-  { icon: LineChart, label: "Analytics", slug: "/" },
-  { icon: MessageSquare, label: "Chats", slug: "/chats" },
-  { icon: CgTemplate, label: "Templates", slug: "/templates" },
-  { icon: FaBoltLightning, label: "Flash Response", slug: "/flashresponse" },
-  { icon: RiAccountPinBoxFill, label: "Prospects", slug: "/prospects" },
-  { icon: Users, label: "Teams", slug: "/teams" },
-  { icon: BetweenHorizonalEnd, label: "Broadcast", slug: "/broadcast" },
-  { icon: IoMegaphone, label: "Campaigns:", slug: "/campaigns" },
- 
-  { icon: AIBuilder, label: "bots", slug: "/bots" },
-  
-  
+  { icon: LineChart, label: "Analytics", slugs: ["/", "/engagement-analytics", "/chat-analytics"] },
+  { icon: MessageSquare, label: "Chats", slugs: ["/chats", "/orders/*"] },
+  { icon: CgTemplate, label: "Templates", slugs: ["/templates"] },
+  { icon: FaBoltLightning, label: "Flash Response", slugs: ["/flashresponse"] },
+  { icon: RiAccountPinBoxFill, label: "Prospects", slugs: ["/prospects"] },
+  { icon: Users, label: "Teams", slugs: ["/teams"] },
+  { icon: BetweenHorizonalEnd, label: "Broadcast", slugs: ["/broadcast"] },
+  { icon: IoMegaphone, label: "Campaigns", slugs: ["/campaigns"] },
+  { icon: AIBuilder, label: "Bots", slugs: ["/bots"] },
 ];
+
+
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -49,6 +48,15 @@ const Sidebar = () => {
     (state: RootState) => state.Prospect.openMenuModal
   );
   const dispatch = useDispatch();
+  const isPathActive = (slugs: string[]) => {
+    return slugs.some(slug => {
+      if (slug.endsWith('/*')) {
+        const basePath = slug.slice(0, -2);
+        return pathname.startsWith(basePath);
+      }
+      return pathname === slug || pathname.startsWith(`${slug}/`);
+    });
+  };
 
   return (
     <div
@@ -90,11 +98,11 @@ const Sidebar = () => {
         </div>
         {sidebarItems.map((item: any) => (
           <Link
-            href={item.slug}
+            href={item.slugs[0]}
             key={item.label}
             className={cn(
-              "flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors xl:justify-normal ",
-              pathname === item.slug || pathname.startsWith(`${item.slug}/`)
+              "flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors xl:justify-normal",
+              isPathActive(item.slugs)
                 ? "bg-blue-500 text-white"
                 : "text-gray-50 hover:text-white hover:bg-white/10"
             )}

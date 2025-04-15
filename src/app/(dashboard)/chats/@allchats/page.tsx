@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -48,6 +49,7 @@ import {
   addProspect,
   clearlastChat,
   clearSelectedProspects,
+  markLastChatAsRead
 } from "@/store/features/prospect";
 import { getLastOnlineStatus } from "@/lib/last_online";
 
@@ -100,11 +102,13 @@ const AllChats = () => {
     prospectId: selectedProspect?.id ?? "",
   });
 
+
   useEffect(() => {
     if (chats) {
       dispatch(setChats(chats));
+
     }
-  });
+  },[chats]);
 
   const [message, setMessage] = useState("");
   const [showFlashPopup, setShowFlashPopup] = useState(false);
@@ -213,6 +217,7 @@ const AllChats = () => {
     }
   };
 
+
   useEffect(() => {
     if (message.startsWith("/")) {
       setShowFlashPopup(true);
@@ -302,7 +307,7 @@ const AllChats = () => {
         toast.error("Invalid field value");
         return;
       }
-      const promise = updateProspect({ id: selectedProspect?.id, body });
+      const promise = updateProspect({ id: selectedProspect?.id, body }).unwrap();
       toast.promise(promise, {
         loading: "Updating...",
         success: "Details updated successfully!",
@@ -635,7 +640,7 @@ const AllChats = () => {
                       <SelectContent>
                         <SelectItem value="LEAD">Lead</SelectItem>
                         <SelectItem value="LOST">Lost</SelectItem>
-                        <SelectItem value=" NEGOTIATION">
+                        <SelectItem value="NEGOTIATION">
                           Negotiation
                         </SelectItem>
                         <SelectItem value="OTHER">Other</SelectItem>

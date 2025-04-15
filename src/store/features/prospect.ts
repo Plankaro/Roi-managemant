@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { find, findIndex, merge } from "lodash";
 
 // Define Prospect type
@@ -34,6 +35,10 @@ export type Prospect = {
   phoneNo: string;
   lead: string;
   last_Online: Date;
+  assignedTo?: {
+    id: string;
+    name: string;
+  };
   assignedToId?: string;
   businessId?: string;
   buisnessNo: string;
@@ -182,6 +187,24 @@ const ProspectSlice = createSlice({
         console.warn("No prospect found with id:", action.payload);
       }
     },
+    markLastChatAsRead: (state) => {
+      const selectedProspect = state.selectedProspect;
+      // Only proceed if selectedProspect exists and has a non-empty chats array
+     
+    
+      // Only try to find and update the prospect if selectedProspect exists
+      if (selectedProspect) {
+        const prospect = find(state.prospects, { id: selectedProspect.id });
+        // Ensure prospect exists and its chats array is defined and non-empty
+        if (prospect && prospect.chats && prospect.chats.length > 0) {
+          prospect.chats[0].Status = "read";
+        }
+      }
+    },
+    
+    
+    
+    
 
     // Update filters
     toggleFilterOption: (state, action: PayloadAction<{ filterKey: keyof Filters; value: string }>) => {
@@ -239,6 +262,7 @@ export const {
   toggleFilterOption,
   clearAllFilters,
   setProspect,
+  markLastChatAsRead
 } = ProspectSlice.actions;
 
 export default ProspectSlice.reducer;

@@ -1,46 +1,60 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+"use client"
 
-import {
-  Search,
-  Plus,
-  Edit2,
-  Trash2,
-  Mail,
-  Pencil,
-  CircleEllipsis,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { useGetTeamQuery,useDeleteTeamMutation } from "@/store/features/apislice";
-import toast from "react-hot-toast";
+import type React from "react"
+
+import { Search, Plus, Edit2, Trash2, Mail, Pencil, CircleEllipsis } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import Image from "next/image"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import Link from "next/link"
+import { useGetTeamQuery, useDeleteTeamMutation } from "@/store/features/apislice"
+import toast from "react-hot-toast"
+import { useState } from "react"
 
 export default function Dashboard() {
-  const { data } = useGetTeamQuery({});
-  console.log(data);
-  const [deleteTeam] = useDeleteTeamMutation();
+  const { data } = useGetTeamQuery({})
+  console.log(data)
+  const [deleteTeam] = useDeleteTeamMutation()
 
-  
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
+
+  const filteredData = () => {
+    if (!data) return { admin: null, agents: [] }
+
+    const filteredAdmin =
+      data.admin &&
+      (data.admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        data.admin.email.toLowerCase().includes(searchQuery.toLowerCase()))
+        ? data.admin
+        : null
+
+    const filteredAgents = data.agents.filter(
+      (agent: any) =>
+        agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        agent.email.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
+
+    return { admin: filteredAdmin, agents: filteredAgents }
+  }
+
+  const filtered = filteredData()
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this team?")) {
-      const promise = deleteTeam({ id });
+      const promise = deleteTeam({ id }).unwrap()
       toast.promise(promise, {
         loading: "Deleting...",
         success: "Team deleted successfully!",
-        error: (error: any) =>
-          error?.data?.message || "An unexpected error occurred.",
-      });
+        error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+      })
     }
-  };
+  }
 
   return (
     <div className="">
@@ -53,7 +67,8 @@ export default function Dashboard() {
               <Input
                 className="pl-10 bg-[#1e1e3f]  border-none rounded-full text-sm h-9 text-white"
                 placeholder="Search here..."
-
+                value={searchQuery}
+                onChange={handleSearch}
               />
             </div>
             <Link href={"/teams/create"}>
@@ -69,39 +84,41 @@ export default function Dashboard() {
           <Input
             className="pl-10 bg-[#1e1e3f]  border-none rounded-full text-sm h-9 text-white"
             placeholder="Search here..."
+            value={searchQuery}
+            onChange={handleSearch}
           />
         </div>
 
         <div className=" no-scrollbar overflow-y-scroll h-[calc(100vh-200px)] ">
           <div className="md:grid hidden  xl:grid-col-4 lg:grid-cols-3 md:grid-cols-2  gap-5">
-            {data && data?.admin && <AgentCard data={data.admin} handleDelete={handleDelete}/>}
-            {data &&
-              data?.agents.map((data:any, index:any) => (
-                <AgentCard key={index} data={data} handleDelete={handleDelete}/>
-              ))}
+            {filtered.admin && <AgentCard data={filtered.admin} handleDelete={handleDelete} />}
+            {filtered.agents.map((data: any, index: any) => (
+              <AgentCard key={index} data={data} handleDelete={handleDelete} />
+            ))}
           </div>
 
           <div className=" md:hidden grid-cols-1 space-y-2">
-            {data && data?.admin && <AgentListItem data={data.admin} handleDelete={handleDelete}/>}
-            {data &&
-              data?.agents.map((data:any, index:any) => (
-                <AgentListItem key={index} data={data} handleDelete={handleDelete}/>
-              ))}
+            {filtered.admin && <AgentListItem data={filtered.admin} handleDelete={handleDelete} />}
+            {filtered.agents.map((data: any, index: any) => (
+              <AgentListItem key={index} data={data} handleDelete={handleDelete} />
+            ))}
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-function AgentCard({ data,handleDelete }: { data: any,handleDelete:any }) {
+function AgentCard({ data, handleDelete }: { data: any; handleDelete: any }) {
   return (
-    <div className={`${data?.role === "ADMIN" ? "bg-gradient-to-b from-[rgba(203,28,101,0.3)] to-[rgba(30,30,128,0.3)]":"bg-backgroundColor"}  border  border-primary rounded-xl p-6 relative`}>
+    <div
+      className={`${data?.role === "ADMIN" ? "bg-gradient-to-b from-[rgba(203,28,101,0.3)] to-[rgba(30,30,128,0.3)]" : "bg-backgroundColor"}  border  border-primary rounded-xl p-6 relative`}
+    >
       <div className="absolute top-4 right-4 flex flex-col gap-3">
         <Link href={`/teams/${data?.id}`}>
-        <button className="text-gray-400  rounded-full p-2 hover:bg-primary hover:text-white">
-          <Edit2 className="h-4 w-4" />
-        </button>
+          <button className="text-gray-400  rounded-full p-2 hover:bg-primary hover:text-white">
+            <Edit2 className="h-4 w-4" />
+          </button>
         </Link>
         <button className="text-red-500 hover:text-red-400 rounded-full p-2" onClick={() => handleDelete(data?.id)}>
           <Trash2 className="h-4 w-4" />
@@ -113,7 +130,8 @@ function AgentCard({ data,handleDelete }: { data: any,handleDelete:any }) {
           <Image
             src={
               data?.image ||
-              "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png"
+              "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png" ||
+              "/placeholder.svg"
             }
             alt="Agent profile"
             fill
@@ -122,49 +140,43 @@ function AgentCard({ data,handleDelete }: { data: any,handleDelete:any }) {
         </div>
 
         <h3 className="text-xl font-semibold text-white mb-1">{data?.name}</h3>
-        <span className="px-4 py-1 bg-black/30 rounded-full text-xs text-gray-300 mb-4">
-          {data?.role}
-        </span>
+        <span className="px-4 py-1 bg-black/30 rounded-full text-xs text-gray-300 mb-4">{data?.role}</span>
 
         <div className="w-full space-y-3 flex items-center justify-center">
           {/* <div className="flex items-center text-sm text-gray-300">
             <Phone className="h-4 w-4 mr-2 text-gray-400" />
             <span>+919876543210</span>
           </div> */}
-          
-            <div className="flex items-center text-sm text-gray-300">
-              <Mail className="h-4 w-4 mr-2 text-gray-400" />
-              <span>{data?.email}</span>
-           
+
+          <div className="flex items-center text-sm text-gray-300">
+            <Mail className="h-4 w-4 mr-2 text-gray-400" />
+            <span>{data?.email}</span>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-function AgentListItem({ data,handleDelete }: { data: any,handleDelete:any }) {
+function AgentListItem({ data, handleDelete }: { data: any; handleDelete: any }) {
   return (
     <div className="bg-[#0A0A1B] rounded-lg py-4 px-5 border border-primary relative overflow-hidden">
-      <span className="absolute top-0  right-2 bg-blue-600 text-white text-sm px-3 py-1 rounded-lg">
-        {data?.role}
-      </span>
+      <span className="absolute top-0  right-2 bg-blue-600 text-white text-sm px-3 py-1 rounded-lg">{data?.role}</span>
 
       <div className="flex items-center mt-4 gap-3 mb-4">
         <div className="flex items-center gap-4">
           <Image
             src={
               data?.image ||
-              "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png"
+              "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png" ||
+              "/placeholder.svg"
             }
             alt="Profile"
             width={40}
             height={40}
             className="rounded-full aspect-square"
           />
-          <h2 className="md:text-base text-sm  font-semibold text-white">
-            {data?.name}
-          </h2>
+          <h2 className="md:text-base text-sm  font-semibold text-white">{data?.name}</h2>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -177,7 +189,7 @@ function AgentListItem({ data,handleDelete }: { data: any,handleDelete:any }) {
               <Pencil className="mr-2 h-4 w-4" />
               <span>Edit</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer text-red-500" onClick={()=>handleDelete(data?.id)}>
+            <DropdownMenuItem className="cursor-pointer text-red-500" onClick={() => handleDelete(data?.id)}>
               <Trash2 className="mr-2 h-4 w-4" />
               <span>Delete</span>
             </DropdownMenuItem>
@@ -196,5 +208,5 @@ function AgentListItem({ data,handleDelete }: { data: any,handleDelete:any }) {
           <span>+919876543210</span>
         </div> */}
     </div>
-  );
+  )
 }

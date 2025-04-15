@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Bar, BarChart, Legend, XAxis, YAxis, ResponsiveContainer } from "recharts"
@@ -6,46 +7,28 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-
-const data = [
-  {
-    name: "Naman",
-    agentMessages: 520,
-    engagementResponses: 200,
-  },
-  {
-    name: "Ram",
-    agentMessages: 200,
-    engagementResponses: 180,
-  },
-  {
-    name: "Ankit",
-    agentMessages: 320,
-    engagementResponses: 200,
-  },
-  {
-    name: "Anil",
-    agentMessages: 420,
-    engagementResponses: 200,
-  },
-  {
-    name: "Aman",
-    agentMessages: 120,
-    engagementResponses: 200,
-  },
-  {
-    name: "Sam",
-    agentMessages: 320,
-    engagementResponses: 200,
-  },
-  {
-    name: "Suraj",
-    agentMessages: 520,
-    engagementResponses: 200,
-  },
-]
+import { useSelector } from "react-redux"
+import { RootState } from "@/store/store"
+import { useGetChatAnalyticsQuery } from "@/store/features/apislice"
 
 export function AgentMessagesChart() {
+  const { analytics } = useSelector((state: RootState) => state);
+  const { data: analyticsData } = useGetChatAnalyticsQuery({
+    startDate: new Date(analytics.startDate).toISOString(),
+    endDate: new Date(analytics.endDate).toISOString(),
+  });
+
+  const data = analyticsData?.messagesByAgents?.map((agent: any) => ({
+    name: agent.senderName,
+    messageCount: agent.messageCount
+  }));
+
+  // Calculate the maximum message count and set appropriate Y-axis settings
+  const maxMessageCount = Math.max(...(data?.map((item:any) => item.messageCount) || [0]));
+  const yAxisMax = Math.ceil(maxMessageCount / 10) * 10 + 20; // Round up to nearest 10 and add 20 for padding
+  const tickCount = Math.min(10, Math.ceil(yAxisMax / 10)); // Ensure we don't have too many ticks
+  const ticks = Array.from({ length: tickCount }, (_, i) => Math.round((i * yAxisMax) / (tickCount - 1)));
+
   return (
     <Card className="w-full h-full bg-backgroundColor border-primary border rounded-xl overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
@@ -55,18 +38,14 @@ export function AgentMessagesChart() {
         </Button>
       </CardHeader>
       <CardContent className="p-4">
-        <ScrollArea className="w-full  relative ">
-          <div className="h-[250px] sm:h-[280px] w-[600px] md:h-[300px]">
+        <ScrollArea className="w-full ">
+          <div className="h-[400px] min-w-full">
             <ChartContainer
               className="h-full w-full"
               config={{
                 agentMessages: {
                   label: "Agent Messages",
                   color: "hsl(221, 70%, 55%)",
-                },
-                engagementResponses: {
-                  label: "Engagement responses",
-                  color: "hsl(221, 70%, 30%)",
                 },
               }}
             >
@@ -87,21 +66,15 @@ export function AgentMessagesChart() {
                     tickLine={false}
                     axisLine={false}
                     tick={{ fill: "white", fontSize: 12 }}
-                    ticks={[0, 100, 200, 300, 400, 500, 600, 700, 800]}
-                    domain={[0, 800]}
+                    ticks={ticks}
+                    domain={[0, yAxisMax]}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} cursor={{ fill: "transparent" }}/>
                   <Bar
-                    dataKey="agentMessages"
-                    stackId="a"
-                    radius={[0, 0, 0, 0]}
-                    fill="var(--color-agentMessages)"
-                  />
-                  <Bar
-                    dataKey="engagementResponses"
+                    dataKey="messageCount"
                     stackId="a"
                     radius={[4, 4, 0, 0]}
-                    fill="var(--color-engagementResponses)"
+                    fill="var(--color-agentMessages)"
                   />
                   <Legend
                     iconType="circle"
@@ -115,12 +88,13 @@ export function AgentMessagesChart() {
             </ChartContainer>
           </div>
           <ScrollBar 
-          orientation="horizontal" 
-          className="bg-white/20 hover:bg-white/25 rounded-full"
-       
-        />
+            orientation="horizontal" 
+            className="bg-white/20 hover:bg-white/25 rounded-full"
+          />
         </ScrollArea>
       </CardContent>
     </Card>
   )
 }
+
+export default AgentMessagesChart;

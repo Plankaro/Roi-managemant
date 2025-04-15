@@ -142,7 +142,7 @@ const ChatLists = () => {
                       className="object-cover lg:h-14 lg:w-14 h-10 w-10"
                      
                     />
-                   <AvatarFallback   className="object-contain flex bg-gray-500 lg:h-14 lg:w-14 justify-center items-center"
+                   <AvatarFallback   className="object-cover flex bg-gray-500 lg:h-14 lg:w-14 h-10 w-10 justify-center items-center"
                      >
                         {contact?.name?.slice(0, 2).toUpperCase()??"" }
                       </AvatarFallback>
@@ -162,8 +162,8 @@ const ChatLists = () => {
                   <div className="flex lg:gap-4 gap-2 items-center justify-between w-full">
                     <p className={`text-sm flex gap-3 items-center   mt-auto basis-3/4`}>
                       
-                    <span className={`${user?.buisness?.whatsapp_mobile===contact.chats[0]?.receiverPhoneNo && "hidden"} text-white`}> {getStatusIcon(contact.chats?.[0]?.Status)} </span>
-                    <span className={`line-clamp-1 ${user?.buisness?.whatsapp_mobile===contact.chats[0]?.receiverPhoneNo && contact.chats?.[0]?.Status=="delivered" ? "font-black text-white":"text-gray-400"}`}>{contact.chats?.[0]?.body_text??"Send your first message"}</span>
+                    <span className={`${contact.phoneNo===contact.chats[0]?.senderPhoneNo && "hidden"} text-white`}> {getStatusIcon(contact.chats?.[0]?.Status)} </span>
+                    <span className={`line-clamp-1 break-words ${contact.phoneNo===contact.chats[0]?.senderPhoneNo && contact.chats?.[0]?.Status!=="read" ? "font-black text-white":"text-gray-400"}`}>{contact.chats?.[0]?.body_text??"Send your first message"}</span>
                     </p>
 
                   {contact.assignedTo ? <Person /> : <PersonAlert />}

@@ -6,7 +6,7 @@ import BotCard from "@/components/page/bots/bot-card"
 import { useFindBotsQuery } from "@/store/features/apislice"
 
 export default function Dashboard() {
-  const { data:bots, isLoading, isError } = useFindBotsQuery({})
+  const { data:bots } = useFindBotsQuery({})
   
   
   return (

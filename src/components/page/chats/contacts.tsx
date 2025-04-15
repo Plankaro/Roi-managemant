@@ -52,7 +52,7 @@ export default function ScrollableContactDialog({
         refetch();
         
       } catch (error) {
-        //console.log(error);
+        console.log(error);
       }
       finally{
         setOpen(false);

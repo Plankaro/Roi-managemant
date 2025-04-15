@@ -30,7 +30,7 @@ function ResetpasswordComponent({ id }: { id: string }) {
           "An error occurred while resetting the password.",
       });
 
-      const data = await promise; // Wait for the mutation to resolve
+      // Wait for the mutation to resolve
       //console.log("Password Reset Response:", data);
     } catch (error: any) {
       // This block handles unexpected issues not caught by `toast.promise`.

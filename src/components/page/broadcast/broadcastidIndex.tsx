@@ -16,7 +16,7 @@ import Link from "next/link"
 
 export default function BroadcastDetails({id}:{id:string}) {
 
-  const { data, isLoading, refetch }: { data?: BroadcastDetailResult; isLoading: boolean,refetch:()=>void } = useGetBroadcastByIdQuery(id);
+  const { data, refetch }: { data?: BroadcastDetailResult; isLoading: boolean,refetch:()=>void } = useGetBroadcastByIdQuery(id);
   //console.log(data)
   
   let totalOrderPrice = 0;

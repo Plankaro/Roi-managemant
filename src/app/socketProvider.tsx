@@ -6,6 +6,7 @@ import { createContext, useMemo, useContext, useEffect, ReactNode,} from "react"
 import { useDispatch } from "react-redux";
 import io, { Socket } from "socket.io-client";
 import { useSession } from "next-auth/react";
+import { addNotification } from "@/store/features/notificationslice";
 type SocketContextType = Socket | null;
 
 const SocketContext = createContext<SocketContextType>(null);
@@ -37,11 +38,15 @@ const dispatch = useDispatch()
       //console.log("✅ WebSocket Connected!");
       
       // Subscribe automatically (replace with dynamic phone number if needed)
-      const phoneNumber = user?.buisness?.whatsapp_mobile??"";
+      const buisnessId = user?.buisness?.id??"";
+      const userId = user?.id??""
       //console.log(user)
       //console.log(phoneNumber) // Replace with dynamic number if necessary
-      socket.emit("subscribe", phoneNumber);
-      console.log(`🔔 Subscribed to ${phoneNumber}`);
+      socket.emit("subscribe", buisnessId);
+      console.log(`🔔 Subscribed to ${buisnessId}`);
+
+      socket.emit("subscribe", userId);
+      console.log(`🔔 Subscribed to ${userId}`);
     });
 
     // Listen for incoming messages
@@ -59,6 +64,11 @@ const dispatch = useDispatch()
       
       
     });
+
+    socket.on("notification", (data) => {
+      dispatch(addNotification([data]));
+    })
+
 
     return () => {
       //console.log("❌ Disconnecting WebSocket...");

@@ -70,7 +70,7 @@ function ProfileChart() {
 
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="basis-4/6 h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" className={"min-h-[300px] "}>
               <BarChart
                 data={data}
                 barGap={40}
@@ -99,13 +99,13 @@ function ProfileChart() {
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-blue-500 text-white" />
               <p className="text-xs text-white">
-                Users Engaged Average increased by 20% from past week
+                Users Engaged Average increased by 63% from past week
               </p>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-blue-500" />
               <p className="text-xs text-white">
-                User Abandoned Average decreased by 12% from past week
+                User Abandoned Average increased by 12% from past week
               </p>
             </div>
           </div>

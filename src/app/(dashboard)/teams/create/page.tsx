@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Eye, EyeClosed, PlusIcon } from "lucide-react";
@@ -35,7 +34,7 @@ export default function CreateNewAgentForm() {
   const uploadref: any = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [uplodFiles,{isLoading:isUploading}] = useUploadFilesMutation()
-  const [createTeam,{isLoading:isCreateTeam}] = useCreateTeamMutation();
+  const [createTeam] = useCreateTeamMutation();
 
 
   const form = useForm<FormValues>({
@@ -103,7 +102,7 @@ export default function CreateNewAgentForm() {
 
   const onSubmit = async(data: FormValues) => {
     try {
-      //console.log("Form data:", data);
+      console.log("Form data:", data);
   
       const datas = createTeam(data).unwrap();
       toast.promise(datas,{

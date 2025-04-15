@@ -60,7 +60,7 @@ function AbondnedAnalytics() {
 
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="basis-4/6 h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" className={"min-h-[300px]"}>
               <BarChart
                 data={data}
                 barGap={40}

@@ -2,14 +2,14 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Plus, Trash2, X, ImageIcon } from "lucide-react"
+import { Search, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useGetAllTemplatesIncludingPendingQuery, useDeleteTemplateMutation } from "@/store/features/apislice"
 import SelectedPreview from "@/components/page/broadcast/selectTemplatepreview"
-import { hasIn } from "lodash"
 import toast from "react-hot-toast"
+import Link from "next/link"
 
 export default function TemplatesGrid() {
   const [selectedTemplate, setSelectedTemplate] = useState(null)
@@ -17,7 +17,9 @@ export default function TemplatesGrid() {
 
   const [deleteTemplate] = useDeleteTemplateMutation()
 
-  const { data:templates, isLoading } = useGetAllTemplatesIncludingPendingQuery({})
+  const { data:templates} = useGetAllTemplatesIncludingPendingQuery({})
+
+  
 
 
 
@@ -45,10 +47,12 @@ const handleDelete = (template_name: string) => {
       <div className=" mx-auto">
         <div className="flex items-center justify-between mb-6 text-white">
           <h1 className="text-2xl font-bold">Templates</h1>
+          <Link href="templates/create">
           <Button className="rounded-full bg-blue-600 hover:bg-blue-700">
             <Plus className="h-5 w-5" />
             <span className="">Add template</span>
           </Button>
+          </Link>
         </div>
 
         <div className="relative mb-6">

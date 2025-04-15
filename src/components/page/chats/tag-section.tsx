@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -20,94 +21,114 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useCreateTagsMutation, useDeleteTagMutation,  useGetTagforProspectQuery,useCreateTagforProspectMutation,useDeleteTagForProspectMutation } from "@/store/features/apislice"
+import { useSelector } from "react-redux"
+import { RootState } from "@/store/store"
+import z from "zod"
+import toast from "react-hot-toast"
 
-type TagType = {
-  id: string
-  name: string
-}
 
-export default function TagsSelect() {
+
+
+export default function TagsSelect({}) {
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [tagToDelete, setTagToDelete] = useState<TagType | null>(null)
+  const [tagToDelete, setTagToDelete] = useState<any | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [newTagName, setNewTagName] = useState("")
-  const [selectedTags, setSelectedTags] = useState<TagType[]>([])
+
+
+  const selectedProspect = useSelector((state: RootState) => state.Prospect.selectedProspect)
+  const { data: tags } = useGetTagforProspectQuery(selectedProspect?.id)
+
+
+
+  const [createTag] = useCreateTagsMutation()
+  const[deleteTag]=useDeleteTagMutation()
+  const [createTagforProspect]=useCreateTagforProspectMutation()
+  const [deleteTagForProspect]=useDeleteTagForProspectMutation()
+
+  console.log("tags", tags);
+
+
 
   // Sample tags - replace with your actual data source
-  const [availableTags, setAvailableTags] = useState<TagType[]>([
-    { id: "1", name: "New Customer" },
-    { id: "2", name: "High Priority" },
-    { id: "3", name: "Follow Up" },
-    { id: "4", name: "Urgent" },
-    { id: "5", name: "VIP" },
-  ])
-
-  const filteredTags = availableTags.filter(
-    (tag) =>
-      tag.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !selectedTags.some((selectedTag) => selectedTag.id === tag.id),
+  
+  const filteredTags = tags?.tagsNotForProspect?.filter(
+    (tag:any) =>
+      tag.tagName.toLowerCase().includes(searchQuery.toLowerCase()) 
+      
   )
 
-  const handleSelectTag = (tag: TagType) => {
-    setSelectedTags([...selectedTags, tag])
-    setOpen(false)
+  console.log("filteredTags", filteredTags);
+
+  const handleSelectTag = (id: string) => {
+    const payload = {
+      tagId: id,
+      ProspectId: selectedProspect?.id,
+    }
+
+    const promise = createTagforProspect(payload).unwrap()
+    toast.promise(promise, {
+      loading: "Adding tag...",
+      success: "Tag added successfully!",
+      error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+    })
+
   }
 
-  const handleRemoveTag = (tagId: string) => {
-    setSelectedTags(selectedTags.filter((tag) => tag.id !== tagId))
+  const handleRemoveTag = async(tagId: string) => {
+    const promise = deleteTagForProspect({id:tagId, ProspectId:selectedProspect?.id??""}).unwrap()
+    toast.promise(promise, {
+      loading: "Removing tag...",
+      success: "Tag removed successfully!",
+      error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+    })
   }
 
   const handleCreateTag = () => {
-    if (newTagName.trim()) {
-      const newTag = {
-        id: `new-${Date.now()}`,
-        name: newTagName.trim(),
-      }
-      setAvailableTags([...availableTags, newTag])
-      setSelectedTags([...selectedTags, newTag])
-      setNewTagName("")
-      setModalOpen(false)
+    const payload = {
+      tagName: newTagName,
     }
+    const parsedPayload = z
+      .object({
+        tagName: z.string(),
+      })
+      .parse(payload)
+    const promise = createTag(parsedPayload).unwrap()
+    toast.promise(promise, {
+      loading: "Creating tag...",
+      success: "Tag created successfully!",
+      error: "Failed to create tag",
+    })
+    setModalOpen(false)
+    setNewTagName("")
   }
 
-  const handleDeleteTag = (tag: TagType, e: React.MouseEvent) => {
+  const handleDeleteTag = (tag: any, e: React.MouseEvent) => {
     e.stopPropagation() // Prevent triggering the CommandItem onSelect
-    setTagToDelete(tag)
-    setDeleteDialogOpen(true)
+  setTagToDelete(tag)
+  setDeleteDialogOpen(true)
   }
 
   const confirmDeleteTag = () => {
     if (tagToDelete) {
       // Remove from available tags
-      setAvailableTags(availableTags.filter((tag) => tag.id !== tagToDelete.id))
-
-      // Also remove from selected tags if it's there
-      setSelectedTags(selectedTags.filter((tag) => tag.id !== tagToDelete.id))
-
-      setDeleteDialogOpen(false)
-      setTagToDelete(null)
+      const promise = deleteTag({id:tagToDelete.id}).unwrap()
+      toast.promise(promise, {
+        loading: "Deleting tag...",
+        success: "Tag deleted successfully!",
+        error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+      })
+      setDeleteDialogOpen(true)
     }
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2 min-h-10 p-1">
-        {selectedTags.map((tag) => (
-          <Badge
-            key={tag.id}
-            className="bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-1 px-3 py-1"
-          >
-            <Tag className="h-3 w-3 mr-1" />
-            {tag.name}
-            <X
-              className="h-3 w-3 cursor-pointer ml-1"
-              onClick={() => handleRemoveTag(tag.id)}
-              aria-label="Remove tag"
-            />
-          </Badge>
-        ))}
+      <div className="flex flex-col flex-wrap gap-2 min-h-10 p-1">
+        
 
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
@@ -131,21 +152,21 @@ export default function TagsSelect() {
               <CommandList>
                 <CommandEmpty>No tags found</CommandEmpty>
                 <CommandGroup>
-                  {filteredTags.map((tag) => (
+                  {filteredTags && filteredTags.map((tag:any) => (
                     <CommandItem
                       key={tag.id}
-                      onSelect={() => handleSelectTag(tag)}
+                      onSelect={() => handleSelectTag(tag.id)}
                       className="cursor-pointer hover:bg-primary-50 flex items-center justify-between"
                     >
                       <div className="flex items-center">
                         <Check className="h-4 w-4 mr-2 text-primary-500 opacity-0 group-data-[selected]:opacity-100" />
-                        {tag.name}
+                        {tag.tagName}
                       </div>
                       <div className="flex items-center">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full"
+                          className="h-6 w-full text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full"
                           onClick={(e) => handleDeleteTag(tag, e)}
                           aria-label="Delete tag"
                         >
@@ -156,6 +177,7 @@ export default function TagsSelect() {
                   ))}
                   <CommandItem
                     className="border-t border-slate-200 text-primary-600 cursor-pointer hover:bg-primary-50"
+                    disabled={tags?.tagsForProspect?.length >= 3}
                     onSelect={() => {
                       setModalOpen(true)
                       setOpen(false)
@@ -169,6 +191,23 @@ export default function TagsSelect() {
             </Command>
           </PopoverContent>
         </Popover>
+
+<div className="w-full flex gap-3 self-start flex-wrap">
+        {tags?.tagsForProspect?.map((tag:any) => (
+          <Badge
+            key={tag.id}
+            className="bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-1 px-3 py-1 "
+          >
+            <Tag className="h-3 w-3 mr-1" />
+            {tag.tagName}
+            <X
+              className="h-3 w-3 cursor-pointer ml-1"
+              onClick={() => handleRemoveTag(tag.id)}
+              aria-label="Remove tag"
+            />
+          </Badge>
+        ))}
+      </div>
       </div>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
@@ -200,7 +239,7 @@ export default function TagsSelect() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Tag</AlertDialogTitle>
             <AlertDialogDescription >
-              Are you sure you want to delete the tag "{tagToDelete?.name}"? This action cannot be undone.
+              Are you sure you want to delete the tag &quot;{tagToDelete?.tagName}&quot;? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

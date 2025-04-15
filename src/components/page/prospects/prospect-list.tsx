@@ -1,16 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useInView } from "react-intersection-observer";
-import { Button } from "@/components/ui/button";
+
 import { Card } from "@/components/ui/card";
 import { Star } from "lucide-react";
-import { type Prospect, getProspectsByPage } from "@/lib/data";
-import { IoLogoWhatsapp } from "react-icons/io";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IoSyncCircleOutline } from "react-icons/io5";
-import type { CustomerProspect, CustomerProspectList } from "@/zod/types";
+import type { CustomerProspect,  } from "@/zod/types";
 
 import Link from "next/link";
 import ShopifyLogo from "@/components/icons/shopify";

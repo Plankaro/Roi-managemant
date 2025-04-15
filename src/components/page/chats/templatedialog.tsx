@@ -23,13 +23,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sendTemplateSchema } from "@/zod/chats/chat";
 import { z } from "zod";
-import { RootState } from "@/store/store"
-import { useSendTemplatesMutation } from "@/store/features/apislice"
-import { useDispatch, useSelector } from "react-redux"
-import { setChats } from "@/store/features/chatSlice"
+import { RootState } from "@/store/store";
+import { useSendTemplatesMutation } from "@/store/features/apislice";
+import { useDispatch, useSelector } from "react-redux";
+import { setChats } from "@/store/features/chatSlice";
 import toast from "react-hot-toast";
-
-
+import { updateLastChat } from "@/store/features/prospect";
 
 export default function TemplateBuilder({
   open,
@@ -52,20 +51,16 @@ export default function TemplateBuilder({
 
   const { data: templates, isLoading } = useGetAllTemplatesQuery({});
 
-  const dispatch = useDispatch()
-  const [sendTemplate] = useSendTemplatesMutation({})
- 
+  const dispatch = useDispatch();
+  const [sendTemplate] = useSendTemplatesMutation({});
+
   const selectedProspect = useSelector(
     (state: RootState) => state.Prospect?.selectedProspect
-  )
-  
-
+  );
 
   const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   //console.log(templates)
-
-
 
   useEffect(() => {
     if (searchQuery) {
@@ -78,33 +73,33 @@ export default function TemplateBuilder({
     }
   }, [searchQuery, templates]);
 
-
-  const onSubmit = async(data: z.infer<typeof sendTemplateSchema>) => {
+  const onSubmit = async (data: z.infer<typeof sendTemplateSchema>) => {
     const payload = {
-      name:data.template.name,
-      templateForm:data.templateForm,
-      recipientNo: selectedProspect?.phoneNo
-    }
+      name: data.template.name,
+      templateForm: data.templateForm,
+      recipientNo: selectedProspect?.phoneNo,
+    };
     console.log(payload);
-    const response =  sendTemplate(payload)
+    const response = sendTemplate(payload);
     toast.promise(response, {
       loading: "Sending...",
       success: "Message sent successfully!",
       error: (error: any) =>
         error?.data?.message || "An unexpected error occurred.",
-    })
+    });
 
-    const chat = (await response).data
-    dispatch(setChats([chat]))
-    console.log(response)
-    setOpen(false)
-    
+    const chat = (await response).data;
+
+    dispatch(setChats([chat]));
+    dispatch(updateLastChat(chat));
+    console.log(response);
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="lg:max-w-[1300px] w-[90vw] p-6 gap-6 lg:h-[80vh] h-[90vh] lg:overflow-hidden overflow-scroll no-scrollbar bg-blue-50">
-        <Form {...form} >
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} id="template">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr] gap-10">
               {/* Select Template Section */}
@@ -144,10 +139,19 @@ export default function TemplateBuilder({
                                   onClick={() => field.onChange(template)}
                                 >
                                   <div className="min-w-10 min-h-10 bg-[linear-gradient(180deg,#1B2A48_0%,#4166AE_100%)] rounded" />
-                                  <div>
-                                    <h3 className="font-medium text-sm">
-                                      {template.name}
-                                    </h3>
+                                  <div className="flex-1">
+                                    <div className="flex justify-between">
+                                      <h3 className="font-medium text-sm">
+                                        {template.name}
+                                      </h3>
+                                      <div
+                                        className={`w-3 h-3 rounded-full ${
+                                          template.trackingEnabled
+                                            ? "bg-green-600"
+                                            : "bg-red-600"
+                                        }`}
+                                      />
+                                    </div>
                                     <p className="text-xs text-muted-foreground line-clamp-1">
                                       {
                                         template.components.find(
@@ -168,25 +172,23 @@ export default function TemplateBuilder({
               </div>
 
               <FormField
-                  control={form.control}
-                  name="templateForm"
-                  render={({ field, fieldState }) => (
-                    <FormItem className="">
-                      
-                      <FormControl>
-                      <SelectedTemplateForm selectedTemplate={form.watch("template")} 
-                      formData={field.value}
-                      setFormData={field.onChange}
-                      errors={form.formState.errors}
+                control={form.control}
+                name="templateForm"
+                render={({ field, fieldState }) => (
+                  <FormItem className="">
+                    <FormControl>
+                      <SelectedTemplateForm
+                        selectedTemplate={form.watch("template")}
+                        formData={field.value}
+                        setFormData={field.onChange}
+                        errors={form.formState.errors}
                       />
-                      </FormControl>
-                      
-                    </FormItem>
-                  )}
-                />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
               {/* Template Form and Preview Section */}
-             
             </div>
           </form>
         </Form>

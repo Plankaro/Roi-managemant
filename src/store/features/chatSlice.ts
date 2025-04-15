@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {  uniqBy } from "lodash";
@@ -125,8 +125,7 @@ const chatSlice = createSlice({
         console.warn("No prospect chat group found for id:", action.payload);
       }
     },
-    
-    
+
     
   },
 });

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client"
 import { useState } from "react"
 import { ChevronDown, Search } from "lucide-react"
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { BsGraphUpArrow } from "react-icons/bs"
 import { useGetCampaignQuery } from "@/store/features/apislice"
-import { ScrollArea } from "@radix-ui/react-scroll-area"
+
 
 interface CampaignStats {
   id: string
@@ -201,11 +201,11 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
         </div>
 
         {/* Edit Details Button */}
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <Button variant="link" className="text-red-400 p-0 h-auto">
             Edit Details →
           </Button>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   )

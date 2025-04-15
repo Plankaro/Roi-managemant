@@ -42,7 +42,7 @@ export default function CodToCheckoutAnalytics() {
       </CardHeader>
       <CardContent className="flex lg:flex-row flex-col">
         <div className="h-[300px] w-full relative basis-8/12">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" className={"min-h-[300px]"}>
             <PieChart>
               <Pie
                 data={chartData}

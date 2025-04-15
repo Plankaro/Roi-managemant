@@ -46,7 +46,7 @@ export default function MessageStats() {
         <CardTitle className="flex items-center justify-between">
           <span>Messages Sent to Messages Read</span>
           <div className="text-sm font-normal text-muted-foreground">
-            Messages Sent: {data?.sentMessage??0}
+            Messages Sent: {data?.sentMessage??0 + data?.deliveredMessage??0 + data?.readMessage??0}
           </div>
         </CardTitle>
       </CardHeader>
@@ -68,8 +68,8 @@ export default function MessageStats() {
             </div>
           ))}
         </div>
-        <div className="min-h-[300px] w-full basis-8/12">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="min-h-[300px] w-full  md:basis-8/12">
+          <ResponsiveContainer width="100%" height="100%" className={"min-h-[300px]"}>
             <PieChart>
               <Pie
                 data={chartData}

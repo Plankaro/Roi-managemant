@@ -7,8 +7,12 @@ import { useDispatch,useSelector } from "react-redux";
 import { toggleMenuModal } from "@/store/features/prospect";
 import { RootState } from "@/store/store";
 import {  useSession } from "next-auth/react";
+import { Notification } from "./notification";
+import { useState } from "react";
 const Header = () => {
   const session:any = useSession();
+  console.log(session)
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
     const isOpen = useSelector((state:RootState)=>state.Prospect.openMenuModal)
     const dispatch = useDispatch()
@@ -24,14 +28,26 @@ const Header = () => {
       <Logo width={120} height={58} className="md:inline hidden"/>
       <div className="flex items-center  gap-10">
         <Search className="text-white" />
-        <Bell className="text-white" />
+        <div className="relative inline-block">
+        <button
+          onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+          className="p-2 text-white rounded-full hover:bg-gray-700 transition-colors duration-200"
+        >
+          <Bell className="h-6 w-6" />
+        </button>
+        
+        <Notification 
+          isOpen={isNotificationOpen} 
+          onClose={() => setIsNotificationOpen(false)} 
+        />
+      </div>
         <div className=" items-center gap-2 sm:flex hidden">
           <div className="flex flex-col  text-white">
             <span className="text-sm ">{session?.data?.user?.user?.name??""}</span>
             <span className="text-xs">{session?.data?.user?.user?.email??""}</span>
           </div>
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" height={28} width={28} />
+            <AvatarImage src={session?.data?.user?.user?.image??""} alt="@shadcn" height={28} width={28} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>

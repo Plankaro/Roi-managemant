@@ -39,7 +39,6 @@ import { Bold, Italic, Strikethrough, Smile } from "lucide-react";
 import { MultiSelect } from "@/components/ui/multi-select";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { useUploadFilesMutation } from "@/store/features/apislice";
 import { templateLanguage } from "@/lib/language";
 import { useCreateTemplateMutation,useSendWhatsappMediaMutation } from "@/store/features/apislice";
 
@@ -250,6 +249,15 @@ console.log(data);
     });
     return previewText;
   };
+
+  function isValidUrl(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   const onSubmit = async (data: FormData) => {
     console.log(data);
@@ -688,7 +696,7 @@ console.log(data);
                 headerType === "image" ? (
                   <div className="w-full h-48 relative">
                     <Image
-                      src={headerPreview || "/placeholder.svg"}
+                      src={isValidUrl(headerPreview) ? headerPreview : "/placeholder.svg"}
                       fill
                       alt="Header preview"
                       className="absolute inset-0 w-full h-full object-cover object bg-center"

@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useCreateBroadcastRetryMutation, useGetBroadcastByIdQuery } from "@/store/features/apislice";
+import { useCreateBroadcastRetryMutation } from "@/store/features/apislice";
 import toast from "react-hot-toast";
 import { useGetRetryBroadcastQuery } from "@/store/features/apislice";
 import { format } from "date-fns";

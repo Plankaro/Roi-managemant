@@ -3,6 +3,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import baseQuery from "./basequery";
 import { Filters } from "./prospect";
 
+
 export const apiSlice = createApi({
   baseQuery,
   tagTypes: [
@@ -13,6 +14,8 @@ export const apiSlice = createApi({
     "flashresponse",
     "getbroadcastbyid",
     "bots",
+    "teams",
+    "tags"
   ], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
@@ -294,6 +297,8 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["teams"],
+      
     }),
     asignChat: builder.mutation({
       query: (body) => ({
@@ -307,12 +312,14 @@ export const apiSlice = createApi({
         url: "/agents",
         method: "GET",
       }),
+      providesTags: ["teams"],
     }),
     getSpecificTeam: builder.query({
       query: (id) => ({
         url: `/agents/${id}`,
         method: "GET",
       }),
+
     }),
     updateTeam: builder.mutation({
       query: ({ id, body }) => ({
@@ -320,12 +327,14 @@ export const apiSlice = createApi({
         method: "PATCH",
         body,
       }),
+      invalidatesTags: ["teams"],
     }),
     deleteTeam: builder.mutation<void, { id: string }>({
       query: ({ id }) => ({
         url: `/agents/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["teams"],
     }),
     createCampaign: builder.mutation({
       query: (body) => ({
@@ -400,6 +409,69 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["bots"],
     }),
+    markMessagesAsRead: builder.mutation<void, { prospectId: string }>({
+      query: ({ prospectId }) => ({
+        url: '/chats',
+        method: 'PATCH',
+        params: { prospect_id: prospectId }, // Query parameter
+       // Request body
+      }),
+    }),
+    getTags: builder.query({
+      query: () => ({
+        url: "/tags",
+        method: "GET",
+      }),
+      providesTags: ["tags"],
+    }),
+    createTags: builder.mutation({
+      query: (body) => ({
+        url: "/tags",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["tags"],
+    }),
+    deleteTag: builder.mutation<void, { id: string }>({
+      query: ({ id }) => ({
+        url: `/tags/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["tags"],
+    }),
+    getTagforProspect: builder.query({
+      query: (prospectId) => ({
+        url: `/tags/prospect/${prospectId}`,
+        method: "GET",
+      }),
+      providesTags: ["tags"],
+    }),
+    createTagforProspect: builder.mutation({
+      query: (body) => ({
+        url: "/tags/prospect",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["tags"],
+    }),
+    deleteTagForProspect: builder.mutation<void, { id: string, ProspectId: string}>({
+      query: ({ id, ProspectId}) => ({
+        url: `/tags/prospect/${ProspectId}`,
+        method: "DELETE",
+        params: { tag_id: id },
+      
+      }),
+      invalidatesTags: ["tags"],
+    }),
+    getNotifications: builder.query({
+      query: (id) => ({
+        url: `/buisness/notifications/${id}`,
+        method: "GET",
+      }),
+     
+    }),
+    
+
   }),
 });
 
@@ -457,4 +529,12 @@ export const {
   useDeleteTemplateMutation,
   useFindBotsQuery,
   useCreateOrUpdateBotMutation,
+  useMarkMessagesAsReadMutation,
+  useGetTagsQuery,
+  useCreateTagsMutation,
+  useDeleteTagMutation,
+  useGetTagforProspectQuery,
+  useCreateTagforProspectMutation,
+  useDeleteTagForProspectMutation,
+  useGetNotificationsQuery
 } = apiSlice;

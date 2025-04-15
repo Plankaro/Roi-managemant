@@ -6,6 +6,7 @@ import ProspectReducer from "./features/prospect";
 import cartReducer from "./features/cartSlice";
 import CustomerProspectReducer from "./features/customersSlice";
 import analyticsReducer from "./features/analytics";
+import notificationReducer from "./features/notificationslice";
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     cart: cartReducer,
     chat: chatReducer,
     customerProspect: CustomerProspectReducer,
-    analytics: analyticsReducer
+    analytics: analyticsReducer,
+    notifications: notificationReducer
 
   },
 

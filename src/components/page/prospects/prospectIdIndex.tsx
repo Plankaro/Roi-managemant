@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React from "react";
-import { useState } from "react";
 import {
   Wallet,
   Package,
@@ -9,8 +8,6 @@ import {
   MessageSquare,
   Mail,
   Phone,
-  Tags,
-  ShoppingBag,
   Plus,
   User,
 } from "lucide-react";
@@ -41,7 +38,6 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import Link from "next/link";
 import {
   useCreateProspectMutation,
-  useGetProspectQuery,
 } from "@/store/features/apislice";
 import { useDispatch } from "react-redux";
 
@@ -53,7 +49,7 @@ import { updateProspectSchema } from "@/zod/chats/chat";
 
 function ProspectId({ id }: { id: string }) {
   const dispatch = useDispatch();
-  const [updateProspect, { isLoading: isUpdatingProspect }] =
+  const [updateProspect] =
     useUpdateProspectMutation();
   const router = useRouter();
 

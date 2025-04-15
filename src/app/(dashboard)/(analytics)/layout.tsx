@@ -2,7 +2,7 @@
 import { AnalyticsTabs } from "@/components/page/analytics/analytics-tab";
 
 
-import TimeFilter, { DateRange } from "@/components/page/chats/timefilter";
+import TimeFilter from "@/components/page/chats/timefilter";
 
 
 

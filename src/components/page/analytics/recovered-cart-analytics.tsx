@@ -1,14 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from "recharts"
 
-interface SessionStatsProps {
-  data: {
-    sessionMessages: number;
-    templateMessages: number;
-  }
-}
-
 const COLORS = ['#1e40af', '#ef4444'];
+
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -32,7 +27,7 @@ export default function RecoveredCartAnalytics() {
   ];
 
   const totalMessages = chartData.reduce((acc, curr) => acc + curr.value, 0);
-  const average = ((100 / 200) * 100).toFixed(0);
+  // const average = ((100 / 200) * 100).toFixed(0);
 
   return (
     <Card className="bg-backgroundColor border border-primary  text-white">
@@ -46,7 +41,7 @@ export default function RecoveredCartAnalytics() {
       </CardHeader>
       <CardContent className="flex lg:flex-row flex-col">
         <div className="h-[300px] w-full relative basis-8/12">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" className={"min-h-[300px]"}>
             <PieChart>
               <Pie
                 data={chartData}

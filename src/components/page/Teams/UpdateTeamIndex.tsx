@@ -6,43 +6,43 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Eye, EyeClosed, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { MdEmail } from "react-icons/md";
 import {
   useGetSpecificTeamQuery,
   useUpdateTeamMutation,
-  useUploadFilesMutation,
-} from "@/store/features/apislice";
+  useUploadFilesMutation} from "@/store/features/apislice";
 import { updateSchema } from "@/zod/Teams/Teams";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import toast from "react-hot-toast";
+import Link from "next/link";
+import { formSchema } from "@/zod/Teams/Teams";
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function UpdateAgentForm({ id }: { id: string }) {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [changePassword, setChangePassword] = useState<boolean>(false);
+
   const [updateTeam] = useUpdateTeamMutation();
 
   const [uplodFiles] = useUploadFilesMutation();
-  const [showPassword, setShowPassword] = useState(true);
-  const { data: team } = useGetSpecificTeamQuery(id);
+
+  const { data: team, refetch } = useGetSpecificTeamQuery(id);
+  
+
 
   console.log(team);
 
-  const [isUploading, setIsUploading] = useState(false);
+ 
   const uploadref: any = useRef(null);
 
   const form = useForm<FormValues>({
@@ -113,18 +113,17 @@ export default function UpdateAgentForm({ id }: { id: string }) {
   };
 
   const onSubmit = async(data: FormValues) => {
-    const payload = { ...data };
-    if (!changePassword) {
-      delete payload.password;
-    }
+   
 
-    const promise = updateTeam({id:id,body:payload}).unwrap();
+    const promise = updateTeam({id:id,body:data}).unwrap();
     toast.promise(promise, {
       loading: "Updating...",
       success: "Details updated successfully!",
       error: (error: any) =>
         error?.data?.message || "An unexpected error occurred.",
     });
+    refetch();
+  
     const updatedTeam = await promise;
     console.log(updatedTeam);
 
@@ -137,12 +136,14 @@ export default function UpdateAgentForm({ id }: { id: string }) {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-white text-2xl font-semibold">Edit Agent</h1>
           <div className="flex gap-3">
+            <Link href={"/teams"}>
             <Button
               variant="outline"
               className="bg-transparent text-white border-white/20 hover:bg-white/10 hover:text-white"
             >
               Exit
             </Button>
+            </Link>
             <Button
               type="submit"
               form="agent-form"
@@ -224,58 +225,7 @@ export default function UpdateAgentForm({ id }: { id: string }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-white text-lg">
-                      <div className="flex gap-6 items-center ">
-                        <span> Password</span>
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            variant="blue"
-                            className="border border-white"
-                            checked={form.watch("changePassword")} // `watch` dynamically updates the UI
-                            onCheckedChange={(checked) =>
-                              setChangePassword(!!checked)
-                            }
-                          />
-                          <span className="text-white text-xs">
-                            Change password
-                          </span>
-                        </div>
-                      </div>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="flex flex-col gap-5">
-                        <div className="relative">
-                          <Input
-                            {...field}
-                            autoComplete="off"
-                            disabled={!changePassword}
-                            type={showPassword ? "text" : "password"}
-                            className="rounded-3xl text-white bg-white/5 border-white/10 placeholder:text-gray-400"
-                            placeholder="Enter password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-300"
-                          >
-                            {showPassword ? <Eye /> : <EyeClosed />}
-                          </button>
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-red-400 text-xs" />
-                    <FormDescription className="text-gray-400 text-xs">
-                      Password must be at least 8 characters with uppercase,
-                      lowercase, and numbers.
-                    </FormDescription>
-                  </FormItem>
-                )}
-              />
+             
 
               <input
                 type="file"

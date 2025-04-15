@@ -4,9 +4,6 @@ import {
   EllipsisVertical,
   Search,
   User,
-  UserRound,
-  CheckCircle2,
-  XCircle,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -27,7 +24,8 @@ import {
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { addProspect } from "@/store/features/prospect";
+import { addProspect,selectProspect } from "@/store/features/prospect";
+
 
 // Mock data for agents with assignment status
 
@@ -41,7 +39,7 @@ function AssignmentDropdown() {
   const { data: Teams } = useGetTeamQuery({});
   const [assignChat] = useAsignChatMutation();
 
-  const [assignedAgent, setAssignedAgent] = useState<string | null>(null);
+
   const { selectedProspect } = useSelector(
     (state: RootState) => state.Prospect
   );
@@ -50,7 +48,7 @@ function AssignmentDropdown() {
 
   const agents = Teams?.agents;
 
-  const assignedToMe = selectedProspect?.assignedToId === user.id;
+  const assignedToMe = selectedProspect?.assignedToId === user?.id;
   const filteredAgents = agents
     ? agents.filter(
         (agent: any) =>
@@ -87,6 +85,7 @@ function AssignmentDropdown() {
 // console.log(prospect)
 
          dispatch(addProspect([prospect]));
+         dispatch(selectProspect(prospect));
 
     } catch (error) {
       console.log(error);
@@ -111,10 +110,10 @@ function AssignmentDropdown() {
         className="w-72 bg-[#1B2A48] border border-primary-700 rounded-lg shadow-xl"
       >
         <DropdownMenuItem className="focus:bg-primary-700 transition-colors p-4">
-          <a
+          {/* <a
             href="/orders/123"
             className="flex items-center gap-3 w-full text-white"
-          >
+          > */}
             <Image
               src="/icons/shopify.png"
               alt="shopify"
@@ -122,7 +121,7 @@ function AssignmentDropdown() {
               height={21}
             />
             <span className="font-medium">Create Order</span>
-          </a>
+          {/* </a> */}
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="bg-primary-700" />

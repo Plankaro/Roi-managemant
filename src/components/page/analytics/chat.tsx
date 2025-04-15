@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React from "react";
 import MessageCountChart from "./message-count";
@@ -20,13 +21,19 @@ function ChatAnalytics() {
   });
 
   console.log(data);
+  const totalAgentMessage =  data?.messagesByAgents?.reduce(
+    (total: number, agent: any) => total + Number(agent.messageCount),
+    0
+  ) ?? 0
+
+  
 
   const metrics = [
    
     { label: "Engagement", value: data?.totalEngagements??0 },
-    { label: "Automated interaction time", value: "12" },
-    { label: "Total agents messages", value: "12" },
-    { label: "Total automated messages", value: "12" },
+    { label: "Agent interaction time", value: `${data?.totalMessageTime??0} min` },
+    { label: "Total agents messages", value: totalAgentMessage },
+    { label: "Total automated messages", value: data?.automatedMessages??0 },
   ];
 
   const gridComponents = [

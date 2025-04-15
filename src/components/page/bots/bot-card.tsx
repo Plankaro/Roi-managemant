@@ -61,7 +61,7 @@ export default function BotCard({
           {icon}
           <h3 className="text-lg font-medium">{title}</h3>
         </div>
-        <Switch checked={active} onCheckedChange={(check:boolean)=>handleCheckChange(check)} />
+        <Switch checked={active} onCheckedChange={(check:boolean)=>handleCheckChange(check)} className="data-[state=checked]:bg-blue-600"/>
       </div>
       <div className="mt-6 flex items-center justify-between">
         <div className="text-sm text-white/70">Status: {active ? "Activate" : "Inactive"}</div>

@@ -11,6 +11,8 @@ export const metadata: Metadata = {
 import { auth } from "@/auth"
 import { SocketProvider } from "./socketProvider";
 import { SessionProvider } from "next-auth/react";
+import TopLoaderWrapper from "./loader";
+
 
 export default async function RootLayout({
   children,
@@ -27,7 +29,7 @@ export default async function RootLayout({
       <body
         className={` ${font.className} antialiased`}
       >
-
+  <TopLoaderWrapper/>
         <div>
           {children}
           <Toaster />

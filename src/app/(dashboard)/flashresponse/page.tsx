@@ -14,7 +14,7 @@ import { useDeleteFlashResponseMutation,useGetFlashResponseQuery,useUpdateFlashR
 
 
 export default function FlashResponsesPage() {
-    const {data:flashresponse,isLoading} = useGetFlashResponseQuery({})
+    const {data:flashresponse} = useGetFlashResponseQuery({})
     //console.log(flashresponse)
     const [createMutation] = useCreateFlashResponseMutation()
     const [deleteMutation] = useDeleteFlashResponseMutation()

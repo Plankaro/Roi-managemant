@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { useGetAllBroadcastsQuery, useGetCampaignQuery, useGetTeamQuery } from "@/store/features/apislice"
+import { useGetAllBroadcastsQuery, useGetCampaignQuery, useGetTeamQuery,useGetTagsQuery } from "@/store/features/apislice"
 import { useDispatch, useSelector } from "react-redux"
 import { toggleFilterOption, clearAllFilters,type Filters } from "@/store/features/prospect"
 import { RootState } from "@/store/store"
@@ -33,6 +33,7 @@ export function FilterMenu() {
   const { data: BroadcastData, isLoading: isBroadcastLoading } = useGetAllBroadcastsQuery({})
   const { data: CampaignData, isLoading: isCampaignLoading } = useGetCampaignQuery({})
   const { data: TeamData, isLoading: isTeamLoading } = useGetTeamQuery({})
+  const { data: TagData, isLoading: isTagLoading } = useGetTagsQuery({})
 
   const dispatch = useDispatch();
   const {filters}=useSelector((State:RootState)=>State.Prospect)
@@ -102,12 +103,15 @@ export function FilterMenu() {
     {
       title: "Tags/Labels",
       filter_title:"tags",
-      options: [
-        { label: "Tag 1", value: "tag_1" },
-        { label: "Tag 2", value: "tag_2" },
-        { label: "Tag 3", value: "tag_3" },
-      ],
+      options: TagData?.length
+        ? TagData?.map((item: any) => ({
+            label: item.tagName,
+            value: item.id,
+          }))
+        : [],
+      isLoading: isTagLoading,
     },
+     
   ]
 
 

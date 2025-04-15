@@ -1,16 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import analytics from "@/store/features/analytics";
+
 import { useGetEngagementAnalyticsQuery } from "@/store/features/apislice";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
 import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from "recharts"
 
-interface SessionStatsProps {
-  data: {
-    sessionMessages: number;
-    templateMessages: number;
-  }
-}
 
 const COLORS = ['#1e40af', '#ef4444'];
 
@@ -54,8 +49,8 @@ export default function SessionStats() {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex lg:flex-row flex-col ">
-        <div className="h-[300px] w-full relative basis-8/12">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[300px] w-full  md:basis-8/12">
+          <ResponsiveContainer width="100%" height="100%" className={"min-h-[300px]"}>
             <PieChart>
               <Pie
                 data={chartData}
