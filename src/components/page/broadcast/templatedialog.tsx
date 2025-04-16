@@ -24,7 +24,7 @@ export default function TemplateBuilder({
   setSelectedTemplate,
 }: DialogContentProps) {
   const { data: templates, isLoading } = useGetAllTemplatesQuery({});
-  console.log(templates);
+
 
   const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");

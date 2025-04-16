@@ -55,6 +55,7 @@ function Messages({ isLoading }: { isLoading: boolean }) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const selectedProspect = useSelector((state: RootState) => state.Prospect.selectedProspect);
   const selectedChats = useSelector(getChatsForProspect);
+ 
 
   // Handle marking messages as read
   useEffect(() => {
@@ -81,6 +82,7 @@ function Messages({ isLoading }: { isLoading: boolean }) {
 
     return () => clearTimeout(timeoutId);
   }, [selectedChats]); // Dependency on selectedChats ensures we scroll when messages change
+  console.log("test",selectedChats.map((chat: any) => chat.body_text));
 
   return (
     <>
@@ -214,19 +216,19 @@ function renderMessageContent(chat: any, isMyMessage: boolean) {
           </p>
         </div>
       )}
-      <p className="sm:text-sm text-xs break-all">{chat.body_text}</p>
+      <p className="sm:text-sm text-xs break-all whitespace-pre-line">{chat.body_text}</p>
       {chat.footer_included && chat?.footer_text && chat?.footer_text.length > 0 && (
         <div className="mt-2 pt-2 border-t border-gray-200 sm:text-sm text-xs text-gray-400 break-all">
           {chat.footer_text}
         </div>
       )}
-      <div className="flex flex-col gap-2 mt-2">
+      <div className="flex flex-col gap-2 mt-2 ">
         {chat?.Buttons &&
           chat.Buttons.length > 0 &&
           chat.Buttons.map((button: any, index: any) => {
             if (button.type === "URL") {
               return (
-                <Button key={index} className="bg-primary-100 w-full text-black hover:bg-primary hover:text-white">
+                <Button key={index} className="bg-primary-100 lg:text-base sm:text-sm text-xs  w-full text-black hover:bg-primary hover:text-white">
                   <a href={button.value} target="_blank" rel="noopener noreferrer">
                     {button.text}
                   </a>
@@ -234,7 +236,7 @@ function renderMessageContent(chat: any, isMyMessage: boolean) {
               );
             } else {
               return (
-                <Button key={index} className="bg-primary-100 w-full text-black hover:bg-primary hover:text-white">
+                <Button key={index} className="bg-primary-100 lg:text-base sm:text-sm text-xs w-full text-black hover:bg-primary hover:text-white">
                   {button.text}
                 </Button>
               );

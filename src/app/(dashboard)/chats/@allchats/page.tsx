@@ -226,6 +226,14 @@ const AllChats = () => {
     }
   }, [message]);
 
+  useEffect(() => {
+    if(show===true){
+      setShow(false);
+    }
+   
+  }, [selectedProspect]);
+  console.log(show)
+
   const handleSelectResponse = (response: any) => {
     //console.log("response",response)
     setMessage(response.message);

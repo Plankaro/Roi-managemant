@@ -20,7 +20,7 @@ function ChatAnalytics() {
   endDate: new Date(analytics.endDate).toISOString(),
   });
 
-  console.log(data);
+
   const totalAgentMessage =  data?.messagesByAgents?.reduce(
     (total: number, agent: any) => total + Number(agent.messageCount),
     0

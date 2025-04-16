@@ -49,7 +49,6 @@ export default function TagsSelect({}) {
   const [createTagforProspect]=useCreateTagforProspectMutation()
   const [deleteTagForProspect]=useDeleteTagForProspectMutation()
 
-  console.log("tags", tags);
 
 
 
@@ -61,7 +60,7 @@ export default function TagsSelect({}) {
       
   )
 
-  console.log("filteredTags", filteredTags);
+
 
   const handleSelectTag = (id: string) => {
     const payload = {

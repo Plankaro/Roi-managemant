@@ -14,23 +14,27 @@ import ScrollableContactDialog from "@/components/page/chats/contacts";
 import { useGetProspectQuery } from "@/store/features/apislice";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState,AppDispatch } from "@/store/store";
-import { clearSelectedProspects, selectProspect, setProspect } from "@/store/features/prospect";
+import { RootState, AppDispatch } from "@/store/store";
+import {
+  clearSelectedProspects,
+  selectProspect,
+  setProspect,
+} from "@/store/features/prospect";
 import FilterDropdown from "@/components/page/chats/filter-dropdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addProspect } from "@/store/features/prospect";
 import { useEffect, useState } from "react";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import { getStatusIcon } from "@/components/page/chats/getchatstatus";
-
-
-
 
 export function ChatListSkeleton() {
   return (
     <div className="space-y-2 p-2 w-full animate-pulse">
       {[...Array(6)].map((_, i) => (
-        <div key={i} className="p-3 rounded-lg w-full bg-white/5 backdrop-blur-lg">
+        <div
+          key={i}
+          className="p-3 rounded-lg w-full bg-white/5 backdrop-blur-lg"
+        >
           <div className="flex items-center gap-5">
             <Skeleton className="h-14 w-14 rounded-full bg-white/10" />
             <div className="flex-1 w-full h-14 py-[2px] flex flex-col justify-between">
@@ -47,24 +51,25 @@ export function ChatListSkeleton() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 const ChatLists = () => {
-  const session:any = useSession();
+  const session: any = useSession();
   const dispatch = useDispatch<AppDispatch>();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const user = session?.data?.user?.user
-  const {selectedProspect,prospects,filters} = useSelector((state: RootState) => state.Prospect);
-  console.log(JSON.stringify(filters))
+  const user = session?.data?.user?.user;
+  const { selectedProspect, prospects, filters } = useSelector(
+    (state: RootState) => state.Prospect
+  );
+  console.log(JSON.stringify(filters));
 
-  const {data,isLoading} = useGetProspectQuery(filters)
+  const { data, isLoading } = useGetProspectQuery(filters);
 
-  
   useEffect(() => {
     if (data) {
-      dispatch(clearSelectedProspects())
+      dispatch(clearSelectedProspects());
       dispatch(setProspect(data));
 
       //console.log("added");
@@ -83,7 +88,11 @@ const ChatLists = () => {
 
   //console.log(selectedProspect)
   return (
-    <div className={`md:max-w-md md:flex bg-backgroundColor  ${selectedProspect ? "hidden" : "flex"} w-full border rounded-[20px] xl:basis-2/5 md:basis-4/12 border-primary backdrop-blur-xl flex-col h-full overflow-hidden  `}>
+    <div
+      className={`lg:max-w-md md:flex bg-backgroundColor  ${
+        selectedProspect ? "hidden" : "flex"
+      } w-full border rounded-[20px] xl:basis-2/5 md:basis-4/12 border-primary backdrop-blur-xl flex-col h-full overflow-hidden  `}
+    >
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white">All Chats</h2>
@@ -101,8 +110,8 @@ const ChatLists = () => {
           </ScrollableContactDialog> */}
         </div>
         <div className="w-full flex my-5 md:hidden justify-between">
-        <FilterDropdown>
-         <span className="text-lg">Filters</span> 
+          <FilterDropdown>
+            <span className="text-lg">Filters</span>
           </FilterDropdown>
           <span className="text-red-500">clear all</span>
         </div>
@@ -116,67 +125,89 @@ const ChatLists = () => {
           />
         </div>
       </div>
-      {isLoading ? <ChatListSkeleton />:  <ScrollArea className="w-full no-scrollbar">
-        <div className="space-y-2 p-1 w-full">
-          {filteredProspects  && filteredProspects.map((contact: any) => {
-         
-         
-            return(
-              <button
-              key={contact.id}
-              className={cn(
-                " p-3 rounded-md text-left transition-colors w-full overflow-y-auto",
-                selectedProspect?.id==contact.id ? "bg-primary text-white":"hover:bg-gray-900 hover:text-white"
-              )}
-              onClick={() => {
-                dispatch(selectProspect(contact));
-              }}
+      {isLoading ? (
+        <ChatListSkeleton />
+      ) : (
+        <ScrollArea className=" no-scrollbar">
+          <div className="space-y-2 p-1 w-full">
+            {filteredProspects &&
+              filteredProspects.map((contact: any) => {
+                return (
+                  <button
+                    key={contact.id}
+                    className={cn(
+                      " p-3 rounded-md text-left transition-colors w-full  overflow-x-hidden overflow-y-auto",
+                      selectedProspect?.id == contact.id
+                        ? "bg-primary text-white"
+                        : "hover:bg-gray-900 hover:text-white"
+                    )}
+                    onClick={() => {
+                      dispatch(selectProspect(contact));
+                    }}
+                  >
+                    <div className="flex items-center gap-5">
+                      <div className="relative">
+                        <Avatar className="lg:h-14 lg:w-14">
+                          <AvatarImage
+                            src={contact.image}
+                            alt="/placeholder.svg"
+                            className="object-cover lg:h-14 lg:w-14 h-10 w-10"
+                          />
+                          <AvatarFallback className="object-cover flex bg-gray-500 lg:h-14 lg:w-14 h-10 w-10 justify-center items-center">
+                            {contact?.name?.slice(0, 2).toUpperCase() ?? ""}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div className="flex-1 w-full h-14 py-[2px] flex flex-col justify-between">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-white truncate">
+                            {contact.name || contact.phoneNo}
+                          </p>
+                          <span className="text-xs text-gray-400">
+                            {contact?.chats?.[0]?.createdAt &&
+                              format(
+                                new Date(contact.chats[0].createdAt),
+                                "hh:mm a"
+                              )}
+                          </span>
+                        </div>
+                        <div className="flex   items-center justify-between w-full">
+                          <div
+                            className={`text-sm flex  items-center  mt-auto basis-10/12`}
+                          >
+                            <span
+                              className={` ${
+                                contact.phoneNo ===
+                                  contact.chats[0]?.senderPhoneNo && "hidden"
+                              } text-white basis-1/12`}
+                            >
+                              {" "}
+                              {getStatusIcon(contact.chats?.[0]?.Status)}{" "}
+                            </span>
+                            <span
+                              className={`line-clamp-1 basis-9/12 ${
+                                contact.phoneNo ===
+                                  contact.chats[0]?.senderPhoneNo &&
+                                contact.chats?.[0]?.Status !== "read"
+                                  ? "font-black text-white"
+                                  : "text-gray-400"
+                              }`}
+                            >
+                              {contact.chats?.[0]?.body_text ??
+                                "Send your first message"}
+                            </span>
+                          </div>
 
-            >
-              <div className="flex items-center gap-5">
-                <div className="relative">
-                  <Avatar className="lg:h-14 lg:w-14">
-                    <AvatarImage
-                      src={contact.image}
-                      alt="/placeholder.svg"
-                      className="object-cover lg:h-14 lg:w-14 h-10 w-10"
-                     
-                    />
-                   <AvatarFallback   className="object-cover flex bg-gray-500 lg:h-14 lg:w-14 h-10 w-10 justify-center items-center"
-                     >
-                        {contact?.name?.slice(0, 2).toUpperCase()??"" }
-                      </AvatarFallback>
-                    
-                  </Avatar>
-
-                </div>
-                <div className="flex-1 w-full h-14 py-[2px] flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-white truncate">
-                      {contact.name || contact.phoneNo}
-                    </p>
-                    <span className="text-xs text-gray-400">
-                    {contact?.chats?.[0]?.createdAt && format(new Date(contact.chats[0].createdAt), 'hh:mm a')}
-                    </span>
-                  </div>
-                  <div className="flex lg:gap-4 gap-2 items-center justify-between w-full">
-                    <p className={`text-sm flex gap-3 items-center   mt-auto basis-3/4`}>
-                      
-                    <span className={`${contact.phoneNo===contact.chats[0]?.senderPhoneNo && "hidden"} text-white`}> {getStatusIcon(contact.chats?.[0]?.Status)} </span>
-                    <span className={`line-clamp-1 break-words ${contact.phoneNo===contact.chats[0]?.senderPhoneNo && contact.chats?.[0]?.Status!=="read" ? "font-black text-white":"text-gray-400"}`}>{contact.chats?.[0]?.body_text??"Send your first message"}</span>
-                    </p>
-
-                  {contact.assignedTo ? <Person /> : <PersonAlert />}
-                  </div>
-                </div>
-              </div>
-            </button>
-            )
-         
-          })}
-        </div>
-      </ScrollArea>}
-    
+                          {contact.assignedTo ? <Person /> : <PersonAlert />}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+          </div>
+        </ScrollArea>
+      )}
     </div>
   );
 };

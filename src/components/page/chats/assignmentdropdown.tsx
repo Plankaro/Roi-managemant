@@ -44,7 +44,6 @@ function AssignmentDropdown() {
     (state: RootState) => state.Prospect
   );
 
-  console.log(selectedProspect);
 
   const agents = Teams?.agents;
 

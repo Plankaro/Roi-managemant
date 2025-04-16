@@ -24,6 +24,7 @@ import { useUploadFilesMutation,useCreateTeamMutation } from "@/store/features/a
 import { formSchema } from "@/zod/Teams/Teams";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 type FormValues = z.infer<typeof formSchema>;
@@ -119,7 +120,7 @@ export default function CreateNewAgentForm() {
   };
 
   return (
-    <div className=" flex flex-col ">
+    <div className=" flex flex-col overflow-hidden ">
       <div className="w-full">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-white text-2xl font-semibold">
@@ -146,10 +147,11 @@ export default function CreateNewAgentForm() {
         </div>
 
         <Form {...form}>
+          <ScrollArea className="md:overflow-y-scroll no-scrollbar rounded-sm md:h-[calc(100vh-160px)]">
           <form
             id="agent-form"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 overflow-y-auto no-scrollbar rounded-sm h-[calc(100vh-160px)] bg-backgroundColor p-6"
+            className="space-y-8 o bg-backgroundColor p-6"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
@@ -452,6 +454,7 @@ export default function CreateNewAgentForm() {
               </div>
             </div>
           </form>
+          </ScrollArea>
         </Form>
       </div>
     </div>

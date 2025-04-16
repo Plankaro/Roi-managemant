@@ -21,14 +21,14 @@ import { useUploadFilesMutation } from "@/store/features/apislice";
 import { Eye } from "lucide-react";
 
 function AddContentForm({
-    urldropdownOptions,
+  urldropdownOptions,
   dropdownOptions,
   selectedTemplate,
   formData,
   setFormData,
   errors,
 }: {
-    urldropdownOptions: any;
+  urldropdownOptions: any;
   dropdownOptions: any;
   selectedTemplate: any;
   formData: any;
@@ -127,7 +127,7 @@ function AddContentForm({
             type: button.type,
 
             value: "",
-            isEditable: button?.example?true: false,
+            isEditable: button?.example ? true : false,
             text: button?.text ?? "",
             fromsegment: false,
             segmentname: "",
@@ -402,7 +402,6 @@ function AddContentForm({
                                 />
                                 Select Content from shopify segment
                               </span>
-                             
                             </div>
                           )}
                         {["IMAGE", "VIDEO", "DOCUMENT"].includes(
@@ -436,7 +435,7 @@ function AddContentForm({
                               className="hidden"
                               ref={fileInputRef}
                             />
-                            <div className="flex gap-2">
+                            <div className="flex md:flex-row flex-col gap-2">
                               <Button
                                 type="button"
                                 className={`w-full sm:w-auto  bg-blue-500 hover:bg-blue-600 text-white`}
@@ -449,7 +448,9 @@ function AddContentForm({
                                   Upload {component?.format?.toLowerCase()}
                                 </span>
                               </Button>
-                              {formData?.header?.value && (
+                            
+
+                              {formData?.header?.value && formData?.header?.value!=="ProductImage"  && (
                                 <a
                                   href={formData?.header?.value ?? ""}
                                   target="_blank"
@@ -461,6 +462,36 @@ function AddContentForm({
                                     Preview File
                                   </span>
                                 </a>
+                              )}
+                                {component.format === "IMAGE" && (
+                                <div className="flex items-center gap-2 md:ml-6">
+                                  <Checkbox
+                                    className="border border-white"
+                                    variant="blue"
+                                    checked={
+                                      formData?.header?.value === "ProductImage"
+                                    }
+                                    onCheckedChange={(check:boolean) =>{
+                                      if(check===true){
+                                        handleInputChange(
+                                          "header",
+                                          0,
+                                          "value",
+                                          "ProductImage"
+                                        )
+                                      }else{
+                                        handleInputChange(
+                                          "header",
+                                          0,
+                                          "value",
+                                          ""
+                                        )
+                                      }}
+                                      
+                                    }
+                                  />
+                                  <p>use product image</p>
+                                </div>
                               )}
                             </div>
                             {errors?.templateForm?.header?.value &&
@@ -516,7 +547,6 @@ function AddContentForm({
                                           }
                                         />
                                         Select Content from shopify segment
-                                        
                                       </span>
                                     </div>
                                     {!param.fromsegment ? (
@@ -619,39 +649,138 @@ function AddContentForm({
                     {component.type === "BUTTONS" &&
                       formData?.buttons?.map(
                         (button: any, buttonIndex: any) => (
-                        
-                        <div
-                        key={`buttons-${buttonIndex}`}
-                        className={`flex lg:flex-row flex-col gap-6 ${button.isEditable ? "":"hidden"}`}
-                      >
-                        <div className="flex flex-col gap-2  lg:basis-1/2">
-                          <div className={`  flex flex-col gap-3 `}>
-                            <div className="flex justify-between text-gray-400">
-                              <label
-                                htmlFor={`buttons-${buttonIndex}`}
-                                className={`text-sm font-medium ${
-                                  errors?.templateForm?.buttons?.[
-                                    buttonIndex
-                                  ]?.value ||
-                                  errors?.templateForm?.buttons?.[
-                                    buttonIndex
-                                  ]?.segmentname
-                                    ? "text-red-500"
-                                    : ""
-                                }`}
-                              >
-                               {button.type === "URL"
-                                  ? "CTA Button"
-                                  : button.type === "COPY_CODE"
-                                  ? "Copy Code"
-                                  : ""}
-                              </label>
-                              <span className="sm:flex hidden items-center gap-3 md:text-sm text-xs">
+                          <div
+                            key={`buttons-${buttonIndex}`}
+                            className={`flex lg:flex-row flex-col gap-6 ${
+                              button.isEditable ? "" : "hidden"
+                            }`}
+                          >
+                            <div className="flex flex-col gap-2  lg:basis-1/2">
+                              <div className={`  flex flex-col gap-3 `}>
+                                <div className="flex justify-between text-gray-400">
+                                  <label
+                                    htmlFor={`buttons-${buttonIndex}`}
+                                    className={`text-sm font-medium ${
+                                      errors?.templateForm?.buttons?.[
+                                        buttonIndex
+                                      ]?.value ||
+                                      errors?.templateForm?.buttons?.[
+                                        buttonIndex
+                                      ]?.segmentname
+                                        ? "text-red-500"
+                                        : ""
+                                    }`}
+                                  >
+                                    {button.type === "URL"
+                                      ? "CTA Button"
+                                      : button.type === "COPY_CODE"
+                                      ? "Copy Code"
+                                      : ""}
+                                  </label>
+                                  <span className="sm:flex hidden items-center gap-3 md:text-sm text-xs">
+                                    <Checkbox
+                                      className="border-white "
+                                      variant="blue"
+                                      disabled={
+                                        button.type === "URL" ? false : true
+                                      }
+                                      checked={
+                                        button.type === "URL"
+                                          ? button?.fromsegment
+                                          : false
+                                      }
+                                      onCheckedChange={(checked) =>
+                                        handleInputChange(
+                                          "buttons",
+                                          buttonIndex,
+                                          "fromsegment",
+                                          checked
+                                        )
+                                      }
+                                    />
+                                    Select Content from shopify segment
+                                  </span>
+                                </div>
+                                {!button.fromsegment ? (
+                                  <div className="space-y-3">
+                                    <Input
+                                      id={`button-${buttonIndex}`}
+                                      placeholder={`Enter value for ${button.parameter_name}`}
+                                      value={button.value}
+                                      onChange={(e) =>
+                                        handleInputChange(
+                                          "buttons",
+                                          buttonIndex,
+                                          "value",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`border-blue-500 focus:ring-blue-500`}
+                                    />
+                                    {errors?.templateForm?.buttons?.[
+                                      buttonIndex
+                                    ]?.value && (
+                                      <p className="text-red-500 text-xs mt-1">
+                                        Missing field value
+                                      </p>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="space-y-3">
+                                    <Select
+                                      value={button.segmentname}
+                                      disabled={button.type === "COPY_CODE"}
+                                      onValueChange={(value) =>
+                                        handleInputChange(
+                                          "buttons",
+                                          buttonIndex,
+                                          "segmentname",
+                                          value
+                                        )
+                                      }
+                                    >
+                                      <SelectTrigger className={``}>
+                                        <SelectValue placeholder="Select a field" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectGroup>
+                                          {urldropdownOptions.map(
+                                            (item: any) => (
+                                              <SelectItem
+                                                key={item.value}
+                                                value={item.value}
+                                              >
+                                                {item.type}
+                                              </SelectItem>
+                                            )
+                                          )}
+                                        </SelectGroup>
+                                      </SelectContent>
+                                    </Select>
+                                    {errors?.templateForm?.buttons?.[
+                                      buttonIndex
+                                    ]?.segmentname && (
+                                      <p className="text-red-500 text-xs mt-1">
+                                        select the segment from where you want
+                                        the data
+                                      </p>
+                                    )}
+
+                                    {errors?.templateForm?.body?.[buttonIndex]
+                                      ?.segmentname && (
+                                      <p className="text-red-500 text-xs mt-1">
+                                        select the segment from where you want
+                                        the data
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              <span className="sm:hidden flex items-center gap-3 md:text-sm text-xs">
                                 <Checkbox
-                                  className="border-white "
+                                  className="border-white"
                                   variant="blue"
-                                  disabled={button.type==="URL"?false:true}
-                                  checked={button.type==="URL"?button?.fromsegment:false}
+                                  checked={button?.fromsegment}
                                   onCheckedChange={(checked) =>
                                     handleInputChange(
                                       "buttons",
@@ -662,103 +791,9 @@ function AddContentForm({
                                   }
                                 />
                                 Select Content from shopify segment
-                                
                               </span>
                             </div>
-                            {!button.fromsegment ? (
-                              <div className="space-y-3">
-                                <Input
-                                  id={`button-${buttonIndex}`}
-                                  placeholder={`Enter value for ${button.parameter_name}`}
-                                  value={button.value}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      "buttons",
-                                      buttonIndex,
-                                      "value",
-                                      e.target.value
-                                    )
-                                  }
-                                  className={`border-blue-500 focus:ring-blue-500`}
-                                />
-                                {errors?.templateForm?.buttons?.[
-                                  buttonIndex
-                                ]?.value && (
-                                  <p className="text-red-500 text-xs mt-1">
-                                    Missing field value
-                                  </p>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="space-y-3">
-                                <Select
-                                  value={button.segmentname}
-                                  disabled={button.type==="COPY_CODE"}
-                                  onValueChange={(value) =>
-                                    handleInputChange(
-                                      "buttons",
-                                      buttonIndex,
-                                      "segmentname",
-                                      value
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger className={``}>
-                                    <SelectValue placeholder="Select a field" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectGroup>
-                                      {urldropdownOptions.map(
-                                        (item: any) => (
-                                          <SelectItem
-                                            key={item.value}
-                                            value={item.value}
-                                          >
-                                            {item.type}
-                                          </SelectItem>
-                                        )
-                                      )}
-                                    </SelectGroup>
-                                  </SelectContent>
-                                </Select>
-                                {errors?.templateForm?.buttons?.[
-                                  buttonIndex
-                                ]?.segmentname && (
-                                  <p className="text-red-500 text-xs mt-1">
-                                    select the segment from where you
-                                    want the data
-                                  </p>
-                                )}
-
-                                {errors?.templateForm?.body?.[
-                                  buttonIndex
-                                ]?.segmentname && (
-                                  <p className="text-red-500 text-xs mt-1">
-                                    select the segment from where you
-                                    want the data
-                                  </p>
-                                )}
-                              </div>
-                            )}
                           </div>
-                          <span className="sm:hidden flex items-center gap-3 md:text-sm text-xs">
-                            <Checkbox
-                              className="border-white"
-                              variant="blue"
-                              checked={button?.fromsegment}
-                              onCheckedChange={(checked) =>
-                                handleInputChange(
-                                  "buttons",
-                                  buttonIndex,
-                                  "fromsegment",
-                                  checked
-                                )
-                              }
-                            />
-                            Select Content from shopify segment
-                          </span>
-                        </div>
-                      </div>
                         )
                       )}
                   </div>

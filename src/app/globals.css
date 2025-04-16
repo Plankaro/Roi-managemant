@@ -11,6 +11,11 @@ body {
   background-attachment: fixed;
   background-position: center center;
 }
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
 .glass{
   /* From https://css.glass */

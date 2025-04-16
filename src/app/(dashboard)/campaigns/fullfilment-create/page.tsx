@@ -14,9 +14,9 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { CampaignSchema } from "@/zod/campaigns/checkout-create-campaign";
+import { CampaignSchema } from "@/zod/campaigns/fullfillment-create-campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { z } from "zod";
+import {   z } from "zod";
 import { Input } from "@/components/ui/input";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -36,7 +36,7 @@ import { useCreateCampaignMutation } from "@/store/features/apislice";
 
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
-const CheckoutCreated = () => {
+const OrderCreated = () => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [createCampaign] = useCreateCampaignMutation();
@@ -106,10 +106,7 @@ const CheckoutCreated = () => {
       type: "promotional",
       trigger_type: "AFTER_CAMPAIGN_CREATED",
       trigger_time: { time: 1, unit: "minutes" },
-      is_discount_given: false,
-      discount: 1,
-   
-      discount_type: "AMOUNT",
+
       filter_condition_match: false,
       new_checkout_abandonment_filter: false,
       new_checkout_abandonment_type: "AFTER_EVENT",
@@ -117,7 +114,7 @@ const CheckoutCreated = () => {
       new_order_creation_filter: false,
       new_order_creation_type: "AFTER_EVENT",
       new_order_creation_time: { time: 1, unit: "minutes" },
-      related_order_created: false,
+
       related_order_cancelled: false,
       // Initialize templateForm with default values
       templateForm: {
@@ -134,34 +131,35 @@ const CheckoutCreated = () => {
     },
   });
 
-  console.log(form.getValues());
   const onSubmit = async (data: CampaignFormValues) => {
+   
     try {
       const payload = {
         ...data,
-        trigger: "CHECKOUT_CREATED",
+        trigger: "FULFILLMENT_CREATED",
         template_name: data.template?.name ?? "",
         template_language: data.template?.language ?? "",
         template_category: data.template?.category ?? "",
       };
-
       delete (payload as any).template;
+
+
+      
       const promise = createCampaign(payload).unwrap();
-      console.log("payload", payload);
+
       await toast.promise(promise, {
         loading: "Creating campaign...",
         success: "Campaign created successfully!",
         error: "Error creating campaign.",
       });
       console.log(await promise);
+
       // Additional logic after campaign creation can go here
     } catch (error) {
       // Optionally handle the error further if needed
       console.error("Campaign creation failed:", error);
     }
   };
-
-  const isDiscountavailable = form.watch("is_discount_given");
 
   const dropdownOptions = [
     {
@@ -177,35 +175,51 @@ const CheckoutCreated = () => {
       value: "customer_phone",
     },
     {
-      type: "Cart total items",
-      value: "cart_total_items",
+      type: "order total items",
+      value: "order_total_items",
     },
     {
-      type: "Cart total price",
-      value: "cart_total_price",
+      type: "order total price",
+      value: "order_total_price",
     },
     {
       type: "Cart items",
       value: "cart_items",
     },
-    ...(isDiscountavailable
-      ? [
-          {
-            type: "Discount code",
-            value: "discount_code",
-          },
-          {
-            type: "Discount amount",
-            value: "discount_amount",
-          },
-        ]
-      : []),
+    {
+      type: "Order id",
+      value: "order_id",
+    },
+    {
+      type: "Shipping address",
+      value: "shipping_address",
+    },
+    {
+      type: "Order date",
+      value: "order_date",
+    },
+    {
+      type:"Tracking id",
+      value:"track_id"
+    },
+    {
+      type: "Shippment Status",
+      value:"shippment_status"
+    }
   ];
 
   const urldropdownOptions = [
     {
-      type: "Abandoned Checkout URL",
-      value: "abandon_checkout_url",
+      type: "Order Status Link",
+      value: "Order Status Link",
+    },
+    {
+      type: "COD to checkout link",
+      value: "cod_to_checkout_link",
+    },
+    {
+      type: "Track link",
+      value:"track_link"
     },
     {
       type: "Shop URL",
@@ -308,7 +322,7 @@ const CheckoutCreated = () => {
               name="template"
               render={({ field, fieldState }) => (
                 <FormItem className="py-2 md:text-2xl text-lg text-white basis-1/2">
-                  <FormLabel className="text-lg">Select Template</FormLabel>
+                  <FormLabel>Select Template</FormLabel>
                   <FormDescription className="text-gray-400">
                     Select a template for broadcast messages
                   </FormDescription>
@@ -447,68 +461,6 @@ const CheckoutCreated = () => {
             </div>
           )}
 
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="is_discount_given"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      variant="blue"
-                      className="border border-white"
-                    />
-                  </FormControl>
-                  <FormLabel className="font-medium">Add Discount</FormLabel>
-                </FormItem>
-              )}
-            />
-            {form.watch("is_discount_given") === true && (
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="discount_type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Discount Type</FormLabel>
-                      <Select
-                        disabled={form.watch("is_discount_given") === false}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="AMOUNT">Amount</SelectItem>
-                          <SelectItem value="PERCENTAGE">Percentage</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="discount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Enter Discount Amount</FormLabel>
-                      <FormControl>
-                        <NumericInput {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-          </div>
           <FormField
             control={form.control}
             name="reply_action"
@@ -758,25 +710,7 @@ const CheckoutCreated = () => {
             />
 
             {/* Order Fulfilled */}
-            <FormField
-              control={form.control}
-              name="related_order_created"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      variant="blue"
-                      className="border border-white"
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>The concerned order is fulfilled</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
+          
           </div>
 
           <div className="flex justify-end space-x-4">
@@ -797,4 +731,4 @@ const CheckoutCreated = () => {
   );
 };
 
-export default CheckoutCreated;
+export default OrderCreated;

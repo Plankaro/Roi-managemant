@@ -59,7 +59,9 @@ const TagInput = ({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && inputValue.trim()) {
+   
       e.preventDefault()
+      if(tags.length >= 3) return
       if (!tags.includes(inputValue.trim())) {
         form.setValue(fieldName, [...tags, inputValue.trim()])
       }
@@ -81,6 +83,8 @@ const TagInput = ({
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
+          disabled={tags.length >= 3}
+          
           className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
         />
       </div>

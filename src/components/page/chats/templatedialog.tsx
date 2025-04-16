@@ -80,7 +80,7 @@ export default function TemplateBuilder({
       recipientNo: selectedProspect?.phoneNo,
     };
     console.log(payload);
-    const response = sendTemplate(payload);
+    const response = sendTemplate(payload).unwrap();
     toast.promise(response, {
       loading: "Sending...",
       success: "Message sent successfully!",
@@ -89,6 +89,7 @@ export default function TemplateBuilder({
     });
 
     const chat = (await response).data;
+    console.log(chat);
 
     dispatch(setChats([chat]));
     dispatch(updateLastChat(chat));

@@ -81,7 +81,7 @@ export default function CreateBroadcastCampaign() {
         },
         utm_campaign: {
           enabled: true,
-          value: "test_campaign",
+          value: "roi_broadcast",
         },
         utm_id: true,
         utm_term: false,
@@ -114,9 +114,17 @@ export default function CreateBroadcastCampaign() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      //console.log("Form data:", data);
+      const payload = {
+        ...data,
+        template_name: data.template?.name ?? "",
+        template_language: data.template?.language ?? "",
+      };
+      
+  
+      delete (payload as any).template;
+      console.log("payload",payload);
 
-      const datas = broadcast(data).unwrap();
+      const datas = broadcast(payload).unwrap();
 
       const dataBrod = await datas;
       setCheckoutDialog(false);
@@ -155,7 +163,17 @@ export default function CreateBroadcastCampaign() {
       toast.error("Invalid phone number");
       return;
     }
-    const datas = sendTestMessage(formvalues).unwrap();
+
+    const payload = {
+      ...formvalues,
+      template_name: formvalues.template?.name ?? "",
+      template_language: formvalues.template?.language ?? "",
+    };
+    
+
+    delete (payload as any).template;
+    console.log("payload",payload);
+    const datas = sendTestMessage(payload).unwrap();
     toast.promise(datas, {
       loading: "Sending test message...",
       success: () => "Test message sent successfully",
