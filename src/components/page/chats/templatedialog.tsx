@@ -133,7 +133,7 @@ export default function TemplateBuilder({
                                 <div
                                   key={template.name}
                                   className={`p-3 flex gap-3 cursor-pointer border-b-4 border-blue-700 ${
-                                    field.name === template?.name
+                                    field.value.name === template?.name
                                       ? "bg-gray-50"
                                       : "hover:bg-gray-50"
                                   }`}

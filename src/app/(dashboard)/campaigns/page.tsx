@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { BsGraphUpArrow } from "react-icons/bs"
 import { useGetCampaignQuery } from "@/store/features/apislice"
+import Link from "next/link"
 
 
 interface CampaignStats {
@@ -39,6 +40,7 @@ interface CampaignStats {
 export default function CampaignsPage() {
   const { data: Campaigns, isLoading } = useGetCampaignQuery({})
   const [search, setSearch] = useState("")
+  console.log(Campaigns)
 
   // Filter campaigns based on search query (by campaign name)
   const filteredCampaigns = Campaigns
@@ -201,11 +203,13 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
         </div>
 
         {/* Edit Details Button */}
-        {/* <div className="flex justify-end">
-          <Button variant="link" className="text-red-400 p-0 h-auto">
+        <Link href={getLink(Campaigns)} className="mt-4">
+        <div className="flex justify-end ">
+          <Button variant="link" className="text-red-400 p-0 h-auto" >
             Edit Details →
           </Button>
-        </div> */}
+        </div>
+        </Link>
       </CardContent>
     </Card>
   )
@@ -268,3 +272,19 @@ function CampaignsCardSkeleton() {
     </Card>
   )
 }
+
+function getLink(campaign: CampaignStats): string {
+  const typeToFolderMap: Record<CampaignStats["trigger"], string> = {
+    ORDER_CREATED: "order-created",
+    ORDER_UPDATED: "order-updated",
+    ORDER_CANCELLED: "order-cancelled",
+    CHECKOUT_CREATED: "checkout-created",
+    FULFILLMENT_CREATED: "fulfillment-create",
+    FULFILLMENT_EVENT_CREATED: "fulfillment-update",
+    ORDER_TAG_ADDED: "order-tag-added",
+  };
+
+  const folder = typeToFolderMap[campaign.trigger];
+  return `/campaigns/${folder}/${campaign.id}`;
+}
+
