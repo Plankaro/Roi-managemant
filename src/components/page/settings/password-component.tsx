@@ -1,0 +1,105 @@
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Lock } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+
+const passwordFormSchema = z
+  .object({
+    currentPassword: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    newPassword: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    confirmPassword: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
+
+export function PasswordComponent() {
+  const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  })
+
+  function onPasswordSubmit(data: z.infer<typeof passwordFormSchema>) {
+    console.log(data)
+    // Handle password change
+    passwordForm.reset()
+  }
+
+  return (
+    <Card className="bg-backgroundColor border-primary text-white mt-6">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Lock className="mr-2 h-5 w-5 text-primary-500" />
+          Change Password
+        </CardTitle>
+        <CardDescription>Update your password to keep your account secure.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...passwordForm}>
+          <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+            <FormField
+              control={passwordForm.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Current Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={passwordForm.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={passwordForm.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="bg-primary-700 hover:bg-primary-800">
+              Update Password
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  )
+}

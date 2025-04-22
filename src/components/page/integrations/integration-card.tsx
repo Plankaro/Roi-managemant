@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import Image from "next/image"
 
 
 interface IntegrationCardProps {
@@ -21,8 +22,14 @@ export function IntegrationCard({ integration, onConnect }: IntegrationCardProps
       <CardContent className="p-6">
         <div className="flex flex-col items-start gap-4">
           <div className={` flex items-center gap-4`}>
-            {/* <Image src={integration.icon} alt={integration.name} width={40} height={40} /> */}
-            <h3 className="font-medium text-lg">{integration.name}</h3>
+            {
+              integration.name==="Razorpay" ? <Image src={integration.icon} alt={integration.name} width={156.8} height={40} />:
+              <>
+              <Image src={integration.icon} alt={integration.name} width={40} height={40} />
+              <h3 className="font-medium text-lg">{integration.name}</h3>
+              </>
+            }
+            
           </div>
           <div>
            

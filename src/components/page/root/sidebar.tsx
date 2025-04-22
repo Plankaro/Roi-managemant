@@ -26,6 +26,7 @@ import { handleSignOut } from "@/app/(auth)/sign-in/action";
 import { FaBoltLightning } from "react-icons/fa6";
 import { IoMegaphone } from "react-icons/io5";
 import { CgTemplate } from "react-icons/cg";
+import { GrIntegration } from "react-icons/gr";
 
 export const sidebarItems = [
   { icon: LineChart, label: "Analytics", slugs: ["/", "/engagement-analytics", "/chat-analytics"] },
@@ -37,6 +38,8 @@ export const sidebarItems = [
   { icon: BetweenHorizonalEnd, label: "Broadcast", slugs: ["/broadcast"] },
   { icon: IoMegaphone, label: "Campaigns", slugs: ["/campaigns"] },
   { icon: AIBuilder, label: "Bots", slugs: ["/bots"] },
+  { icon: GrIntegration, label: "Integrations", slugs: ["/integrations"] },
+
 ];
 
 
@@ -119,10 +122,12 @@ const Sidebar = () => {
       </nav>
 
       <div className="mt-auto space-y-2">
+        <Link href={"/settings"}>
         <button className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-50 hover:text-white hover:bg-white/5 justify-normal ">
           <Settings className="h-5 w-5" />
           <span className="xl:inline md:hidden inline">Settings</span>
         </button>
+        </Link>
         <button
           onClick={() => handleSignOut()}
           className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-50 hover:text-white hover:bg-white/5 justify-normal "

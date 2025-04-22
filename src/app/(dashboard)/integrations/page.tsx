@@ -15,14 +15,14 @@ const integrations = [
     name: "Google Analytics 4",
     description:
       "Send conversations and lead events to Google Analytics for thorough performance tracking and valuable insights.",
-    icon: "📊",
+    icon: "./icons/g-analytics.svg",
     color: "bg-amber-500",
   },
   {
     id: "razorpay",
     name: "Razorpay",
     description: "Push conversations and lead event to razor pay for comprehensive performance tracking and insights.",
-    icon: "💳",
+    icon: "./icons/razorpay.svg",
     color: "bg-blue-500",
   },
   {
@@ -30,7 +30,7 @@ const integrations = [
     name: "Meta Pixel",
     description:
       "Incorporate the meta pixel tracking code into your conversational landing pages to gain comprehensive performance analytics.",
-    icon: "📱",
+    icon: "./icons/meta-pixel.svg",
     color: "bg-blue-400",
   },
 ]
