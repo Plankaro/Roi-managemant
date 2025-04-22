@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useUpdateProfileMutation } from "@/store/features/apislice"
+import toast from "react-hot-toast"
+import Link from "next/link"
 
 const passwordFormSchema = z
   .object({
@@ -28,6 +31,7 @@ const passwordFormSchema = z
   })
 
 export function PasswordComponent() {
+  const [updateProfile] = useUpdateProfileMutation()
   const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
     resolver: zodResolver(passwordFormSchema),
     defaultValues: {
@@ -39,6 +43,13 @@ export function PasswordComponent() {
 
   function onPasswordSubmit(data: z.infer<typeof passwordFormSchema>) {
     console.log(data)
+    const promise = updateProfile(data).unwrap()
+    toast.promise(promise, {
+      loading: "Updating...",
+      success: "Password updated successfully!",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+    })
     // Handle password change
     passwordForm.reset()
   }
@@ -62,7 +73,7 @@ export function PasswordComponent() {
                 <FormItem>
                   <FormLabel>Current Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field}  maxLength={50}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -75,7 +86,7 @@ export function PasswordComponent() {
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field}  maxLength={50}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -88,15 +99,26 @@ export function PasswordComponent() {
                 <FormItem>
                   <FormLabel>Confirm New Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field} maxLength={50}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <div className="flex justify-between">
+              
+            
             <Button type="submit" className="bg-primary-700 hover:bg-primary-800">
               Update Password
             </Button>
+            <Link
+                href="/get-token"
+                className="text-secondary-500 hover:underline text-sm"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+          
           </form>
         </Form>
       </CardContent>

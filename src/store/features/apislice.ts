@@ -3,7 +3,6 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import baseQuery from "./basequery";
 import { Filters } from "./prospect";
 
-
 export const apiSlice = createApi({
   baseQuery,
   tagTypes: [
@@ -15,7 +14,9 @@ export const apiSlice = createApi({
     "getbroadcastbyid",
     "bots",
     "teams",
-    "tags"
+    "tags",
+    "integrations",
+    "profile"
   ], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
@@ -298,7 +299,6 @@ export const apiSlice = createApi({
         body,
       }),
       invalidatesTags: ["teams"],
-      
     }),
     asignChat: builder.mutation({
       query: (body) => ({
@@ -319,7 +319,6 @@ export const apiSlice = createApi({
         url: `/agents/${id}`,
         method: "GET",
       }),
-
     }),
     updateTeam: builder.mutation({
       query: ({ id, body }) => ({
@@ -411,10 +410,10 @@ export const apiSlice = createApi({
     }),
     markMessagesAsRead: builder.mutation<void, { prospectId: string }>({
       query: ({ prospectId }) => ({
-        url: '/chats',
-        method: 'PATCH',
+        url: "/chats",
+        method: "PATCH",
         params: { prospect_id: prospectId }, // Query parameter
-       // Request body
+        // Request body
       }),
     }),
     getTags: builder.query({
@@ -454,12 +453,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["tags"],
     }),
-    deleteTagForProspect: builder.mutation<void, { id: string, ProspectId: string}>({
-      query: ({ id, ProspectId}) => ({
+    deleteTagForProspect: builder.mutation<
+      void,
+      { id: string; ProspectId: string }
+    >({
+      query: ({ id, ProspectId }) => ({
         url: `/tags/prospect/${ProspectId}`,
         method: "DELETE",
         params: { tag_id: id },
-      
       }),
       invalidatesTags: ["tags"],
     }),
@@ -468,10 +469,92 @@ export const apiSlice = createApi({
         url: `/buisness/notifications/${id}`,
         method: "GET",
       }),
+    }),
+    postGoogleAnalytics: builder.mutation({
+      query: (body) => ({
+        url: "buisness/google_analytics",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+    deleteGoogleAnalytics: builder.mutation({
+      query: () => ({
+        url: "buisness/google_analytics",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+    postRazorPay: builder.mutation({
+      query: (body) => ({
+        url: "buisness/razorpay",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+    deleteRazorPay: builder.mutation({
+      query: () => ({
+        url: "buisness/razorpay",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+    postmetapixel: builder.mutation({
+      query: (body) => ({
+        url: "buisness/meta_pixel",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+    deletemetapixel: builder.mutation({
+      query: () => ({
+        url: "buisness/meta_pixel",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+
+    postWhatsapp: builder.mutation({
+      query: (body) => ({
+        url: "buiness/whatsapp",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+
+    deleteWhatsapp: builder.mutation({
+      query: () => ({
+        url: "buiness/whatsapp",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+    getIntegrations: builder.query({
+      query: () => ({
+        url: "buisness/integrations",
+        method: "GET",
+      }),
+      providesTags: ["integrations"],
      
     }),
-    
-
+    updateProfile: builder.mutation({
+      query: (body) => ({
+        url: "auth/update",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["profile"],
+    }),
+    getProfile: builder.query({
+      query: () => ({
+        url: "auth",
+        method: "GET",
+      }),
+      providesTags: ["profile"],
+    }),
   }),
 });
 
@@ -536,5 +619,16 @@ export const {
   useGetTagforProspectQuery,
   useCreateTagforProspectMutation,
   useDeleteTagForProspectMutation,
-  useGetNotificationsQuery
+  useGetNotificationsQuery,
+  usePostGoogleAnalyticsMutation,
+  useDeleteGoogleAnalyticsMutation,
+  usePostRazorPayMutation,
+  useDeleteRazorPayMutation,
+  usePostmetapixelMutation,
+  useDeletemetapixelMutation,
+  usePostWhatsappMutation,
+  useDeleteWhatsappMutation,
+  useGetIntegrationsQuery,
+  useUpdateProfileMutation,
+  useGetProfileQuery
 } = apiSlice;

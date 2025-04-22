@@ -13,20 +13,46 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import Image from "next/image"
+import { IntegrationStatus } from "@/app/(dashboard)/integrations/page"
 
-const whatsappFormSchema = z.object({
-  whatsapp_mobile_id: z.string().optional(),
-  whatsapp_mobile: z.string().optional(),
-  whatsapp_token: z.string().optional(),
-  whatsapp_buisness_id: z.string().optional(),
-  whatsapp_app_id: z.string().optional(),
+import { useGetIntegrationsQuery } from "@/store/features/apislice"
+
+export const whatsappFormSchema = z.object({
+  whatsapp_mobile_id: z
+    .string()
+    .min(1, 'WhatsApp Mobile ID is required')
+    .regex(/^\d+$/, 'WhatsApp Mobile ID must be numeric'),
+
+  whatsapp_mobile: z
+    .string()
+    .min(10, 'WhatsApp number must be at least 10 digits')
+    .max(15, 'WhatsApp number must not exceed 15 digits')
+    .regex(/^\+?\d+$/, 'WhatsApp number must be valid and numeric'),
+
+  whatsapp_token: z
+    .string()
+    .min(10, 'WhatsApp token must be at least 10 characters')
+    .regex(/^[A-Za-z0-9-_]+$/, 'WhatsApp token must be alphanumeric with optional - or _'),
+
+  whatsapp_buisness_id: z
+    .string()
+    .min(1, 'WhatsApp Business ID is required')
+    .regex(/^\d+$/, 'Business ID must be numeric'),
+
+  whatsapp_app_id: z
+    .string()
+    .min(5, 'App ID must be at least 5 characters')
+    .regex(/^\d+$/, 'App ID must be numeric'),
 })
+
 
 export function WhatsappComponent() {
   const [isWhatsappConnected, setIsWhatsappConnected] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
   const webhookUrl = "https://api.yourservice.com/webhooks/whatsapp/12345"
   const webhookRef = useRef<HTMLInputElement>(null)
+
+  const { data: integrations } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus };
 
   const whatsappForm = useForm<z.infer<typeof whatsappFormSchema>>({
     resolver: zodResolver(whatsappFormSchema),
@@ -74,7 +100,7 @@ export function WhatsappComponent() {
         <CardDescription>Connect your WhatsApp Business account to enable messaging.</CardDescription>
       </CardHeader>
       <CardContent>
-        {isWhatsappConnected ? (
+        {integrations && integrations?.is_whatsapp_connected ? (
           <div className="space-y-6">
             <Alert className="bg-green-500/10 border-green-500/20">
               <Check className="h-4 w-4 text-white " />
@@ -95,11 +121,11 @@ export function WhatsappComponent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 <div>
                   <p className="text-sm font-medium">Phone Number</p>
-                  <p className="text-sm">{whatsappForm.getValues().whatsapp_mobile || "Not provided"}</p>
+                  <p className="text-sm">{integrations?.whatsapp_mobile || "Not provided"}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium">Business ID</p>
-                  <p className="text-sm">{whatsappForm.getValues().whatsapp_buisness_id || "Not provided"}</p>
+                  <p className="text-sm">{integrations?.whatsapp_buisness_id || "Not provided"}</p>
                 </div>
               </div>
             </div>

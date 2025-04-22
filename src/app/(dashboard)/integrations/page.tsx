@@ -7,37 +7,67 @@ import { GoogleAnalyticsModal } from "@/components/page/integrations/google-anay
 import { RazorpayModal } from "@/components/page/integrations/razorpay-intgration"
 import { MetaPixelModal } from "@/components/page/integrations/meta-pixel-modal"
 import { Input } from "@/components/ui/input"
+import { useGetIntegrationsQuery,useDeleteGoogleAnalyticsMutation,useDeletemetapixelMutation,useDeleteRazorPayMutation } from "@/store/features/apislice"
+
 
 // Integration data
-const integrations = [
-  {
-    id: "google-analytics",
-    name: "Google Analytics 4",
-    description:
-      "Send conversations and lead events to Google Analytics for thorough performance tracking and valuable insights.",
-    icon: "./icons/g-analytics.svg",
-    color: "bg-amber-500",
-  },
-  {
-    id: "razorpay",
-    name: "Razorpay",
-    description: "Push conversations and lead event to razor pay for comprehensive performance tracking and insights.",
-    icon: "./icons/razorpay.svg",
-    color: "bg-blue-500",
-  },
-  {
-    id: "meta-pixel",
-    name: "Meta Pixel",
-    description:
-      "Incorporate the meta pixel tracking code into your conversational landing pages to gain comprehensive performance analytics.",
-    icon: "./icons/meta-pixel.svg",
-    color: "bg-blue-400",
-  },
-]
+
+export type IntegrationStatus = {
+  is_google_analytics_connected: boolean;
+  is_meta_pixel: boolean;
+  is_razorpay_connected: boolean;
+  is_whatsapp_connected: boolean;
+  is_shopify_connected: boolean;
+  shopify_domain: string;
+  whatsapp_mobile: string;
+  whatsapp_buisness_id: string;
+  
+};
+
 
 export default function DataIntegration() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeModal, setActiveModal] = useState<string | null>(null)
+  const { data } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus };
+  const [ deleteGoogleAnalytics ] = useDeleteGoogleAnalyticsMutation()
+  const [ deletemetapixel ] = useDeletemetapixelMutation()
+  const [ deleterazorpay ] = useDeleteRazorPayMutation()
+  console.log(data);
+
+
+
+
+  const integrations = [
+    {
+      id: "google-analytics",
+      name: "Google Analytics 4",
+      description:
+        "Send conversations and lead events to Google Analytics for thorough performance tracking and valuable insights.",
+      icon: "./icons/g-analytics.svg",
+      color: "bg-amber-500",
+      isconnected:data?.is_google_analytics_connected??false,
+      onDisconnect:deleteGoogleAnalytics
+    },
+    {
+      id: "razorpay",
+      name: "Razorpay",
+      description: "Push conversations and lead event to razor pay for comprehensive performance tracking and insights.",
+      icon: "./icons/razorpay.svg",
+      color: "bg-blue-500",
+      isconnected:data?.is_razorpay_connected??false,
+      onDisconnect:deleterazorpay
+    },
+    {
+      id: "meta-pixel",
+      name: "Meta Pixel",
+      description:
+        "Incorporate the meta pixel tracking code into your conversational landing pages to gain comprehensive performance analytics.",
+      icon: "./icons/meta-pixel.svg",
+      color: "bg-blue-400",
+      isconnected:data?.is_meta_pixel??false,
+      onDisconnect:deletemetapixel
+    },
+  ]
 
   // Filter integrations based on search query
   const filteredIntegrations = integrations.filter(
@@ -71,6 +101,8 @@ export default function DataIntegration() {
             key={integration.id}
             integration={integration}
             onConnect={() => setActiveModal(integration.id)}
+            isConnected={integration.isconnected}
+            disconnect={integration.onDisconnect}
           />
         ))}
 

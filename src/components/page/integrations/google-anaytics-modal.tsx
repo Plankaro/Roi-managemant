@@ -1,23 +1,49 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useState } from "react"
-import { X } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { usePostGoogleAnalyticsMutation } from "@/store/features/apislice"
+import Image from "next/image"
+import toast from "react-hot-toast"
 interface GoogleAnalyticsModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
-export function GoogleAnalyticsModal({ isOpen, onClose }: GoogleAnalyticsModalProps) {
-  const [measurementId, setMeasurementId] = useState("")
-  const [apiSecret, setApiSecret] = useState("")
+const formSchema = z.object({
+  measurementId: z.string().min(1, "Measurement ID is required"),
+  apiSecret: z.string().min(1, "API Secret is required"),
+})
 
-  const handleConnect = () => {
+type FormValues = z.infer<typeof formSchema>
+
+export function GoogleAnalyticsModal({ isOpen, onClose }: GoogleAnalyticsModalProps) {
+  const [postGoogleAnalytics, { isLoading }] = usePostGoogleAnalyticsMutation()
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      measurementId: "",
+      apiSecret: "",
+    },
+  })
+
+  const onSubmit = (values: FormValues) => {
+    const promise = postGoogleAnalytics(values).unwrap()
+    toast.promise(promise, {
+      loading: "Connecting...",
+      success: "Connected successfully!",
+      error: (error: any) => error?.data?.message || "An unexpected error occurred",
+    })
+    
+
     // Handle connection logic here
-    console.log("Connecting Google Analytics with:", { measurementId, apiSecret })
+    console.log("Connecting Google Analytics with:", values)
     onClose()
   }
 
@@ -27,15 +53,9 @@ export function GoogleAnalyticsModal({ isOpen, onClose }: GoogleAnalyticsModalPr
         <div className="p-6 pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-amber-500 rounded flex items-center justify-center">
-                <span className="text-sm">📊</span>
-              </div>
+              <Image src="/icons/g-analytics.svg" alt="Google" width={20} height={20} />
               <h2 className="font-semibold">Google Analytics 4</h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </Button>
           </div>
         </div>
         <div className="px-6 pb-2">
@@ -43,36 +63,44 @@ export function GoogleAnalyticsModal({ isOpen, onClose }: GoogleAnalyticsModalPr
             Send conversations and lead events to Google Analytics for thorough performance tracking and valuable
             insights.
           </p>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="measurement-id" className="text-sm font-medium">
-                Measurement ID*
-              </label>
-              <Input
-                id="measurement-id"
-                value={measurementId}
-                onChange={(e) => setMeasurementId(e.target.value)}
-                placeholder="G-XXXXXXXXXX"
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="measurementId"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>Measurement ID*</FormLabel>
+                    <FormControl>
+                      <Input placeholder="G-XXXXXXXXXX" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="api-secret" className="text-sm font-medium">
-                API Secret*
-              </label>
-              <Input
-                id="api-secret"
-                type="password"
-                value={apiSecret}
-                onChange={(e) => setApiSecret(e.target.value)}
-                placeholder="Enter your API secret"
+
+              <FormField
+                control={form.control}
+                name="apiSecret"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel>API Secret*</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter your API secret" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
-        </div>
-        <div className="p-6 flex justify-end">
-          <Button onClick={handleConnect} className="bg-blue-600 hover:bg-blue-700 text-white">
-            Save
-          </Button>
+
+              <div className="pt-4 flex justify-end">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white" disabled={isLoading}>
+                  Save
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </DialogContent>
     </Dialog>

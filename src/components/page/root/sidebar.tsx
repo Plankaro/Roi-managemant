@@ -29,7 +29,11 @@ import { CgTemplate } from "react-icons/cg";
 import { GrIntegration } from "react-icons/gr";
 
 export const sidebarItems = [
-  { icon: LineChart, label: "Analytics", slugs: ["/", "/engagement-analytics", "/chat-analytics"] },
+  {
+    icon: LineChart,
+    label: "Analytics",
+    slugs: ["/", "/engagement-analytics", "/chat-analytics"],
+  },
   { icon: MessageSquare, label: "Chats", slugs: ["/chats", "/orders/*"] },
   { icon: CgTemplate, label: "Templates", slugs: ["/templates"] },
   { icon: FaBoltLightning, label: "Flash Response", slugs: ["/flashresponse"] },
@@ -39,10 +43,7 @@ export const sidebarItems = [
   { icon: IoMegaphone, label: "Campaigns", slugs: ["/campaigns"] },
   { icon: AIBuilder, label: "Bots", slugs: ["/bots"] },
   { icon: GrIntegration, label: "Integrations", slugs: ["/integrations"] },
-
 ];
-
-
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -52,8 +53,8 @@ const Sidebar = () => {
   );
   const dispatch = useDispatch();
   const isPathActive = (slugs: string[]) => {
-    return slugs.some(slug => {
-      if (slug.endsWith('/*')) {
+    return slugs.some((slug) => {
+      if (slug.endsWith("/*")) {
         const basePath = slug.slice(0, -2);
         return pathname.startsWith(basePath);
       }
@@ -123,10 +124,16 @@ const Sidebar = () => {
 
       <div className="mt-auto space-y-2">
         <Link href={"/settings"}>
-        <button className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-50 hover:text-white hover:bg-white/5 justify-normal ">
-          <Settings className="h-5 w-5" />
-          <span className="xl:inline md:hidden inline">Settings</span>
-        </button>
+          <button
+            className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium justify-normal ${
+              pathname.startsWith("/settings")
+                ? "bg-blue-500 text-white"
+                : "text-gray-50 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            <Settings className="h-5 w-5" />
+            <span className="xl:inline md:hidden inline">Settings</span>
+          </button>
         </Link>
         <button
           onClick={() => handleSignOut()}

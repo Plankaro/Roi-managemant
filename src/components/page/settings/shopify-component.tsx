@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react";
+import { useGetIntegrationsQuery } from "@/store/features/apislice"
+import { IntegrationStatus } from "@/app/(dashboard)/integrations/page"
 
 const shopifyFormSchema = z.object({
   shopifyName: z.string().min(2, {
@@ -25,6 +27,8 @@ const shopifyFormSchema = z.object({
 
 export function ShopifyComponent() {
   const router = useRouter()
+  const { data,isLoading } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus,isLoading?:boolean };
+  console.log(data);
   
     const session:any = useSession();
     //console.log(session)
@@ -62,7 +66,7 @@ export function ShopifyComponent() {
         <CardTitle className="flex items-center gap-3">
            <Image src="/icons/shopify.png" alt="Shopify" height={16} width={16} />
           Shopify Integration
-          {isShopifyConnected && (
+          {data && data?.is_shopify_connected && (
             <Badge variant="outline" className="ml-2 bg-green-500/20 text-green-500 border-green-500/20">
               <Check className="w-3 h-3 mr-1" /> Connected
             </Badge>
@@ -71,19 +75,20 @@ export function ShopifyComponent() {
         <CardDescription>Connect your Shopify store to sync products and orders.</CardDescription>
       </CardHeader>
       <CardContent>
-        {isShopifyConnected ? (
+        {data && data?.is_shopify_connected ? (
           <div className="space-y-4">
             <Alert className="bg-backgroundColor">
-              <Check className="h-4 w-4 text-white" />
+            <Check className="h-4 w-6 fill-green-500 stroke-green-500" />
+
               <AlertTitle className="text-green-500">Connected to Shopify</AlertTitle>
               <AlertDescription className="text-white">
                 Your Shopify store is successfully connected. You can now sync products and orders.
               </AlertDescription>
             </Alert>
-            <div className="flex items-center justify-between p-4 border rounded-md">
+            <div className="flex md:flex-row flex-col items-center justify-between p-4 border rounded-md">
               <div>
-                <h3 className="font-medium">Store: {shopifyForm.getValues().shopifyName}</h3>
-                <p className="text-sm text-muted-foreground">Connected on {new Date().toLocaleDateString()}</p>
+                <h3 className="font-medium">Store: {data?.shopify_domain}</h3>
+              
               </div>
               <Button  onClick={disconnectShopify} className="text-white bg-primary-700">
                 Disconnect

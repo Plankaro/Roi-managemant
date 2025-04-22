@@ -9,13 +9,17 @@ import { RootState } from "@/store/store";
 import {  useSession } from "next-auth/react";
 import { Notification } from "./notification";
 import { useState } from "react";
+import { useGetProfileQuery } from "@/store/features/apislice";
+import { Skeleton } from "@/components/ui/skeleton";
 const Header = () => {
   const session:any = useSession();
   console.log(session)
+  const {data,isLoading}=useGetProfileQuery({})
+  console.log(data)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
     const isOpen = useSelector((state:RootState)=>state.Prospect.openMenuModal)
-    const dispatch = useDispatch()
+    const dispatch = useDispatch()  
   return (
     <div className="w-full flex items-center justify-between  py-2 h-[72px]">
         <button
@@ -41,16 +45,29 @@ const Header = () => {
           onClose={() => setIsNotificationOpen(false)} 
         />
       </div>
-        <div className=" items-center gap-2 sm:flex hidden">
+      {
+        isLoading?(
+          <div className="items-center gap-2 sm:flex hidden">
+          <div className="flex flex-col text-white">
+            <Skeleton className="h-4 w-24 mb-1 bg-backgroundColor" />
+            <Skeleton className="h-3 w-32 bg-backgroundColor" />
+          </div>
+          <Skeleton className="h-10 w-10 rounded-full" />
+        </div>
+        ):(
+          <div className=" items-center gap-2 sm:flex hidden">
           <div className="flex flex-col  text-white">
-            <span className="text-sm ">{session?.data?.user?.user?.name??""}</span>
-            <span className="text-xs">{session?.data?.user?.user?.email??""}</span>
+            <span className="text-sm ">{data?.name??""}</span>
+            <span className="text-xs">{data?.email??""}</span>
           </div>
           <Avatar>
-            <AvatarImage src={session?.data?.user?.user?.image??""} alt="@shadcn" height={28} width={28} />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={data?.image??""} alt="@shadcn" height={28} width={28} />
+            <AvatarFallback>{data?.name?.slice(0, 1)??""}</AvatarFallback>
           </Avatar>
         </div>
+        )
+      }
+        
       </div>
     </div>
   );
