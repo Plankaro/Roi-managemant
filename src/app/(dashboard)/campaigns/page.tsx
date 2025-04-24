@@ -49,6 +49,8 @@ export default function CampaignsPage() {
       )
     : []
 
+    console.log(filteredCampaigns)
+
   return (
     <div className="min-h-screen">
       <div className="mx-auto p-4 space-y-6">
@@ -279,7 +281,7 @@ function getLink(campaign: CampaignStats): string {
     ORDER_UPDATED: "order-updated",
     ORDER_CANCELLED: "order-cancelled",
     CHECKOUT_CREATED: "checkout-created",
-    FULFILLMENT_CREATED: "fulfillment-create",
+    FULFILLMENT_CREATED: "fullfilment-create",
     FULFILLMENT_EVENT_CREATED: "fulfillment-update",
     ORDER_TAG_ADDED: "order-tag-added",
   };

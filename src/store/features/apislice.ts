@@ -342,9 +342,22 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    updateCampaign: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `campaign/${id}`,
+        method: "PATCH",
+        body,
+      }),
+    }),
     getCampaign: builder.query({
       query: () => ({
         url: "/campaign",
+        method: "GET",
+      }),
+    }),
+    getSpecificCampaign: builder.query({
+      query: (id) => ({
+        url: `/campaign/${id}`,
         method: "GET",
       }),
     }),
@@ -518,7 +531,7 @@ export const apiSlice = createApi({
 
     postWhatsapp: builder.mutation({
       query: (body) => ({
-        url: "buiness/whatsapp",
+        url: "buisness/whatsapp",
         method: "POST",
         body,
       }),
@@ -527,7 +540,7 @@ export const apiSlice = createApi({
 
     deleteWhatsapp: builder.mutation({
       query: () => ({
-        url: "buiness/whatsapp",
+        url: "buisness/whatsapp",
         method: "DELETE",
       }),
       invalidatesTags: ["integrations"],
@@ -555,6 +568,22 @@ export const apiSlice = createApi({
       }),
       providesTags: ["profile"],
     }),
+    uninstallShopify: builder.mutation({
+      query: () => ({
+        url: "auth/shopify/uninstall",
+        method: "POST",
+      }),
+      invalidatesTags: ["integrations"],
+    }),
+    installShopify: builder.mutation({
+      query: (body) => ({
+        url: 'auth/shopify/install',
+        method: 'POST',
+        body,
+      }),
+    }),
+
+    
   }),
 });
 
@@ -630,5 +659,9 @@ export const {
   useDeleteWhatsappMutation,
   useGetIntegrationsQuery,
   useUpdateProfileMutation,
-  useGetProfileQuery
+  useGetProfileQuery,
+  useUninstallShopifyMutation,
+  useInstallShopifyMutation,
+  useGetSpecificCampaignQuery,
+  useUpdateCampaignMutation
 } = apiSlice;

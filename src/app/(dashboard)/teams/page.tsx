@@ -12,6 +12,8 @@ import Link from "next/link"
 import { useGetTeamQuery, useDeleteTeamMutation } from "@/store/features/apislice"
 import toast from "react-hot-toast"
 import { useState } from "react"
+import { PermissionModal } from "@/components/page/Teams/permission-modal"
+import { DeleteConfirmationModal } from "@/components/page/Teams/delete-modal"
 
 export default function Dashboard() {
   const { data } = useGetTeamQuery({})
@@ -19,6 +21,9 @@ export default function Dashboard() {
   const [deleteTeam] = useDeleteTeamMutation()
 
   const [searchQuery, setSearchQuery] = useState("")
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState<any>(null)
+  const [permissionModalOpen, setPermissionModalOpen] = useState(false)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
@@ -46,14 +51,23 @@ export default function Dashboard() {
   const filtered = filteredData()
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this team?")) {
-      const promise = deleteTeam({ id }).unwrap()
-      toast.promise(promise, {
-        loading: "Deleting...",
-        success: "Team deleted successfully!",
-        error: (error: any) => error?.data?.message || "An unexpected error occurred.",
-      })
-    }
+    const promise = deleteTeam({ id }).unwrap()
+    toast.promise(promise, {
+      loading: "Deleting...",
+      success: "Team deleted successfully!",
+      error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+    })
+    setDeleteModalOpen(false)
+  }
+
+  const openDeleteModal = (team: any) => {
+    setSelectedTeam(team)
+    setDeleteModalOpen(true)
+  }
+
+  const openPermissionModal = (team: any) => {
+    setSelectedTeam(team)
+    setPermissionModalOpen(true)
   }
 
   return (
@@ -91,38 +105,100 @@ export default function Dashboard() {
 
         <div className=" no-scrollbar overflow-y-scroll h-[calc(100vh-200px)] ">
           <div className="md:grid hidden  xl:grid-col-4 lg:grid-cols-3 md:grid-cols-2  gap-5">
-            {filtered.admin && <AgentCard data={filtered.admin} handleDelete={handleDelete} />}
+            {filtered.admin && (
+              <AgentCard
+                data={filtered.admin}
+                handleDelete={handleDelete}
+                openPermissionModal={openPermissionModal}
+                openDeleteModal={openDeleteModal}
+              />
+            )}
             {filtered.agents.map((data: any, index: any) => (
-              <AgentCard key={index} data={data} handleDelete={handleDelete} />
+              <AgentCard
+                key={index}
+                data={data}
+                handleDelete={handleDelete}
+                openPermissionModal={openPermissionModal}
+                openDeleteModal={openDeleteModal}
+              />
             ))}
           </div>
 
           <div className=" md:hidden grid-cols-1 space-y-2">
-            {filtered.admin && <AgentListItem data={filtered.admin} handleDelete={handleDelete} />}
+            {filtered.admin && (
+              <AgentListItem
+                data={filtered.admin}
+                handleDelete={handleDelete}
+                openPermissionModal={openPermissionModal}
+                openDeleteModal={openDeleteModal}
+              />
+            )}
             {filtered.agents.map((data: any, index: any) => (
-              <AgentListItem key={index} data={data} handleDelete={handleDelete} />
+              <AgentListItem
+                key={index}
+                data={data}
+                handleDelete={handleDelete}
+                openPermissionModal={openPermissionModal}
+                openDeleteModal={openDeleteModal}
+              />
             ))}
           </div>
         </div>
       </div>
+      {selectedTeam && (
+        <>
+          <DeleteConfirmationModal
+            isOpen={deleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={() => handleDelete(selectedTeam.id)}
+            teamName={selectedTeam.name}
+          />
+          <PermissionModal
+            isOpen={permissionModalOpen}
+            onClose={() => setPermissionModalOpen(false)}
+            teamId={selectedTeam.id}
+            initialData={{
+              ManageBroadcast: selectedTeam.ManageBroadcast || false,
+              manageTeam: selectedTeam.manageTeam || false,
+              manageCampaign: selectedTeam.manageCampaign || false,
+              assignChat: selectedTeam.assignChat || false,
+              name: selectedTeam.name,
+            }}
+          />
+        </>
+      )}
     </div>
   )
 }
 
-function AgentCard({ data, handleDelete }: { data: any; handleDelete: any }) {
+function AgentCard({
+  data,
+  handleDelete,
+  openPermissionModal,
+  openDeleteModal,
+}: { data: any; handleDelete: any; openPermissionModal: any; openDeleteModal: any }) {
   return (
     <div
       className={`${data?.role === "ADMIN" ? "bg-gradient-to-b from-[rgba(203,28,101,0.3)] to-[rgba(30,30,128,0.3)]" : "bg-backgroundColor"}  border  border-primary rounded-xl p-6 relative`}
     >
       <div className="absolute top-4 right-4 flex flex-col gap-3">
-        <Link href={`/teams/${data?.id}`}>
-          <button className="text-gray-400  rounded-full p-2 hover:bg-primary hover:text-white">
-            <Edit2 className="h-4 w-4" />
-          </button>
-        </Link>
-        <button className="text-red-500 hover:text-red-400 rounded-full p-2" onClick={() => handleDelete(data?.id)}>
-          <Trash2 className="h-4 w-4" />
-        </button>
+      {data?.role !== "ADMIN" && (
+  <div className="flex items-center gap-2">
+    <button
+      className="text-gray-400 rounded-full p-2 hover:bg-primary hover:text-white"
+      onClick={() => openPermissionModal(data)}
+    >
+      <Edit2 className="h-4 w-4" />
+    </button>
+    <button
+      className="text-red-500 hover:text-red-400 rounded-full p-2"
+      onClick={() => openDeleteModal(data)}
+    >
+      <Trash2 className="h-4 w-4" />
+    </button>
+  </div>
+)}
+
       </div>
 
       <div className="flex flex-col items-center">
@@ -131,6 +207,7 @@ function AgentCard({ data, handleDelete }: { data: any; handleDelete: any }) {
             src={
               data?.image ||
               "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png" ||
+              "/placeholder.svg" ||
               "/placeholder.svg"
             }
             alt="Agent profile"
@@ -143,11 +220,6 @@ function AgentCard({ data, handleDelete }: { data: any; handleDelete: any }) {
         <span className="px-4 py-1 bg-black/30 rounded-full text-xs text-gray-300 mb-4">{data?.role}</span>
 
         <div className="w-full space-y-3 flex items-center justify-center">
-          {/* <div className="flex items-center text-sm text-gray-300">
-            <Phone className="h-4 w-4 mr-2 text-gray-400" />
-            <span>+919876543210</span>
-          </div> */}
-
           <div className="flex items-center text-sm text-gray-300">
             <Mail className="h-4 w-4 mr-2 text-gray-400" />
             <span>{data?.email}</span>
@@ -158,7 +230,12 @@ function AgentCard({ data, handleDelete }: { data: any; handleDelete: any }) {
   )
 }
 
-function AgentListItem({ data, handleDelete }: { data: any; handleDelete: any }) {
+function AgentListItem({
+  data,
+  handleDelete,
+  openPermissionModal,
+  openDeleteModal,
+}: { data: any; handleDelete: any; openPermissionModal: any; openDeleteModal: any }) {
   return (
     <div className="bg-[#0A0A1B] rounded-lg py-4 px-5 border border-primary relative overflow-hidden">
       <span className="absolute top-0  right-2 bg-blue-600 text-white text-sm px-3 py-1 rounded-lg">{data?.role}</span>
@@ -169,6 +246,7 @@ function AgentListItem({ data, handleDelete }: { data: any; handleDelete: any })
             src={
               data?.image ||
               "https://businessreflex.se/wp-content/uploads/2019/03/placeholder-person-300x300.png" ||
+              "/placeholder.svg" ||
               "/placeholder.svg"
             }
             alt="Profile"
@@ -185,11 +263,11 @@ function AgentListItem({ data, handleDelete }: { data: any; handleDelete: any })
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-blue-50 border-0 ">
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer" onClick={() => openPermissionModal(data)}>
               <Pencil className="mr-2 h-4 w-4" />
               <span>Edit</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer text-red-500" onClick={() => handleDelete(data?.id)}>
+            <DropdownMenuItem className="cursor-pointer text-red-500" onClick={() => openDeleteModal(data)}>
               <Trash2 className="mr-2 h-4 w-4" />
               <span>Delete</span>
             </DropdownMenuItem>
@@ -203,10 +281,6 @@ function AgentListItem({ data, handleDelete }: { data: any; handleDelete: any })
           <span>{data?.email}</span>
         </div>
       </div>
-      {/* <div className="flex items-center gap-2 text-gray-400">
-          <Phone size={18} />
-          <span>+919876543210</span>
-        </div> */}
     </div>
   )
 }

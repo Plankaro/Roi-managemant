@@ -14,8 +14,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import Image from "next/image"
 import { IntegrationStatus } from "@/app/(dashboard)/integrations/page"
+import { usePostWhatsappMutation,useDeleteWhatsappMutation } from "@/store/features/apislice"
 
 import { useGetIntegrationsQuery } from "@/store/features/apislice"
+import toast from "react-hot-toast"
 
 export const whatsappFormSchema = z.object({
   whatsapp_mobile_id: z
@@ -47,12 +49,16 @@ export const whatsappFormSchema = z.object({
 
 
 export function WhatsappComponent() {
-  const [isWhatsappConnected, setIsWhatsappConnected] = useState(false)
+
+  const [postWhatsapp] = usePostWhatsappMutation()
   const [isCopied, setIsCopied] = useState(false)
   const webhookUrl = "https://api.yourservice.com/webhooks/whatsapp/12345"
   const webhookRef = useRef<HTMLInputElement>(null)
+  
 
   const { data: integrations } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus };
+
+  const [deleteWhatsapp] = useDeleteWhatsappMutation()
 
   const whatsappForm = useForm<z.infer<typeof whatsappFormSchema>>({
     resolver: zodResolver(whatsappFormSchema),
@@ -66,14 +72,25 @@ export function WhatsappComponent() {
   })
 
   function onWhatsappSubmit(data: z.infer<typeof whatsappFormSchema>) {
-    console.log(data)
-    // Handle WhatsApp integration
-    setIsWhatsappConnected(true)
+    const promise = postWhatsapp(data).unwrap()
+    toast.promise(promise, {
+      loading: "Connecting...",
+      success: "WhatsApp connected successfully!",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+    })
+
   }
 
   function disconnectWhatsapp() {
-    setIsWhatsappConnected(false)
-    whatsappForm.reset()
+    const promise = deleteWhatsapp({}).unwrap()
+    toast.promise(promise, {
+      loading: "Disconnecting...",
+      success: "WhatsApp disconnected successfully!",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      error: (error: any) => error?.data?.message || "An unexpected error occurred.",
+    })
+    
   }
 
   const copyWebhookUrl = () => {
@@ -91,7 +108,7 @@ export function WhatsappComponent() {
         <CardTitle className="flex items-center gap-3">
            <Image src="/icons/whatsapp.svg" alt="Shopify" height={16} width={16} />
           WhatsApp Integration
-          {isWhatsappConnected && (
+          {integrations?.is_whatsapp_connected && (
             <Badge variant="outline" className="ml-2 bg-green-500/20 text-green-500 border-green-500/20">
               <Check className="w-3 h-3 mr-1" /> Connected
             </Badge>

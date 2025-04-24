@@ -18,6 +18,9 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react";
 import { useGetIntegrationsQuery } from "@/store/features/apislice"
 import { IntegrationStatus } from "@/app/(dashboard)/integrations/page"
+import { useUninstallShopifyMutation } from "@/store/features/apislice"
+import toast from "react-hot-toast"
+import { useInstallShopifyMutation } from "@/store/features/apislice"
 
 const shopifyFormSchema = z.object({
   shopifyName: z.string().min(2, {
@@ -27,15 +30,17 @@ const shopifyFormSchema = z.object({
 
 export function ShopifyComponent() {
   const router = useRouter()
-  const { data,isLoading } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus,isLoading?:boolean };
-  console.log(data);
+  const { data} = useGetIntegrationsQuery({}) as { data?: IntegrationStatus,isLoading?:boolean };
+  const [uninstallShopify] = useUninstallShopifyMutation({})
+  const [installShopify] = useInstallShopifyMutation({})
+
   
     const session:any = useSession();
     //console.log(session)
   
   const user = session?.data?.user?.user
 
-  const [isShopifyConnected, setIsShopifyConnected] = useState(false)
+ 
 
   const shopifyForm = useForm<z.infer<typeof shopifyFormSchema>>({
     resolver: zodResolver(shopifyFormSchema),
@@ -43,21 +48,39 @@ export function ShopifyComponent() {
       shopifyName: "",
     },
   })
-  function onShopifySubmit(data: { shopifyName: string }) {
+  async function onShopifySubmit(data: { shopifyName: string }) {
     const shopDomain = `${data.shopifyName}.myshopify.com`
+    const payload = {
+      shopifyName:shopDomain
+    }
     console.log(user?.buisness?.id);
+    console.log("www",data)
+    
+    const promise = installShopify(payload).unwrap();
+    toast.promise(promise, {
+      loading: "Connecting...",
+      success: "Connected successfully!",
+      error: (error: any) => error?.data?.message || "An unexpected error occurred",
+    })
+    console.log("Connecting Shopify with:", await promise)
+    const {installUrl} = await promise
+  
+    router.push(installUrl);
     // Redirect merchant to your backend's /auth/shopify endpoint
-    router.push(
-      `https://f4a7-2401-4900-3a7f-74a0-9907-97c0-c9ea-101a.ngrok-free.app/auth/shopify/install?shop=${shopDomain}&buisnessId=${user?.buisness?.id}`
-    )
+   
   }
 
   // …rest of component…
 
 
   function disconnectShopify() {
-    setIsShopifyConnected(false)
-    shopifyForm.reset()
+    const promise = uninstallShopify({}).unwrap();
+    toast.promise(promise, {
+      loading: "Disconnecting...",
+      success: "Disconnected successfully!",
+      error: (error: any) => error?.data?.message || "An unexpected error occurred",
+    })
+    
   }
 
   return (
@@ -90,7 +113,7 @@ export function ShopifyComponent() {
                 <h3 className="font-medium">Store: {data?.shopify_domain}</h3>
               
               </div>
-              <Button  onClick={disconnectShopify} className="text-white bg-primary-700">
+              <Button  onClick={() => disconnectShopify()} className="text-white bg-primary-700">
                 Disconnect
               </Button>
             </div>

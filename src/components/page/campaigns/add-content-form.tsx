@@ -37,12 +37,16 @@ function AddContentForm({
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadFiles] = useUploadFilesMutation();
-  console.log(formData);
+   // a ref that survives across renders but doesn’t trigger them
+
+   console.log(formData);
+   
   useEffect(() => {
-    if (selectedTemplate) {
+    if (  selectedTemplate && formData.body.length === 0) {
+
       const newFormData = {
         header: {
-          type: "",
+          type: "text",
           value: "",
           isEditable: false,
           fromsegment: false,
@@ -63,7 +67,7 @@ function AddContentForm({
         }[],
       };
 
-      selectedTemplate.components.forEach((component: any) => {
+      selectedTemplate?.components?.forEach((component: any) => {
         if (component.type === "HEADER") {
           newFormData.header.type = component.format || "";
           if (

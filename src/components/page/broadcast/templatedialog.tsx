@@ -15,6 +15,7 @@ interface DialogContentProps {
   setOpen: (open: boolean) => void;
   selectedTemplate: any;
   setSelectedTemplate: (template: any) => void;
+
 }
 
 export default function TemplateBuilder({
@@ -22,12 +23,16 @@ export default function TemplateBuilder({
   setOpen,
   selectedTemplate,
   setSelectedTemplate,
+ 
+
 }: DialogContentProps) {
   const { data: templates, isLoading } = useGetAllTemplatesQuery({});
 
 
   const [filteredTemplate, setFilteredTemplate] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  
 
 //console.log(selectedTemplate)
 
