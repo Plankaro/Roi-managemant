@@ -36,7 +36,7 @@ import { useCreateCampaignMutation } from "@/store/features/apislice";
 
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
-const OrderCreated = () => {
+const FullfillmentUpdate = () => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [createCampaign] = useCreateCampaignMutation();
@@ -731,4 +731,4 @@ const OrderCreated = () => {
   );
 };
 
-export default OrderCreated;
+export default FullfillmentUpdate;

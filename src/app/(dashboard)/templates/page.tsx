@@ -2,7 +2,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Plus, Trash2 } from "lucide-react"
+import { Search, Plus, Trash2, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -66,9 +66,35 @@ const handleDelete = (template_name: string) => {
         </div>
 <div className="h-[calc(100vh-250px)]  overflow-y-scroll no-scrollbar">
 <div className="grid grid-cols-1  md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-          {filteredTemplates?.map((template:any, index:number) => (
-            <TemplateCard key={index} template={template} onView={() => openModal(template)} handleDelete={handleDelete}/>
-          ))}
+{filteredTemplates?.length === 0 ? (
+  <div className="bottom-full left-0 col-span-full w-full right-0 rounded-t-lg h-[60vh] p-8 flex flex-col items-center justify-center">
+    <div className="p-4 rounded-full mb-4">
+      <Zap className="h-20 w-20 text-yellow-500" />
+    </div>
+    <h2 className="text-xl font-bold text-white mb-2">
+      No Templates Added Yet!
+    </h2>
+    <p className="text-center text-gray-300 mb-6 max-w-md">
+      It looks like you haven&apos;t created any Template yet.
+     
+    </p>
+    <Link href="templates/create">
+      <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+        Create Tempalate
+      </Button>
+    </Link>
+  </div>
+) : (
+  filteredTemplates?.map((template: any, index: number) => (
+    <TemplateCard
+      key={index}
+      template={template}
+      onView={() => openModal(template)}
+      handleDelete={handleDelete}
+    />
+  ))
+)}
+        
         </div>
 </div>
         

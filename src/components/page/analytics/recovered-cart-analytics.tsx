@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useGetEcommerceAnalyticsQuery } from "@/store/features/apislice";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from "recharts"
 
 const COLORS = ['#1e40af', '#ef4444'];
@@ -21,10 +24,24 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export default function RecoveredCartAnalytics() {
+    const {analytics}=useSelector((state: RootState) => state);
+    const { data } = useGetEcommerceAnalyticsQuery({
+      startDate: new Date(analytics.startDate).toISOString(),
+    endDate: new Date(analytics.endDate).toISOString(),
+    });
+
+    
   const chartData = [
-    { name: 'Abondned Carts', value:100 },
-    { name: 'Recovered Carts', value: 200 }
+    { name: 'Abondned Carts', value:data?.AbondnedCheckout },
+    { name: 'Recovered Carts', value: data?.recoveredCheckout },
   ];
+  const percentAbandon = +(
+    ((data?.recoveredCheckout ?? 0) /
+     ((data?.AbondnedCheckout ?? 0) + (data?.recoveredCheckout ?? 0)) *
+     100
+    ).toFixed(2)
+  ) || 0;
+  
 
   const totalMessages = chartData.reduce((acc, curr) => acc + curr.value, 0);
   // const average = ((100 / 200) * 100).toFixed(0);
@@ -35,7 +52,7 @@ export default function RecoveredCartAnalytics() {
         <CardTitle className="flex items-center justify-between">
           <span>Abondned cart to recovered carts</span>
           <div className="text-sm font-normal text-muted-foreground">
-            Session Messages: {544}
+            total recovered carts:  {percentAbandon} %
           </div>
         </CardTitle>
       </CardHeader>

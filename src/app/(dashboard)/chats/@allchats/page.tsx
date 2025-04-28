@@ -35,7 +35,7 @@ import Image from "next/image";
 import { UserRound } from "lucide-react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
-import type { RootState } from "@/store/store";
+
 import FlashResponsePopup from "@/components/page/chats/flashresponse";
 import {
   Select,
@@ -74,7 +74,7 @@ import EditableField from "@/components/page/chats/editablediv";
 type FileType = "image" | "video" | "document";
 import { useChangeBlockStatusMutation } from "@/store/features/apislice";
 import { getTimeDifference } from "@/lib/timetill";
-
+import { RootState } from "@/store/store";
 import { getChatsForProspect } from "@/components/page/broadcast/getchats";
 import { useGetFlashResponseQuery } from "@/store/features/apislice";
 import AssignmentDropdown from "@/components/page/chats/assignmentdropdown";
@@ -98,17 +98,7 @@ const AllChats = () => {
     (state: RootState) => state.Prospect
   );
 
-  const { data: chats, isLoading: isChatsLoading } = useGetChatsQuery({
-    prospectId: selectedProspect?.id ?? "",
-  });
 
-
-  useEffect(() => {
-    if (chats) {
-      dispatch(setChats(chats));
-
-    }
-  },[chats]);
 
   const [message, setMessage] = useState("");
   const [showFlashPopup, setShowFlashPopup] = useState(false);
@@ -421,7 +411,7 @@ const AllChats = () => {
             </div>
 
             {/* Messages */}
-            <Messages isLoading={isChatsLoading} />
+            <Messages  />
 
             {/* Input */}
             {selectedProspect?.assignedToId === user?.id ? (

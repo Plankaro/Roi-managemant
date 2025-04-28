@@ -39,7 +39,7 @@ export function AgentMessagesChart() {
       </CardHeader>
       <CardContent className="p-4">
         <ScrollArea className="w-full ">
-          <div className="h-[400px] min-w-full">
+          <div className="h-[400px] max-w-[30vw]">
             <ChartContainer
               className="h-full w-full"
               config={{
@@ -73,6 +73,7 @@ export function AgentMessagesChart() {
                   <Bar
                     dataKey="messageCount"
                     stackId="a"
+                    barSize={30}
                     radius={[4, 4, 0, 0]}
                     fill="var(--color-agentMessages)"
                   />

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FilterForm from "@/components/page/campaigns/campaign-filter";
 import { useForm } from "react-hook-form";
 import {
@@ -14,7 +14,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { CampaignSchema } from "@/zod/campaigns/order-create-campaign";
+import { CampaignSchema } from "@/zod/campaigns/fullfillment-create-campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {   z } from "zod";
 import { Input } from "@/components/ui/input";
@@ -32,14 +32,22 @@ import {
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import NumericInput from "@/components/ui/numericInput";
-import { useCreateCampaignMutation } from "@/store/features/apislice";
+import {  useGetAllTemplatesQuery, useGetSpecificCampaignQuery, useUpdateCampaignMutation } from "@/store/features/apislice";
+import CampaignSkeleton from "./campaign skeletion";
+import CampaignNotAvailable from "./not-available";
 
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
-const OrderCreated = () => {
+
+const FullfillmentEventCreate = ({id}: {id: string}) => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
-  const [createCampaign] = useCreateCampaignMutation();
+     const { data: templates, isLoading:isTemplateLoading } = useGetAllTemplatesQuery({});
+
+  
+    const { data: campaignData, isLoading:isCampaignloading ,isSuccess} = useGetSpecificCampaignQuery(id);
+    const  [updateCampaign] = useUpdateCampaignMutation();
+
 
   const form = useForm<CampaignFormValues>({
     resolver: zodResolver(CampaignSchema),
@@ -114,7 +122,7 @@ const OrderCreated = () => {
       new_order_creation_filter: false,
       new_order_creation_type: "AFTER_EVENT",
       new_order_creation_time: { time: 1, unit: "minutes" },
-      related_order_fulfilled: false,
+
       related_order_cancelled: false,
       // Initialize templateForm with default values
       templateForm: {
@@ -131,27 +139,103 @@ const OrderCreated = () => {
     },
   });
 
+  useEffect(() => {
+      if (campaignData && templates) {
+        const matched = templates.find(
+          (t:any) =>
+            t.name === campaignData.template_name
+        );
+        console.log(matched);
+        
+        form.reset({
+          name: campaignData.name,
+          reply_action: campaignData.reply_action,
+          filter: {
+            is_order_tag_filter_enabled: campaignData.filters.is_order_tag_filter_enabled,
+            is_product_tag_filter_enabled: campaignData.filters.is_product_tag_filter_enabled,
+            is_customer_tag_filter_enabled: campaignData.filters.is_customer_tag_filter_enabled,
+            is_discount_code_filter_enabled: campaignData.filters.is_discount_code_filter_enabled,
+            is_payment_gateway_filter_enabled: campaignData.filters.is_payment_gateway_filter_enabled,
+            is_payment_option_filter_enabled: campaignData.filters.is_payment_option_filter_enabled,
+            is_send_to_unsub_customer_filter_enabled: campaignData.filters.is_send_to_unsub_customer_filter_enabled,
+            is_order_amount_filter_enabled: campaignData.filters.is_order_amount_filter_enabled,
+            is_discount_amount_filter_enabled: campaignData.filters.is_discount_amount_filter_enabled,
+            is_order_delivery_filter_enabled: campaignData.filters.is_order_delivery_filter_enabled,
+            is_order_count_filter_enabled: campaignData.filters.is_order_count_filter_enabled,
+  
+            order_tag_filter_all: campaignData.filters.order_tag_filter_all,
+            order_tag_filter_any: campaignData.filters.order_tag_filter_any,
+            order_tag_filter_none: campaignData.filters.order_tag_filter_none,
+            product_tag_filter_all: campaignData.filters.product_tag_filter_all,
+            product_tag_filter_any: campaignData.filters.product_tag_filter_any,
+            product_tag_filter_none: campaignData.filters.product_tag_filter_none,
+            customer_tag_filter_all: campaignData.filters.customer_tag_filter_all,
+            customer_tag_filter_any: campaignData.filters.customer_tag_filter_any,
+            customer_tag_filter_none: campaignData.filters.customer_tag_filter_none,
+            discount_code_filter_any: campaignData.filters.discount_code_filter_any,
+            discount_code_filter_none: campaignData.filters.discount_code_filter_none,
+            payment_gateway_filter_any: campaignData.filters.payment_gateway_filter_any,
+            payment_gateway_filter_none: campaignData.filters.payment_gateway_filter_none,
+  
+            payment_options_type: campaignData.filters.payment_options_type,
+            send_to_unsub_customer: campaignData.filters.send_to_unsub_customer,
+            order_amount_filter_greater_or_equal: campaignData.filters.order_amount_filter_greater_or_equal,
+            order_amount_filter_less_or_equal: campaignData.filters.order_amount_filter_less_or_equal,
+            order_amount_min: campaignData.filters.order_amount_min,
+            order_amount_max: campaignData.filters.order_amount_max,
+            discount_amount_filter_greater_or_equal: campaignData.filters.discount_amount_filter_greater_or_equal,
+            discount_amount_filter_less_or_equal: campaignData.filters.discount_amount_filter_less_or_equal,
+            discount_amount_min: campaignData.filters.discount_amount_min,
+            discount_amount_max: campaignData.filters.discount_amount_max,
+            order_count_greater_or_equal: campaignData.filters.order_count_greater_or_equal || 0,
+            order_count_less_or_equal: campaignData.filters.order_count_less_or_equal || 0,
+            order_count_min: campaignData.filters.order_count_min || 0,
+            order_count_max: campaignData.filters.order_count_max || 0,
+            order_method: campaignData.filters.order_method,
+          },
+          type: campaignData.type,
+          trigger_type: campaignData.trigger_type,
+          trigger_time: campaignData.trigger_time,
+         
+        
+       
+          filter_condition_match: campaignData.filter_condition_match,
+          new_checkout_abandonment_filter: campaignData.new_checkout_abandonment_filter,
+          new_checkout_abandonment_type: campaignData.new_checkout_abandonment_type,
+          new_checkout_abandonment_time: campaignData.new_checkout_abandonment_time,
+          new_order_creation_filter: campaignData.new_order_creation_filter,
+          new_order_creation_type: campaignData.new_order_creation_type,
+          new_order_creation_time: campaignData.new_order_creation_time,
+          
+          related_order_cancelled: campaignData.related_order_cancelled,
+          templateForm: campaignData.components,
+          template:matched?matched:null,
+  
+        
+        });
+      }
+    }, [campaignData,templates]);
+
   const onSubmit = async (data: CampaignFormValues) => {
    
     try {
       const payload = {
         ...data,
-        trigger: "ORDER_CREATED",
+        trigger: "FULFILLMENT_EVENT_CREATED",
         template_name: data.template?.name ?? "",
         template_language: data.template?.language ?? "",
         template_category: data.template?.category ?? "",
       };
-      
       delete (payload as any).template;
-      console.log("sss",payload)
+
 
       
-      const promise = createCampaign(payload).unwrap();
+      const promise = updateCampaign({id:id,body:payload}).unwrap();
 
       await toast.promise(promise, {
-        loading: "Creating campaign...",
-        success: "Campaign created successfully!",
-        error: "Error creating campaign.",
+        loading: "Update campaign...",
+        success: "Campaign Updating successfully!",
+        error: "Error updating campaign.",
       });
       console.log(await promise);
 
@@ -199,22 +283,40 @@ const OrderCreated = () => {
       type: "Order date",
       value: "order_date",
     },
+    {
+      type:"Tracking id",
+      value:"track_id"
+    },
+    {
+      type: "Shippment Status",
+      value:"shippment_status"
+    }
   ];
 
   const urldropdownOptions = [
     {
       type: "Order Status Link",
-      value: "order_status_link",
+      value: "Order Status Link",
     },
     {
       type: "COD to checkout link",
       value: "cod_to_checkout_link",
     },
     {
+      type: "Track link",
+      value:"track_link"
+    },
+    {
       type: "Shop URL",
       value: "shop_url",
     },
   ];
+  if(isCampaignloading || isTemplateLoading){
+    return <CampaignSkeleton/>
+  }
+  if(!isSuccess){
+    return <CampaignNotAvailable/>
+  }
 
   return (
     <ScrollArea className="h-[calc(100vh-100px)] overflow-auto no-scrollbar">
@@ -699,25 +801,7 @@ const OrderCreated = () => {
             />
 
             {/* Order Fulfilled */}
-            <FormField
-              control={form.control}
-              name="related_order_fulfilled"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      variant="blue"
-                      className="border border-white"
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>The concerned order is fulfilled</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
+          
           </div>
 
           <div className="flex justify-end space-x-4">
@@ -738,4 +822,4 @@ const OrderCreated = () => {
   );
 };
 
-export default OrderCreated;
+export default FullfillmentEventCreate;

@@ -45,6 +45,8 @@ import { addProspect, selectProspect } from "@/store/features/prospect";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { updateProspectSchema } from "@/zod/chats/chat";
+import ProspectSkeleton from "./prospect-id-skeleton";
+import NoProspectFound from "./prospect-id-not-available";
 
 
 function ProspectId({ id }: { id: string }) {
@@ -53,7 +55,7 @@ function ProspectId({ id }: { id: string }) {
     useUpdateProspectMutation();
   const router = useRouter();
 
-  const { data,refetch } = useGetSpecificShopifyContactsQuery(id);
+  const { data,refetch, isLoading,isSuccess } = useGetSpecificShopifyContactsQuery(id);
 
 
   //console.log(data);
@@ -143,6 +145,13 @@ function ProspectId({ id }: { id: string }) {
       value: data?.sentMessages || 0,
     },
   ];
+
+  if (isLoading) {
+    return <ProspectSkeleton/>
+  }
+  if(!isSuccess){
+    return <NoProspectFound/>
+  }
 
   return (
     <div className="h-[calc(100vh-100px)] overflow-auto no-scrollbar  text-white sm:p-4 md:p-8">

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { Bar, BarChart, XAxis, ResponsiveContainer } from "recharts"
+import { Bar, BarChart, XAxis } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer } from "@/components/ui/chart"
 import { useGetChatAnalyticsQuery } from "@/store/features/apislice"
@@ -42,7 +42,7 @@ export function EngagementComparisonChart() {
       <CardContent className="p-2 sm:p-4">
         <div className="w-full h-[180px] sm:h-[200px] md:h-[220px]">
           <ChartContainer
-            className="h-full w-full"
+            className="h-full w-full "
             config={{
               value: {
                 label: "Value",
@@ -50,7 +50,7 @@ export function EngagementComparisonChart() {
               },
             }}
           >
-            <ResponsiveContainer width="100%" height="100%">
+            {/* <ResponsiveContainer width="100%" height="100%"> */}
               <BarChart
                 data={data}
                 layout="vertical"
@@ -66,6 +66,7 @@ export function EngagementComparisonChart() {
                 <XAxis type="number" hide />
                 <Bar
                   dataKey="value"
+                  barSize={30}
                   radius={[0, 6, 6, 0]}
                   fill="#ffffff"
                   label={{
@@ -77,7 +78,7 @@ export function EngagementComparisonChart() {
                   }}
                 />
               </BarChart>
-            </ResponsiveContainer>
+            {/* </ResponsiveContainer> */}
           </ChartContainer>
         </div>
         <div className="mt-3 space-y-2">

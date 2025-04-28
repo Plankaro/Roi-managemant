@@ -45,7 +45,7 @@ function ChatAnalytics() {
 
  
   return (
-    <div className="overflow-scroll no-scrollbar h-[calc(100vh-250px)]">
+    <div className="overflow-auto no-scrollbar h-[calc(100vh-250px)]">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 ">
         {metrics.map((metric, index) => (
           <div

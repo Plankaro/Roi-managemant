@@ -425,7 +425,7 @@ export const CampaignSchema = z
     new_order_creation_filter: z.boolean(),
     new_order_creation_type: TriggerType,
     new_order_creation_time: TimeSchema.optional(),
-    related_order_fullfilled: z.boolean(),
+    related_order_fulfilled: z.boolean(),
     related_order_cancelled: z.boolean(),
   })
   .superRefine((data, ctx) => {

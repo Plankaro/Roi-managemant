@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React from "react";
 import ConversionsAnalytics from "./conversion-ctr";
@@ -5,13 +6,31 @@ import { BentoGrid, BentoGridItem } from "@/components/ui/bentogrid";
 import RevenueAnalytics from "./revenue";
 import RecoveredCartAnalytics from "./recovered-cart-analytics";
 import CodToCheckoutAnalytics from "./checkout-cod-analytics";
+import { useGetEcommerceAnalyticsQuery } from "@/store/features/apislice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 function EcommerceAnalytics() {
+  const {analytics}=useSelector((state: RootState) => state);
+  const { data } = useGetEcommerceAnalyticsQuery({
+    startDate: new Date(analytics.startDate).toISOString(),
+  endDate: new Date(analytics.endDate).toISOString(),
+  });
+console.log(data);
+const percentAbandon = +(
+  ((data?.recoveredCheckout ?? 0) /
+   ((data?.AbondnedCheckout ?? 0) + (data?.recoveredCheckout ?? 0)) *
+   100
+  ).toFixed(2)
+) || 0;
+
+const revenue = data?.getOrder?.reduce((acc:number, item:any) => acc + Number(item?.Order?.amount), 0);
+console.log(revenue);
   const metrics = [
-    { label: "Total Sales", value: "$1,200,000" },
-    { label: "Total Orders", value: "10" },
-    { label: "Cod to Checkout", value: "12,000" },
-    { label: "Abondned Cart Recovered", value: "75%" },
+    { label: "Total Sales", value: revenue },
+    { label: "Total Orders", value: data?.getOrder?.length },
+    { label: "Cod to Checkout", value: data?.totalCodtocheckoutlinkDelivered},
+    { label: "Abondned Cart Recovered", value:`${percentAbandon}% ` },
   ];
   const gridComponents = [
     <RevenueAnalytics key="revenue" />,

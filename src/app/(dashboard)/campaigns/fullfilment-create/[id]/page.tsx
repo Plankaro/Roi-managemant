@@ -1,5 +1,5 @@
 
-import FullfillmentCreate from '@/components/page/campaigns/fullufillment-update-campaign-update';
+import FullfillmentCreate from '@/components/page/campaigns/fullufillment-create-campaign-update';
 import React from 'react';
 
 const Verify = async({params}: {params: Promise<{ id: string }>}) => {

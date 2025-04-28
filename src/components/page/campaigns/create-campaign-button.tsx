@@ -22,8 +22,9 @@ export function CreateCampaignButton({ className }: CreateCampaignButtonProps) {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild className="">
+        <div>
         <Button
-          className={`bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-1 rounded-full px-4 ${className}`}
+          className={`bg-blue-500 hover:bg-blue-600 text-white hidden items-center gap-1 sm:flex rounded-full px-4 ${className}`}
         >
           <Plus className="h-4 w-4" />
           Create New Campaign
@@ -33,6 +34,13 @@ export function CreateCampaignButton({ className }: CreateCampaignButtonProps) {
             }`}
           />
         </Button>
+        <Button
+      className={`bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full sm:hidden ${className}`}
+    >
+      <Plus className="h-4 w-4" />
+    </Button>
+        </div>
+
       </DropdownMenuTrigger>
       <AnimatePresence>
         {open && (

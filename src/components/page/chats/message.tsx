@@ -11,7 +11,8 @@ import type { RootState } from '@/store/store';
 import { getStatusIcon } from './getchatstatus';
 import { getChatsForProspect } from '../broadcast/getchats';
 import { markLastChatAsRead } from '@/store/features/prospect';
-import { useMarkMessagesAsReadMutation } from '@/store/features/apislice';
+import { useGetChatsQuery, useMarkMessagesAsReadMutation } from '@/store/features/apislice';
+import { setChats } from '@/store/features/chatSlice';
 
 function MessagesSkeleton() {
   return (
@@ -49,14 +50,26 @@ function MessagesSkeleton() {
   );
 }
 
-function Messages({ isLoading }: { isLoading: boolean }) {
+function Messages() {
+
   const [markMessagesAsRead] = useMarkMessagesAsReadMutation();
   const dispatch = useDispatch();
+  
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const selectedProspect = useSelector((state: RootState) => state.Prospect.selectedProspect);
   const selectedChats = useSelector(getChatsForProspect);
  
+  const { data: chats, isLoading: isChatsLoading } = useGetChatsQuery({
+    prospectId: selectedProspect?.id ?? "",
+  });
 
+
+  useEffect(() => {
+    if (chats) {
+      dispatch(setChats(chats));
+
+    }
+  },[chats]);
   // Handle marking messages as read
   useEffect(() => {
     if (selectedChats && selectedChats.length > 0 && (selectedProspect?.phoneNo !== selectedChats?.[0]?.receiverPhoneNo || selectedProspect?.chats?.[0]?.Status !== "read")) {
@@ -86,14 +99,13 @@ function Messages({ isLoading }: { isLoading: boolean }) {
 
   return (
     <>
-      {isLoading ? (
+      {isChatsLoading ? (
         <MessagesSkeleton />
       ) : (
         <ScrollArea className="flex-1 pt-20 pb-4 bg-backgroundColor">
           <div 
-            className="space-y-4 p-4 w-full h-full flex-1" 
-            ref={scrollContainerRef}
-            style={{ overflowY: 'auto', maxHeight: '100%' }}
+            className="space-y-4 p-4 w-full h-full flex-1 overscroll-y-auto" 
+           
           >
             {selectedChats && selectedChats.length > 0 ? (
               selectedChats.map((chat: any) => {

@@ -1,4 +1,6 @@
-import FullfillmentEventCreate from "@/components/page/campaigns/fullfillment-event-campaign-update";
+
+
+import OrderUpdate from "@/components/page/campaigns/order-update-campaign-update";
 
 import React from "react";
 
@@ -7,7 +9,7 @@ const Verify = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   // Example: If you want to use the slug with a query
 
-  return <FullfillmentEventCreate id={id} />;
+  return <OrderUpdate id={id} />;
 };
 
 export default Verify;

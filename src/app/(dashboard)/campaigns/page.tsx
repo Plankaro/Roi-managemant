@@ -1,55 +1,54 @@
-
-"use client"
-import { useState } from "react"
-import { ChevronDown, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Skeleton } from "@/components/ui/skeleton"
-import { CreateCampaignButton } from "@/components/page/campaigns/create-campaign-button"
+"use client";
+import { useState } from "react";
+import { ChevronDown, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CreateCampaignButton } from "@/components/page/campaigns/create-campaign-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { BsGraphUpArrow } from "react-icons/bs"
-import { useGetCampaignQuery } from "@/store/features/apislice"
-import Link from "next/link"
-
+} from "@/components/ui/dropdown-menu";
+import { BsGraphUpArrow } from "react-icons/bs";
+import { useGetCampaignQuery } from "@/store/features/apislice";
+import Link from "next/link";
+import CampaignsNotFound from "@/components/page/campaigns/campaigns-list-not-found";
 
 interface CampaignStats {
-  id: string
-  name: string
-  type: string
-  trigger: string
-  totalMessages: number
-  deliveredCount: number
-  readCount: number
-  skippedCount: number
-  failedCount: number
-  abondnedCheckoutRecovered: number
-  abondnedCheckoutRecoveredAmount: number
-  codtoCheckout: number
-  codtoCheckoutRecoveredAmount: number
-  status: string
+  id: string;
+  name: string;
+  type: string;
+  trigger: string;
+  totalMessages: number;
+  deliveredCount: number;
+  readCount: number;
+  skippedCount: number;
+  failedCount: number;
+  abondnedCheckoutRecovered: number;
+  abondnedCheckoutRecoveredAmount: number;
+  codtoCheckout: number;
+  codtoCheckoutRecoveredAmount: number;
+  status: string;
 }
 
 export default function CampaignsPage() {
-  const { data: Campaigns, isLoading } = useGetCampaignQuery({})
-  const [search, setSearch] = useState("")
-  console.log(Campaigns)
+  const { data: Campaigns, isLoading } = useGetCampaignQuery({});
+  const [search, setSearch] = useState("");
+  console.log(Campaigns);
 
   // Filter campaigns based on search query (by campaign name)
   const filteredCampaigns = Campaigns
     ? Campaigns.filter((campaign: CampaignStats) =>
         campaign.name.toLowerCase().includes(search.toLowerCase())
       )
-    : []
+    : [];
 
-    console.log(filteredCampaigns)
+  console.log(filteredCampaigns);
 
   return (
     <div className="min-h-screen">
@@ -72,20 +71,30 @@ export default function CampaignsPage() {
         </div>
 
         {/* Campaigns Grid */}
-        <div className="grid no-scrollbar grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 overflow-auto h-[calc(100vh-270px)]">
-          {isLoading
-            ? Array(8)
-                .fill(0)
-                .map((_, i) => <CampaignsCardSkeleton key={i} />)
-            : filteredCampaigns.map((Campaigns: CampaignStats) => (
-                <div key={Campaigns.id} className="h-full">
-                  <CampaignsCard Campaigns={Campaigns} />
-                </div>
-              ))}
-        </div>
+        <div
+  className="grid no-scrollbar
+             grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+             gap-4 pb-8 overflow-auto
+             h-[calc(100vh-270px)]"
+>
+  {isLoading ? (
+    Array(8)
+      .fill(0)
+      .map((_, i) => <CampaignsCardSkeleton key={i} />)
+  ) : filteredCampaigns.length > 0 ? (
+    filteredCampaigns.map((campaign: CampaignStats) => (
+      <CampaignsCard key={campaign.id} Campaigns={campaign} />
+    ))
+  ) : (
+    <div className="col-span-full flex justify-center items-center">
+      <CampaignsNotFound />
+    </div>
+  )}
+</div>
+
       </div>
     </div>
-  )
+  );
 }
 
 function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
@@ -95,16 +104,16 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
     readCount,
     skippedCount,
     failedCount,
-  } = Campaigns
+  } = Campaigns;
 
   const deliveredPercentage =
-    totalMessages > 0 ? Math.round((deliveredCount / totalMessages) * 100) : 0
+    totalMessages > 0 ? Math.round((deliveredCount / totalMessages) * 100) : 0;
   const readPercentage =
-    totalMessages > 0 ? Math.round((readCount / totalMessages) * 100) : 0
+    totalMessages > 0 ? Math.round((readCount / totalMessages) * 100) : 0;
   const skippedPercentage =
-    totalMessages > 0 ? Math.round((skippedCount / totalMessages) * 100) : 0
+    totalMessages > 0 ? Math.round((skippedCount / totalMessages) * 100) : 0;
   const failedPercentage =
-    totalMessages > 0 ? Math.round((failedCount / totalMessages) * 100) : 0
+    totalMessages > 0 ? Math.round((failedCount / totalMessages) * 100) : 0;
 
   return (
     <Card className="bg-backgroundColor border-primary border-none text-white rounded-xl h-full">
@@ -173,7 +182,7 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
         {/* Trigger Set */}
         <div className="flex justify-between items-center">
           <p className="text-blue-400 text-sm">Trigger Set</p>
-          <p className="text-sm">{Campaigns.trigger}</p>
+          <p className="text-sm">{getTriggerDisplayName(Campaigns.trigger)}</p>
         </div>
 
         {/* Metrics */}
@@ -206,15 +215,15 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
 
         {/* Edit Details Button */}
         <Link href={getLink(Campaigns)} className="mt-4">
-        <div className="flex justify-end ">
-          <Button variant="link" className="text-red-400 p-0 h-auto" >
-            Edit Details →
-          </Button>
-        </div>
+          <div className="flex justify-end ">
+            <Button variant="link" className="text-red-400 p-0 h-auto">
+              Edit Details →
+            </Button>
+          </div>
         </Link>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function MetricRow({
@@ -223,10 +232,10 @@ function MetricRow({
   percentage,
   color,
 }: {
-  label: string
-  value: number
-  percentage: number
-  color: "blue" | "red"
+  label: string;
+  value: number;
+  percentage: number;
+  color: "blue" | "red";
 }) {
   return (
     <div>
@@ -247,7 +256,7 @@ function MetricRow({
         {percentage}%
       </div>
     </div>
-  )
+  );
 }
 
 function CampaignsCardSkeleton() {
@@ -272,7 +281,7 @@ function CampaignsCardSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function getLink(campaign: CampaignStats): string {
@@ -282,7 +291,7 @@ function getLink(campaign: CampaignStats): string {
     ORDER_CANCELLED: "order-cancelled",
     CHECKOUT_CREATED: "checkout-created",
     FULFILLMENT_CREATED: "fullfilment-create",
-    FULFILLMENT_EVENT_CREATED: "fulfillment-update",
+    FULFILLMENT_EVENT_CREATED: "fullfilment-update",
     ORDER_TAG_ADDED: "order-tag-added",
   };
 
@@ -290,3 +299,17 @@ function getLink(campaign: CampaignStats): string {
   return `/campaigns/${folder}/${campaign.id}`;
 }
 
+function getTriggerDisplayName(trigger: string): string {
+  const typeToNameMap = {
+    ORDER_CREATED: "Order Created",
+    ORDER_UPDATED: "Order Updated",
+    ORDER_CANCELLED: "Order Cancelled",
+    CHECKOUT_CREATED: "Checkout Created",
+    FULFILLMENT_CREATED: "Fulfillment Created",
+    FULFILLMENT_EVENT_CREATED: "Fulfillment Event Created",
+    ORDER_TAG_ADDED: "Order Tag Added",
+  };
+
+  const key = trigger as keyof typeof typeToNameMap;
+  return typeToNameMap[key] ?? "Unknown Trigger";
+}
