@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { IoIosDocument } from 'react-icons/io';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { FaRobot } from "react-icons/fa6";
+import { Avatar, AvatarImage,AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { RootState } from '@/store/store';
 import { getStatusIcon } from './getchatstatus';
@@ -63,6 +64,8 @@ function Messages() {
     prospectId: selectedProspect?.id ?? "",
   });
 
+  console.log(chats);
+
 
   useEffect(() => {
     if (chats) {
@@ -95,16 +98,16 @@ function Messages() {
 
     return () => clearTimeout(timeoutId);
   }, [selectedChats]); // Dependency on selectedChats ensures we scroll when messages change
-  console.log("test",selectedChats.map((chat: any) => chat.body_text));
+
 
   return (
     <>
       {isChatsLoading ? (
         <MessagesSkeleton />
       ) : (
-        <ScrollArea className="flex-1 pt-20 pb-4 bg-backgroundColor">
+        <ScrollArea className="flex-1 pt-20 pb-4  bg-backgroundColor overscroll-y-auto no-scrollbar">
           <div 
-            className="space-y-4 p-4 w-full h-full flex-1 overscroll-y-auto" 
+            className="space-y-4 p-4 w-full h-full flex-1 " 
            
           >
             {selectedChats && selectedChats.length > 0 ? (
@@ -119,12 +122,14 @@ function Messages() {
                     <div className={`hidden md:flex gap-3 items-start`}>
                       {!isMyMessage && (
                         <Avatar className="h-8 w-8 shrink-0">
-                          <Image
-                            fill
-                            src={selectedProspect?.image || "https://github.com/shadcn.png" || "/placeholder.svg"}
+                          <AvatarImage
+                            
+                            src={selectedProspect?.image ?? ""}
                             alt={selectedProspect?.name ?? ""}
                             className="object-cover"
                           />
+                          <AvatarFallback>{selectedProspect?.name?.charAt(0).toUpperCase()}</AvatarFallback>
+
                         </Avatar>
                       )}
                       <div className={`flex-1 flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}>
@@ -138,11 +143,7 @@ function Messages() {
                           {renderMessageContent(chat, isMyMessage)}
                         </div>
                       </div>
-                      {isMyMessage && (
-                        <Avatar className="h-8 w-8 shrink-0">
-                          <AvatarImage src={"https://github.com/shadcn.png"} alt="Me" className="object-cover" />
-                        </Avatar>
-                      )}
+                      <MessageAvatar isMyMessage={isMyMessage} chat={chat} />
                     </div>
 
                     {/* For smaller screens - vertical layout */}
@@ -260,6 +261,44 @@ function renderMessageContent(chat: any, isMyMessage: boolean) {
         {chat.Status}
       </div>
     </>
+  );
+}
+
+
+
+interface Chat {
+  sender?: {
+    image?: string;
+    name?: string;
+  };
+  // …other chat fields
+}
+
+interface Props {
+  isMyMessage: boolean;
+  chat: Chat;
+}
+
+ function MessageAvatar({ isMyMessage, chat }: Props) {
+  if (!isMyMessage) return null;
+
+  return chat.sender ? (
+    <Avatar className="h-8 w-8 shrink-0">
+      <AvatarImage
+        src={chat.sender.image || "/placeholder.svg"}
+        alt={chat.sender.name ?? "User"}
+        className="object-cover"
+      />
+      <AvatarFallback>
+        {chat.sender.name
+          ? chat.sender.name.charAt(0).toUpperCase()
+          : "U"}
+      </AvatarFallback>
+    </Avatar>
+  ) : (
+    <div className='h-8 w-8 rounded-full flex items-center justify-center shrink-0 bg-white'>
+    <FaRobot className="h-6 w-6 text-zinc-400 shrink-0" aria-label="Bot" />
+    </div>
   );
 }
 

@@ -21,12 +21,14 @@ import { toggleMenuModal } from "@/store/features/prospect";
 import { RootState } from "@/store/store";
 import Logo from "@/components/ui/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useSession } from "next-auth/react";
 import { handleSignOut } from "@/app/(auth)/sign-in/action";
 import { FaBoltLightning } from "react-icons/fa6";
 import { IoMegaphone } from "react-icons/io5";
 import { CgTemplate } from "react-icons/cg";
 import { GrIntegration } from "react-icons/gr";
+
+import { useGetProfileQuery } from "@/store/features/apislice";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const sidebarItems = [
   {
@@ -47,10 +49,12 @@ export const sidebarItems = [
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const session: any = useSession();
+
   const isOpen = useSelector(
     (state: RootState) => state.Prospect.openMenuModal
   );
+  const { data, isLoading } = useGetProfileQuery({});
+  console.log(data);
   const dispatch = useDispatch();
   const isPathActive = (slugs: string[]) => {
     return slugs.some((slug) => {
@@ -82,22 +86,29 @@ const Sidebar = () => {
           </button>
         </div>
         <div className=" items-center  space-y-4 m-2 mb-6 w-full gap-2 sm:hidden flex ">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              alt="@shadcn"
-              height={20}
-              width={20}
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col  text-white">
-            <span className="text-sm ">
-              {session?.data?.user?.user?.name ?? ""}
-            </span>
-            <span className="text-xs">
-              {session?.data?.user?.user?.email ?? ""}
-            </span>
+          {isLoading ? (
+            <div className="items-center gap-2 sm:flex hidden">
+              <div className="flex flex-col text-white">
+                <Skeleton className="h-4 w-24 mb-1 bg-backgroundColor" />
+                <Skeleton className="h-3 w-32 bg-backgroundColor" />
+              </div>
+              <Skeleton className="h-10 w-10 rounded-full" />
+            </div>
+          ) : (
+            <Avatar>
+              <AvatarImage
+                src={data?.image ?? ""}
+                alt="@shadcn"
+                height={28}
+                width={28}
+              />
+              <AvatarFallback>{data?.name?.slice(0, 1) ?? ""}</AvatarFallback>
+            </Avatar>
+          )}
+
+          <div className="flex flex-col text-white">
+            <span className="text-sm ">{data?.name ?? ""}</span>
+            <span className="text-xs">{data?.email ?? ""}</span>
           </div>
         </div>
         {sidebarItems.map((item: any) => (

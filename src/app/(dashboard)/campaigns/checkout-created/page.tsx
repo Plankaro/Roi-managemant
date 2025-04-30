@@ -22,6 +22,7 @@ import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import AddContentForm from "@/components/page/campaigns/add-content-form";
 import toast from "react-hot-toast";
+import AccessDenied from "@/components/page/campaigns/acess-denied";
 import {
   Select,
   SelectTrigger,
@@ -32,12 +33,15 @@ import {
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import NumericInput from "@/components/ui/numericInput";
-import { useCreateCampaignMutation } from "@/store/features/apislice";
+import { useCreateCampaignMutation,useGetProfileQuery } from "@/store/features/apislice";
+import CampaignSkeleton from "@/components/page/campaigns/campaign skeletion";
+
 
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
 const CheckoutCreated = () => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const {data:profile,isLoading:isProfileLoading} = useGetProfileQuery({});
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [createCampaign] = useCreateCampaignMutation();
 
@@ -212,6 +216,12 @@ const CheckoutCreated = () => {
       value: "shop_url",
     },
   ];
+  if(isProfileLoading){
+    return <CampaignSkeleton/>
+  }
+  if(!isProfileLoading && profile?.manageCampaign===false){
+    return <AccessDenied/>
+  }
 
   return (
     <ScrollArea className="h-[calc(100vh-100px)] overflow-auto no-scrollbar">

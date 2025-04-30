@@ -63,7 +63,9 @@ export const apiSlice = createApi({
     }),
 
     getSpecificShopifyContacts: builder.query({
+    
       query: (id) => ({
+        
         url: `/customers/${id}`,
         method: "GET",
       }),

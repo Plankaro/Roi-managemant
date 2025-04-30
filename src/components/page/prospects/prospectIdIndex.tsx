@@ -36,9 +36,7 @@ import {
 } from "@/store/features/apislice";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import Link from "next/link";
-import {
-  useCreateProspectMutation,
-} from "@/store/features/apislice";
+import { useCreateProspectMutation } from "@/store/features/apislice";
 import { useDispatch } from "react-redux";
 
 import { addProspect, selectProspect } from "@/store/features/prospect";
@@ -48,15 +46,13 @@ import { updateProspectSchema } from "@/zod/chats/chat";
 import ProspectSkeleton from "./prospect-id-skeleton";
 import NoProspectFound from "./prospect-id-not-available";
 
-
 function ProspectId({ id }: { id: string }) {
   const dispatch = useDispatch();
-  const [updateProspect] =
-    useUpdateProspectMutation();
+  const [updateProspect] = useUpdateProspectMutation();
   const router = useRouter();
 
-  const { data,refetch, isLoading,isSuccess } = useGetSpecificShopifyContactsQuery(id);
-
+  const { data, refetch, isLoading, isSuccess } =
+    useGetSpecificShopifyContactsQuery(id);
 
   //console.log(data);
 
@@ -104,7 +100,6 @@ function ProspectId({ id }: { id: string }) {
       refetch();
       return prospect;
     } catch (error) {
-
       console.log(error);
     }
   };
@@ -147,10 +142,10 @@ function ProspectId({ id }: { id: string }) {
   ];
 
   if (isLoading) {
-    return <ProspectSkeleton/>
+    return <ProspectSkeleton />;
   }
-  if(!isSuccess){
-    return <NoProspectFound/>
+  if (!isSuccess) {
+    return <NoProspectFound />;
   }
 
   return (
@@ -318,18 +313,20 @@ function ProspectId({ id }: { id: string }) {
           </AccordionItem>
         </Accordion>
       </div>
-      <div className="absolute bottom-10 right-10" onClick={handleClick}>
-        <div className="relative flex items-center justify-center w-16 h-16 group">
-          {/* Animated Wave Effect (Only on Hover) */}
-          <span className="absolute w-full h-full rounded-full bg-primary opacity-30 scale-0 group-hover:scale-100 group-hover:animate-ping transition-transform duration-500"></span>
-          <span className="absolute w-12 h-12 rounded-full bg-primary opacity-50 scale-0 group-hover:scale-100 group-hover:animate-ping transition-transform duration-500 delay-100"></span>
+      {(data?.DbData?.phoneNo || data?.shopifyData?.phone) && (
+          <div className="absolute bottom-10 right-10" onClick={handleClick}>
+            <div className="relative flex items-center justify-center w-16 h-16 group">
+              {/* Animated Wave Effect (Only on Hover) */}
+              <span className="absolute w-full h-full rounded-full bg-primary opacity-30 scale-0 group-hover:scale-100 group-hover:animate-ping transition-transform duration-500"></span>
+              <span className="absolute w-12 h-12 rounded-full bg-primary opacity-50 scale-0 group-hover:scale-100 group-hover:animate-ping transition-transform duration-500 delay-100"></span>
 
-          {/* Chat Icon */}
-          <div className="relative w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg">
-            <MdOutlineChat className="text-white w-6 h-6" />
+              {/* Chat Icon */}
+              <div className="relative w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                <MdOutlineChat className="text-white w-6 h-6" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
     </div>
   );
 }

@@ -13,10 +13,12 @@ import { BroadcastDetailResult } from "@/zod/broadcast/broadcast"
 
 import { calculateTotalPrice, exportJsonToExcel } from "@/lib/utils"
 import Link from "next/link"
+import BroadcastDetailsSkeleton from "./broadvastIdskeleton"
+import BroadcastNotAvailable from "./not-available"
 
 export default function BroadcastDetails({id}:{id:string}) {
 
-  const { data, refetch }: { data?: BroadcastDetailResult; isLoading: boolean,refetch:()=>void } = useGetBroadcastByIdQuery(id);
+  const { data, refetch, isLoading,isSuccess }: { data?: BroadcastDetailResult; isLoading: boolean,refetch:()=>void,isSuccess:boolean } = useGetBroadcastByIdQuery(id);
   //console.log(data)
   
   let totalOrderPrice = 0;
@@ -88,6 +90,12 @@ const handleDownload = async () => {
     }
 };
 
+if(isLoading){
+  return <BroadcastDetailsSkeleton/>
+}
+if(!isSuccess){
+  return <BroadcastNotAvailable/>
+}
 
 
 

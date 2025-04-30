@@ -10,13 +10,13 @@ import { BroadcastDetailResult } from "@/zod/broadcast/broadcast";
 
 export default function BroadcastAndRetries({
   selectedBroadcast,
-  BroadCastrefetch
+  BroadCastrefetch,
 }: {
   selectedBroadcast: BroadcastDetailResult | undefined;
-  BroadCastrefetch:()=>void
+  BroadCastrefetch: () => void;
 }) {
   const [createBroadcastRetry] = useCreateBroadcastRetryMutation();
-  const { data,refetch } = useGetRetryBroadcastQuery(selectedBroadcast?.id);
+  const { data, refetch } = useGetRetryBroadcastQuery(selectedBroadcast?.id);
 
   //console.log(data);
 
@@ -31,8 +31,8 @@ export default function BroadcastAndRetries({
         error: (error: any) =>
           error?.data?.message || "An unexpected error occurred",
       });
-      refetch()
-      BroadCastrefetch()
+      refetch();
+      BroadCastrefetch();
     } catch (error) {
       console.log(error);
     }
@@ -42,19 +42,21 @@ export default function BroadcastAndRetries({
     <Card className="w-full h-fit bg-transparent border-primary text-white p-6">
       <div className="flex items-center justify-between my-5 ">
         <h2 className="text-xl font-semibold mb-4">Broadcast status</h2>
-        <Button className="bg-blue-500 hover:bg-blue-600 px-5 py-2" onClick={handleCreateBroadcastRetry}>Add retries</Button>
+        <Button
+          className="bg-blue-500 hover:bg-blue-600 px-5 py-2"
+          onClick={handleCreateBroadcastRetry}
+        >
+          Add retries
+        </Button>
       </div>
       <ScrollArea className="w-full whitespace-nowrap border-primary border p-4 rounded-sm">
         <div className="space-y-4 ">
-          {data &&
+          {data && data.length > 0 ? (
             data.map((retry: any, index: number) => {
-              // Format the date with fallback
-             
-                const date = retry?.createdAt
-                  ? new Date(retry.createdAt)
-                  : new Date();
-                const formattedDate = format(date, "MM/dd/yy hh:mm aa");
-             
+              const date = retry.createdAt
+                ? new Date(retry.createdAt)
+                : new Date();
+              const formattedDate = format(date, "MM/dd/yy hh:mm aa");
 
               return (
                 <div
@@ -66,16 +68,16 @@ export default function BroadcastAndRetries({
                     <div>Retry {index + 1}</div>
                     <div>
                       <div className="text-sm text-gray-400">Scheduled on</div>
-                      {formattedDate }
+                      {formattedDate}
                     </div>
-                    <div className="text-blue-500">{retry?.status ?? ""}</div>
+                    <div className="text-blue-500">{retry.status}</div>
                     <div>
                       <div className="text-sm text-gray-400">Delivered</div>
-                      {retry?.deliveredCount ?? ""}
+                      {retry.deliveredCount}
                     </div>
                     <div>
                       <div className="text-sm text-gray-400">Failed</div>
-                      {retry?.failedCount ?? ""}
+                      {retry.failedCount}
                     </div>
                   </div>
 
@@ -83,7 +85,7 @@ export default function BroadcastAndRetries({
                   <div className="xl:hidden space-y-2">
                     <div className="flex justify-between items-start">
                       <div>Retry {index + 1}</div>
-                      <div className="text-blue-500">{retry?.status ?? ""}</div>
+                      <div className="text-blue-500">{retry.status}</div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-400">Scheduled on</div>
@@ -92,17 +94,22 @@ export default function BroadcastAndRetries({
                     <div className="flex justify-between">
                       <div>
                         <div className="text-sm text-gray-400">Delivered</div>
-                        <div>{retry?.deliveredCount ?? ""}</div>
+                        <div>{retry.deliveredCount}</div>
                       </div>
                       <div>
                         <div className="text-sm text-gray-400">Failed</div>
-                        <div>{retry?.failedCount ?? ""}</div>
+                        <div>{retry.failedCount}</div>
                       </div>
                     </div>
                   </div>
                 </div>
               );
-            })}
+            })
+          ) : (
+            <div className="py-4 text-center text-gray-500">
+              No retry performed on failed messages.
+            </div>
+          )}
         </div>
         <ScrollBar orientation="horizontal" className="mt-10 no-scollbar" />
       </ScrollArea>

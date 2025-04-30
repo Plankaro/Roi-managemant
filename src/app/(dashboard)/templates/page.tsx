@@ -1,46 +1,51 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search, Plus, Trash2, Zap } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useGetAllTemplatesIncludingPendingQuery, useDeleteTemplateMutation } from "@/store/features/apislice"
-import SelectedPreview from "@/components/page/broadcast/selectTemplatepreview"
-import toast from "react-hot-toast"
-import Link from "next/link"
+import { useState } from "react";
+import { Search, Plus, Trash2, Zap } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  useGetAllTemplatesIncludingPendingQuery,
+  useDeleteTemplateMutation,
+} from "@/store/features/apislice";
+import SelectedPreview from "@/components/page/broadcast/selectTemplatepreview";
+import toast from "react-hot-toast";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TemplatesGrid() {
-  const [selectedTemplate, setSelectedTemplate] = useState(null)
-  const [query, setQuery] = useState("")
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [query, setQuery] = useState("");
 
-  const [deleteTemplate] = useDeleteTemplateMutation()
+  const [deleteTemplate] = useDeleteTemplateMutation();
 
-  const { data:templates} = useGetAllTemplatesIncludingPendingQuery({})
+  const { data: templates ,isLoading} = useGetAllTemplatesIncludingPendingQuery({});
 
-  
+  const filteredTemplates = templates?.filter((template: any) =>
+    template.name.toLowerCase().includes(query.toLowerCase())
+  );
 
+  const handleDelete = (template_name: string) => {
+    const promise = deleteTemplate(template_name).unwrap();
 
+    toast.promise(promise, {
+      loading: "Deleting template...",
+      success: "Template deleted successfully!",
+      error: (error: any) =>
+        error?.data?.message || "An unexpected error occurred.",
+    });
+  };
 
-
-const filteredTemplates = templates?.filter((template: any) => template.name.toLowerCase().includes(query.toLowerCase()));
-
-const handleDelete = (template_name: string) => {
-  const promise = deleteTemplate(template_name).unwrap()
-
-  toast.promise(promise, {
-    loading: "Deleting template...",
-    success: "Template deleted successfully!",
-    error: (error: any) =>
-      error?.data?.message || "An unexpected error occurred.",
-  });
-
-}
-
-  const openModal = (template:any) => {
-    setSelectedTemplate(template)
-  }
+  const openModal = (template: any) => {
+    setSelectedTemplate(template);
+  };
 
   return (
     <div className="p-4 md:p-6">
@@ -48,10 +53,10 @@ const handleDelete = (template_name: string) => {
         <div className="flex items-center justify-between mb-6 text-white">
           <h1 className="text-2xl font-bold">Templates</h1>
           <Link href="templates/create">
-          <Button className="rounded-full bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-5 w-5" />
-            <span className="">Add template</span>
-          </Button>
+            <Button className="rounded-full bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-5 w-5" />
+              <span className="">Add template</span>
+            </Button>
           </Link>
         </div>
 
@@ -64,40 +69,76 @@ const handleDelete = (template_name: string) => {
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-<div className="h-[calc(100vh-250px)]  overflow-y-scroll no-scrollbar">
-<div className="grid grid-cols-1  md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-{filteredTemplates?.length === 0 ? (
-  <div className="bottom-full left-0 col-span-full w-full right-0 rounded-t-lg h-[60vh] p-8 flex flex-col items-center justify-center">
-    <div className="p-4 rounded-full mb-4">
-      <Zap className="h-20 w-20 text-yellow-500" />
-    </div>
-    <h2 className="text-xl font-bold text-white mb-2">
-      No Templates Added Yet!
-    </h2>
-    <p className="text-center text-gray-300 mb-6 max-w-md">
-      It looks like you haven&apos;t created any Template yet.
-     
-    </p>
-    <Link href="templates/create">
-      <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-        Create Tempalate
-      </Button>
-    </Link>
-  </div>
-) : (
-  filteredTemplates?.map((template: any, index: number) => (
-    <TemplateCard
-      key={index}
-      template={template}
-      onView={() => openModal(template)}
-      handleDelete={handleDelete}
-    />
-  ))
-)}
-        
+        <div className="h-[calc(100vh-250px)]  overflow-y-scroll no-scrollbar">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+        {isLoading ? (
+          // Skeleton loading state
+          Array(6)
+            .fill(0)
+            .map((_, index) => (
+              <div key={index} className="bg-backgroundColor border-primary rounded-lg overflow-hidden shadow-md p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <Skeleton className="h-5 w-32 bg-slate-700" />
+                  <Skeleton className="h-8 w-8 rounded-full bg-slate-700" />
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Skeleton className="h-4 w-24 bg-slate-700 mb-2" />
+                    <Skeleton className="h-4 w-20 bg-slate-700" />
+                  </div>
+                  <div className="flex justify-between">
+                    <div>
+                      <Skeleton className="h-4 w-16 bg-slate-700 mb-2" />
+                      <Skeleton className="h-4 w-20 bg-slate-700" />
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Skeleton className="h-4 w-16 bg-slate-700" />
+                  </div>
+                </div>
+              </div>
+            ))
+        ) : templates?.length === 0 ? (
+          // Empty state when no templates exist
+          <div className="bottom-full left-0 col-span-full w-full right-0 rounded-t-lg h-[60vh] p-8 flex flex-col items-center justify-center">
+            <div className="p-4 rounded-full mb-4">
+              <Zap className="h-20 w-20 text-yellow-500" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">No Templates Added Yet!</h2>
+            <p className="text-center text-gray-300 mb-6 max-w-md">
+              It looks like you haven&apos;t created any Template yet.
+            </p>
+            <Link href="templates/create">
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white">Create Template</Button>
+            </Link>
+          </div>
+        ) : filteredTemplates?.length === 0 ? (
+          // No search results found
+          <div className="bottom-full left-0 col-span-full w-full right-0 rounded-t-lg h-[60vh] p-8 flex flex-col items-center justify-center">
+            <div className="p-4 rounded-full mb-4">
+              <Search className="h-20 w-20 text-slate-500" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">No Results Found</h2>
+            <p className="text-center text-gray-300 mb-6 max-w-md">
+              We couldn&apos;t find any templates matching your search query.
+            </p>
+            {/* <Button variant="outline" className="text-white border-slate-600" onClick={() => setQuery("")}>
+              Clear Search
+            </Button> */}
+          </div>
+        ) : (
+          // Display filtered templates
+          filteredTemplates?.map((template: any, index: number) => (
+            <TemplateCard
+              key={index}
+              template={template}
+              onView={() => openModal(template)}
+              handleDelete={handleDelete}
+            />
+          ))
+        )}
+      </div>
         </div>
-</div>
-        
       </div>
 
       <TemplateModal
@@ -106,7 +147,7 @@ const handleDelete = (template_name: string) => {
         onClose={() => setSelectedTemplate(null)}
       />
     </div>
-  )
+  );
 }
 
 function TemplateCard({ template, onView, handleDelete }: any) {
@@ -116,9 +157,16 @@ function TemplateCard({ template, onView, handleDelete }: any) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <h3 className="text-white font-medium">{template.name}</h3>
-            <span className="text-xs bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded-full">{template.category}</span>
+            <span className="text-xs bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded-full">
+              {template.category}
+            </span>
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-700/50" onClick={()=>handleDelete(template.name)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-700/50"
+            onClick={() => handleDelete(template.name)}
+          >
             <Trash2 className="h-4 w-4" />
             <span className="sr-only">Delete</span>
           </Button>
@@ -133,7 +181,7 @@ function TemplateCard({ template, onView, handleDelete }: any) {
           <div className="flex justify-between">
             <div>
               <span className="text-blue-400 text-sm">Category</span>
-              <p className="text-white text-sm">{template.status }</p>
+              <p className="text-white text-sm">{template.status}</p>
             </div>
 
             {/* <div>
@@ -169,22 +217,20 @@ function TemplateCard({ template, onView, handleDelete }: any) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function TemplateModal({ isOpen, template, onClose }: any) {
-  if (!template) return null
+  if (!template) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md bg-white rounded-lg p-0 overflow-hidden">
         <DialogHeader className="p-4 flex flex-row items-center justify-between ">
           <DialogTitle className="text-lg font-medium">Preview</DialogTitle>
-          
         </DialogHeader>
         <SelectedPreview selectedTemplate={template} />
-        
-              </DialogContent>
+      </DialogContent>
     </Dialog>
-  )
+  );
 }

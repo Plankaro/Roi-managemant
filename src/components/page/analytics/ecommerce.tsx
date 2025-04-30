@@ -9,10 +9,11 @@ import CodToCheckoutAnalytics from "./checkout-cod-analytics";
 import { useGetEcommerceAnalyticsQuery } from "@/store/features/apislice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import ChatAnalyticsSkeleton from "./analytics-skeleton";
 
 function EcommerceAnalytics() {
   const {analytics}=useSelector((state: RootState) => state);
-  const { data } = useGetEcommerceAnalyticsQuery({
+  const { data,isLoading } = useGetEcommerceAnalyticsQuery({
     startDate: new Date(analytics.startDate).toISOString(),
   endDate: new Date(analytics.endDate).toISOString(),
   });
@@ -38,6 +39,9 @@ console.log(revenue);
     <RecoveredCartAnalytics key="analytics" />,
     <CodToCheckoutAnalytics key="codanalytics" />,
   ];
+  if(isLoading){
+    return <ChatAnalyticsSkeleton/>
+  }
   return (
     <div className="overflow-scroll no-scrollbar h-[calc(100vh-250px)]">
       <div className="grid grid-cols-2  md:grid-cols-4 gap-4 mb-6 ">

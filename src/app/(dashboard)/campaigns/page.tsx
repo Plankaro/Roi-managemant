@@ -116,7 +116,7 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
     totalMessages > 0 ? Math.round((failedCount / totalMessages) * 100) : 0;
 
   return (
-    <Card className="bg-backgroundColor border-primary border-none text-white rounded-xl h-full">
+    <Card className="bg-backgroundColor  border-primary  text-white rounded-xl h-full">
       <CardContent className="p-6 space-y-4">
         {/* Title and Badge */}
         <div className="flex items-center justify-between">

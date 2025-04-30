@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/form";
 import {
   useCreateBroadcastMutation,
+  useGetProfileQuery,
   useSendTestMessageMutation,
 } from "@/store/features/apislice";
 import toast from "react-hot-toast";
@@ -44,14 +45,17 @@ import { isValidPhoneNumber } from "@/lib/isvalidphoneno";
 import Link from "next/link";
 import BroadcastPopup from "@/components/page/broadcast/proceedmodel";
 import { useRouter } from "next/navigation";
+import AccessDenied from "@/components/page/broadcast/acessdenied";
 
 import { useGetAllBroadcastsQuery } from "@/store/features/apislice";
 import { error } from "console";
 import BroadcastSuccessModal from "@/components/page/broadcast/broadcastSucessModel";
+import CampaignSkeleton from "@/components/page/campaigns/campaign skeletion";
 
 export default function CreateBroadcastCampaign() {
   const router = useRouter();
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
+  const {data:profile,isLoading:isProfileLoading} = useGetProfileQuery({});
   const [checkoutDialog, setCheckoutDialog] = useState(false);
   const [sucessModel, setSucessModel] = useState(false);
   const submitRef = useRef(null);
@@ -196,7 +200,12 @@ export default function CreateBroadcastCampaign() {
     }
     setCheckoutDialog(value);
   };
-
+  if(isProfileLoading) {
+    return <CampaignSkeleton />
+  }
+  if(profile?.ManageBroadcast===false){
+    return <AccessDenied />
+  }
   //console.log(selectedTemplate);
   return (
     <ScrollArea className="  text-white p-4 h-[calc(100vh-100px)] ">

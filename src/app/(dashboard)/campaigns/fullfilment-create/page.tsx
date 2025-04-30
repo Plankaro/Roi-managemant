@@ -32,7 +32,9 @@ import {
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import NumericInput from "@/components/ui/numericInput";
-import { useCreateCampaignMutation } from "@/store/features/apislice";
+import { useCreateCampaignMutation, useGetProfileQuery } from "@/store/features/apislice";
+import CampaignSkeleton from "@/components/page/campaigns/campaign skeletion";
+import AccessDenied from "@/components/page/campaigns/acess-denied";
 
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
@@ -40,6 +42,7 @@ const FullfillmentCreate = () => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
   const [createCampaign] = useCreateCampaignMutation();
+    const {data:profile,isLoading:isProfileLoading} = useGetProfileQuery({});
 
   const form = useForm<CampaignFormValues>({
     resolver: zodResolver(CampaignSchema),
@@ -226,6 +229,14 @@ const FullfillmentCreate = () => {
       value: "shop_url",
     },
   ];
+
+  if(isProfileLoading){
+    return <CampaignSkeleton/>
+  }
+  if(!isProfileLoading && profile?.manageCampaign===false){
+    return <AccessDenied/>
+  }
+
 
   return (
     <ScrollArea className="h-[calc(100vh-100px)] overflow-auto no-scrollbar">

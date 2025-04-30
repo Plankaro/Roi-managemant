@@ -9,41 +9,42 @@ import AbondnedAnalytics from "./abondned-chart";
 import { useGetChatAnalyticsQuery } from "@/store/features/apislice";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-
-
-
+import ChatAnalyticsSkeleton from "./analytics-skeleton";
 
 function ChatAnalytics() {
-  const {analytics}=useSelector((state: RootState) => state);
-  const {data} = useGetChatAnalyticsQuery({
+  const { analytics } = useSelector((state: RootState) => state);
+  const { data,isLoading } = useGetChatAnalyticsQuery({
     startDate: new Date(analytics.startDate).toISOString(),
-  endDate: new Date(analytics.endDate).toISOString(),
+    endDate: new Date(analytics.endDate).toISOString(),
   });
 
-
-  const totalAgentMessage =  data?.messagesByAgents?.reduce(
-    (total: number, agent: any) => total + Number(agent.messageCount),
-    0
-  ) ?? 0
-
-  
+  const totalAgentMessage =
+    data?.messagesByAgents?.reduce(
+      (total: number, agent: any) => total + Number(agent.messageCount),
+      0
+    ) ?? 0;
 
   const metrics = [
-   
-    { label: "Engagement", value: data?.totalEngagements??0 },
-    { label: "Agent interaction time", value: `${data?.totalMessageTime??0} min` },
+    { label: "Engagement", value: data?.totalEngagements ?? 0 },
+    {
+      label: "Agent interaction time",
+      value: `${data?.totalMessageTime ?? 0} min`,
+    },
     { label: "Total agents messages", value: totalAgentMessage },
-    { label: "Total automated messages", value: data?.automatedMessages??0 },
+    { label: "Total automated messages", value: data?.automatedMessages ?? 0 },
   ];
 
   const gridComponents = [
     <MessageCountChart key="message-count" />,
     <EngagementComparisonChart key="engagement" />,
-    <AgentMessagesChart key="agent"/>,
-    <AbondnedAnalytics key = "abondned"/>
-];
+    <AgentMessagesChart key="agent" />,
+    <AbondnedAnalytics key="abondned" />,
+  ];
 
- 
+  if(isLoading){
+    return <ChatAnalyticsSkeleton/>
+  }
+
   return (
     <div className="overflow-auto no-scrollbar h-[calc(100vh-250px)]">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 ">
@@ -75,5 +76,6 @@ function ChatAnalytics() {
     </div>
   );
 }
+
 
 export default ChatAnalytics;

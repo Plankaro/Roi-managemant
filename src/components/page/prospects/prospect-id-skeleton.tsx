@@ -5,7 +5,7 @@ export default function ProspectSkeleton() {
   return (
     <ScrollArea className="px-4 h-[calc(100vh-200px)]  sm:px-6 lg:px-8 mt-20 space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="bg-backgroundColor rounded-lg p-6 w-full">
             <div className="flex items-start">

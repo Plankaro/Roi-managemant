@@ -7,6 +7,11 @@ import {  uniqBy } from "lodash";
 export type Chat = {
   id: string;
   chatId: string;
+  sender: {
+    id: string;
+    image: string;
+    name: string;
+  }
   senderPhoneNo: string;
   receiverPhoneNo: string;
   sendDate: Date;

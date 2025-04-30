@@ -7,7 +7,7 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
   //console.log(order)
   if (isLoading) {
     return(
-      <div className="xl:w-[320px] w-full rounded-3xl border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white">
+      <div className="xl:basis-3/12 w-full rounded-3xl  border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white">
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold">History</h2>
 
@@ -25,11 +25,11 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
 
           <div className="h-0.5 w-full bg-primary my-4" />
 
-          <div className="divide-y divide-primary no-scrollbar overflow-scroll">
+          <div className="divide-y divide-primary no-scrollbar overflow-hidden">
             {[...Array(5)].map((_, index) => (
               <div key={index} className="w-full flex items-center justify-between py-4">
                 <div className="space-y-0.5">
-                  <Skeleton className="h-4 w-16 bg-white/10" />
+                  <Skeleton className="h-4 w-16 bg-white/10" /> 
                   <Skeleton className="h-6 w-24 bg-white/10" />
                 </div>
                 <div className="text-right space-y-0.5">
@@ -46,7 +46,7 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
     )
   }
   return (
-    <div className="xl:w-[320px] w-full min-h-[400px] h-full  no-scrollbar overflow-scroll  rounded-3xl  border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white ">
+    <div className="xl:basis-3/12   h-full   rounded-3xl  border border-blue-500 p-6 bg-[var(--Background-50,#19191980)] text-white ">
       <div className="space-y-6">
         <h2 className="text-2xl font-semibold">History</h2>
 
@@ -64,7 +64,7 @@ export default function HistoryView({order,isLoading}:{order:any,isLoading:boole
 
           <div className="h-0.5 w-full bg-primary my-4" />
 
-          <div className="divide-y divide-primary">
+          <div className="divide-y divide-primary h-[300px] no-scrollbar overflow-y-auto ">
             {order  && order?.orders.map((order:any) => (
               <button
                 key={order.id}

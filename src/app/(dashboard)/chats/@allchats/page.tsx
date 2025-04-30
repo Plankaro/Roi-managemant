@@ -364,7 +364,7 @@ const AllChats = () => {
             <div className="sm:p-4 px-2 py-4 w-full   absolute top-0 z-10 bg-primary/50 glass">
               <div className="flex items-center justify-between">
                 <div
-                  className="flex items-center gap-4"
+                  className="flex items-center gap-4 cursor-pointer"
                   onClick={() => setShow(!show)}
                 >
                   <div className="relative flex items-center sm:gap-5 gap-1">
@@ -408,7 +408,7 @@ const AllChats = () => {
                   <AssignmentDropdown />
                 </div>
               </div>
-            </div>
+            </div>b  
 
             {/* Messages */}
             <Messages  />

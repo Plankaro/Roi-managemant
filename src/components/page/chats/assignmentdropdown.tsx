@@ -25,6 +25,7 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { addProspect,selectProspect } from "@/store/features/prospect";
+import Link from "next/link";
 
 
 // Mock data for agents with assignment status
@@ -109,10 +110,10 @@ function AssignmentDropdown() {
         className="w-72 bg-[#1B2A48] border border-primary-700 rounded-lg shadow-xl"
       >
         <DropdownMenuItem className="focus:bg-primary-700 transition-colors p-4">
-          {/* <a
-            href="/orders/123"
+          <Link
+            href={`/orders/${selectedProspect?.id}`}
             className="flex items-center gap-3 w-full text-white"
-          > */}
+          >
             <Image
               src="/icons/shopify.png"
               alt="shopify"
@@ -120,7 +121,7 @@ function AssignmentDropdown() {
               height={21}
             />
             <span className="font-medium">Create Order</span>
-          {/* </a> */}
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="bg-primary-700" />

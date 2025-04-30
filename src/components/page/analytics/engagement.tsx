@@ -6,11 +6,12 @@ import SessionStats from './session-to-template-message';
 import { useSelector } from 'react-redux';
 import { useGetEngagementAnalyticsQuery } from '@/store/features/apislice';
 import { RootState } from '@/store/store';
+import ChatAnalyticsSkeleton from './analytics-skeleton';
 
 
 function EngagementAnalytics() {
     const {analytics}=useSelector((state: RootState) => state);
-    const {data} = useGetEngagementAnalyticsQuery({
+    const {data,isLoading} = useGetEngagementAnalyticsQuery({
       startDate: new Date(analytics.startDate).toISOString(),
     endDate: new Date(analytics.endDate).toISOString(),
     })
@@ -26,6 +27,9 @@ const gridComponents = [
     <MessageStats key={"messagestats"}/>,
     <SessionStats key={"sessionstats"}/>
 ]    
+ if(isLoading){
+   return  <ChatAnalyticsSkeleton/>
+  }
   return (
    <div className="overflow-scroll no-scrollbar h-[calc(100vh-250px)]">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 ">

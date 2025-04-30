@@ -32,12 +32,12 @@ const filteredBroadcasts = broadcasts && broadcasts.filter((broadcast: any) => b
         </div>
 
         {/* Search - Only show if there are broadcasts */}
-        {hasBroadcasts && (
+     
           <div className="relative bg-transparent border-white border-2 lg:w-1/2 rounded-lg">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white" />
             <Input placeholder="Search here..." className="pl-9 bg-transparent border-0 text-white"  value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
           </div>
-        )}
+        
 
         {/* Empty State */}
         {!isLoading && !hasBroadcasts ? (
