@@ -788,7 +788,7 @@ const CheckoutCreated = () => {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>The concerned order is fulfilled</FormLabel>
+                    <FormLabel>The concerned order is created</FormLabel>
                   </div>
                 </FormItem>
               )}

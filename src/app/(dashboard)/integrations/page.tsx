@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import { Search } from "lucide-react"
-import { IntegrationCard } from "@/components/page/integrations/integration-card"
+import { IntegrationCard } from "@/components/page/integrations/integrationcard"
 import { GoogleAnalyticsModal } from "@/components/page/integrations/google-anaytics-modal"
 import { RazorpayModal } from "@/components/page/integrations/razorpay-intgration"
 import { MetaPixelModal } from "@/components/page/integrations/meta-pixel-modal"

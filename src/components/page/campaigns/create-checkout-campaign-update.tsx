@@ -523,29 +523,33 @@ const CheckoutCreated = ({ id }: { id: string }) => {
             <FormField
               control={form.control}
               name="trigger_type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>When to trigger</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+              render={({ field }) => {
+                console.log("trigger_type", field.value);
+                return (
+                  <FormItem>
+                    <FormLabel>When to trigger</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select option" />
-                      </SelectTrigger>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger value={field.value}>
+                          <SelectValue placeholder="Select option" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectItem value="AFTER_CAMPAIGN_CREATED">
+                            Immediate
+                          </SelectItem>
+                          <SelectItem value="CUSTOM">
+                            Custom time after event
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                        Immediate
-                      </SelectItem>
-                      <SelectItem value="CUSTOM">
-                        Custom time after event
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
+                  </FormItem>
+                );
+              }}
             />
           </div>
           {form.watch("trigger_type") === "CUSTOM" && (
@@ -925,7 +929,7 @@ const CheckoutCreated = ({ id }: { id: string }) => {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>The concerned order is fulfilled</FormLabel>
+                    <FormLabel>The concerned order is created</FormLabel>
                   </div>
                 </FormItem>
               )}
