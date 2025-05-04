@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -120,7 +121,15 @@ const OrderCancelled = () => {
   console.log(form.getValues())
   const onSubmit = async (data: CampaignFormValues) => {
     try {
-      const promise = createCampaign({...data,trigger:"ORDER_CANCELLED"})
+      const payload = {
+        ...data,
+        trigger: "ORDER_CANCELLED",
+        template_name: data.template?.name ?? "",
+        template_language: data.template?.language ?? "",
+        template_category: data.template?.category ?? "",
+      };
+      delete (payload as any).template;
+      const promise = createCampaign(payload).unwrap()
       await toast.promise(promise, {
         loading: "Creating campaign...",
         success: "Campaign created successfully!",
@@ -259,14 +268,15 @@ const OrderCancelled = () => {
                     <div className="h-full overflow-hidden">
                       <FilterForm form={form} />
                     </div>
-                    {form.formState.errors.filter && (
+                 
+                  </DialogContent>
+                </Dialog>
+              </div>
+              {form.formState.errors.filter && (
                       <p className="text-red-500 text-sm">
                         There is an error in the filter fields. Please review your inputs.
                       </p>
                     )}
-                  </DialogContent>
-                </Dialog>
-              </div>
             </div>
 
             <FormField

@@ -432,14 +432,15 @@ const OrderCreated = ({ id }: { id: string }) => {
                     <div className="h-full overflow-hidden">
                       <FilterForm form={form} />
                     </div>
-                    {form.formState.errors.filter && (
+                   
+                  </DialogContent>
+                </Dialog>
+                 {form.formState.errors.filter && (
                       <p className="text-red-500 text-sm">
                         There is an error in the filter fields. Please review
                         your inputs.
                       </p>
                     )}
-                  </DialogContent>
-                </Dialog>
               </div>
             </div>
 
@@ -523,15 +524,16 @@ const OrderCreated = ({ id }: { id: string }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
+                  <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                  
                       <SelectTrigger>
                         <SelectValue placeholder="Select option" />
                       </SelectTrigger>
-                    </FormControl>
+                  
                     <SelectContent>
                       <SelectItem value="AFTER_CAMPAIGN_CREATED">
                         Immediate
@@ -541,6 +543,7 @@ const OrderCreated = ({ id }: { id: string }) => {
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                  </FormControl>
                 </FormItem>
               )}
             />
@@ -566,21 +569,23 @@ const OrderCreated = ({ id }: { id: string }) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Unit</FormLabel>
+                    <FormControl>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <FormControl>
+                  
                         <SelectTrigger>
                           <SelectValue placeholder="Select unit" />
                         </SelectTrigger>
-                      </FormControl>
+                    
                       <SelectContent>
                         <SelectItem value="minutes">Minutes</SelectItem>
                         <SelectItem value="hours">Hours</SelectItem>
                         <SelectItem value="days">Days</SelectItem>
                       </SelectContent>
                     </Select>
+                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -598,20 +603,22 @@ const OrderCreated = ({ id }: { id: string }) => {
                   Auto-reply bot for responses. If the user replies within 72
                   hours of getting the message.
                 </p>
+                <FormControl>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
-                  <FormControl>
+                 
                     <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
                       <SelectValue placeholder="Transfer Bot" />
                     </SelectTrigger>
-                  </FormControl>
+                
                   <SelectContent>
                     <SelectItem value="transfer">Transfer Bot</SelectItem>
                     <SelectItem value="welcome-bot">Welcome bot</SelectItem>
                   </SelectContent>
                 </Select>
+                </FormControl>
               </FormItem>
             )}
           />
@@ -653,15 +660,16 @@ const OrderCreated = ({ id }: { id: string }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
+                      <FormControl>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl>
+                      
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
-                        </FormControl>
+                        
                         <SelectContent>
                           <SelectItem value="AFTER_EVENT">
                             Immediately after event
@@ -671,6 +679,7 @@ const OrderCreated = ({ id }: { id: string }) => {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -696,21 +705,23 @@ const OrderCreated = ({ id }: { id: string }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
+                          <FormControl>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
+                         
                               <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
                               </SelectTrigger>
-                            </FormControl>
+                          
                             <SelectContent>
                               <SelectItem value="minutes">Minutes</SelectItem>
                               <SelectItem value="hours">Hours</SelectItem>
                               <SelectItem value="days">Days</SelectItem>
                             </SelectContent>
                           </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />
@@ -748,15 +759,16 @@ const OrderCreated = ({ id }: { id: string }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
+                      <FormControl>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl>
+                        
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
-                        </FormControl>
+                       
                         <SelectContent>
                           <SelectItem value="AFTER_EVENT">
                             Immediately after event
@@ -766,6 +778,7 @@ const OrderCreated = ({ id }: { id: string }) => {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -791,21 +804,23 @@ const OrderCreated = ({ id }: { id: string }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
+                          <FormControl>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
+                          
                               <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
                               </SelectTrigger>
-                            </FormControl>
+                           
                             <SelectContent>
                               <SelectItem value="minutes">Minutes</SelectItem>
                               <SelectItem value="hours">Hours</SelectItem>
                               <SelectItem value="days">Days</SelectItem>
                             </SelectContent>
                           </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />

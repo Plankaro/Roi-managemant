@@ -80,8 +80,8 @@ const OrderCreated = () => {
 
         // Order Count - numeric defaults
         order_count_filter_type: "greater",
-        order_count_greater_or_equal: 0,
-        order_count_less_or_equal: 0,
+        order_count_filter_greater_or_equal: 0,
+        order_count_filter_less_or_equal: 0,
         order_count_min: 0,
         order_count_max: 0,
 
@@ -99,7 +99,7 @@ const OrderCreated = () => {
       new_order_creation_filter: false,
       new_order_creation_type: "AFTER_EVENT",
       new_order_creation_time: { time: 1, unit: "minutes" },
-      related_order_fullfilled: false,
+      related_order_fulfilled: false,
       related_order_cancelled: false,
       // Initialize templateForm with default values
       templateForm: {
@@ -225,7 +225,7 @@ const OrderCreated = () => {
                   <FormLabel className=" md:text-2xl text-lg">Trigger Type</FormLabel>
 
                   <FormControl>
-                    <Select {...field}>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
                         <SelectValue placeholder="Select a Category" />
                       </SelectTrigger>
@@ -623,7 +623,7 @@ const OrderCreated = () => {
             {/* Order Fulfilled */}
             <FormField  
               control={form.control}
-              name="related_order_fullfilled"
+              name="related_order_fulfilled"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                   <FormControl>

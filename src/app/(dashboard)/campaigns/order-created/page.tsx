@@ -296,14 +296,15 @@ const OrderCreated = () => {
                     <div className="h-full overflow-hidden">
                       <FilterForm form={form} />
                     </div>
-                    {form.formState.errors.filter && (
+                    
+                  </DialogContent>
+                </Dialog>
+                {form.formState.errors.filter && (
                       <p className="text-red-500 text-sm">
                         There is an error in the filter fields. Please review
                         your inputs.
                       </p>
                     )}
-                  </DialogContent>
-                </Dialog>
               </div>
             </div>
 

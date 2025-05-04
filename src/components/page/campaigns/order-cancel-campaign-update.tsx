@@ -33,7 +33,6 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import NumericInput from "@/components/ui/numericInput";
 import {
- 
   useGetAllTemplatesQuery,
   useGetSpecificCampaignQuery,
   useUpdateCampaignMutation,
@@ -45,7 +44,6 @@ type CampaignFormValues = z.infer<typeof CampaignSchema>;
 const OrderCancelled = ({ id }: { id: string }) => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
-
 
   const { data: templates, isLoading: isTemplateLoading } =
     useGetAllTemplatesQuery({});
@@ -257,7 +255,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
         new_order_creation_filter: campaignData.new_order_creation_filter,
         new_order_creation_type: campaignData.new_order_creation_type,
         new_order_creation_time: campaignData.new_order_creation_time,
-        
+
         related_order_cancelled: campaignData.related_order_cancelled,
         templateForm: campaignData.components,
         template: matched ? matched : null,
@@ -276,7 +274,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
       };
       delete (payload as any).template;
 
-      const promise = updateCampaign({id:id,body:payload}).unwrap();
+      const promise = updateCampaign({ id: id, body: payload }).unwrap();
 
       await toast.promise(promise, {
         loading: "Creating campaign...",
@@ -346,12 +344,12 @@ const OrderCancelled = ({ id }: { id: string }) => {
     },
   ];
 
-    if(isCampaignloading || isTemplateLoading){
-      return <CampaignSkeleton/>
-    }
-    if(!isSuccess){
-      return <CampaignNotAvailable/>
-    }
+  if (isCampaignloading || isTemplateLoading) {
+    return <CampaignSkeleton />;
+  }
+  if (!isSuccess) {
+    return <CampaignNotAvailable />;
+  }
 
   return (
     <ScrollArea className="h-[calc(100vh-100px)] overflow-auto no-scrollbar">
@@ -392,8 +390,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
                   </FormLabel>
 
                   <FormControl>
-                  <Select  value={field.value} 
-          onValueChange={field.onChange}> 
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
                         <SelectValue placeholder="Select a Category" />
                       </SelectTrigger>
@@ -433,16 +430,15 @@ const OrderCancelled = ({ id }: { id: string }) => {
                     <div className="h-full overflow-hidden">
                       <FilterForm form={form} />
                     </div>
-                    
                   </DialogContent>
                 </Dialog>
               </div>
               {form.formState.errors.filter && (
-                      <p className="text-red-500 text-sm">
-                        There is an error in the filter fields. Please review
-                        your inputs.
-                      </p>
-                    )}
+                <p className="text-red-500 text-sm">
+                  There is an error in the filter fields. Please review your
+                  inputs.
+                </p>
+              )}
             </div>
 
             <FormField
@@ -568,28 +564,30 @@ const OrderCancelled = ({ id }: { id: string }) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Unit</FormLabel>
+                    <FormControl>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <FormControl>
+                    
                         <SelectTrigger>
                           <SelectValue placeholder="Select unit" />
                         </SelectTrigger>
-                      </FormControl>
+                     
                       <SelectContent>
                         <SelectItem value="minutes">Minutes</SelectItem>
                         <SelectItem value="hours">Hours</SelectItem>
                         <SelectItem value="days">Days</SelectItem>
                       </SelectContent>
                     </Select>
+                    </FormControl>
                   </FormItem>
                 )}
               />
             </div>
           )}
 
-          <FormField
+<FormField
             control={form.control}
             name="reply_action"
             defaultValue="transfer"
@@ -600,20 +598,21 @@ const OrderCancelled = ({ id }: { id: string }) => {
                   Auto-reply bot for responses. If the user replies within 72
                   hours of getting the message.
                 </p>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
                       <SelectValue placeholder="Transfer Bot" />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="transfer">Transfer Bot</SelectItem>
-                    <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                  </SelectContent>
-                </Select>
+
+                    <SelectContent>
+                      <SelectItem value="transfer">Transfer Bot</SelectItem>
+                      <SelectItem value="welcome-bot">Welcome bot</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
               </FormItem>
             )}
           />
@@ -655,15 +654,16 @@ const OrderCancelled = ({ id }: { id: string }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
+                      <FormControl>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl>
+                    
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
-                        </FormControl>
+                        
                         <SelectContent>
                           <SelectItem value="AFTER_EVENT">
                             Immediately after event
@@ -673,6 +673,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -698,21 +699,23 @@ const OrderCancelled = ({ id }: { id: string }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
+                          <FormControl>
+                          
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
-                              <SelectTrigger>
+                            <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
                               </SelectTrigger>
-                            </FormControl>
+                          
                             <SelectContent>
                               <SelectItem value="minutes">Minutes</SelectItem>
                               <SelectItem value="hours">Hours</SelectItem>
                               <SelectItem value="days">Days</SelectItem>
                             </SelectContent>
                           </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />
@@ -750,15 +753,16 @@ const OrderCancelled = ({ id }: { id: string }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
+                      <FormControl>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl>
+                       
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
-                        </FormControl>
+                      
                         <SelectContent>
                           <SelectItem value="AFTER_EVENT">
                             Immediately after event
@@ -768,6 +772,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -793,21 +798,23 @@ const OrderCancelled = ({ id }: { id: string }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
+                          <FormControl>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
+                          
                               <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
                               </SelectTrigger>
-                            </FormControl>
+                           
                             <SelectContent>
                               <SelectItem value="minutes">Minutes</SelectItem>
                               <SelectItem value="hours">Hours</SelectItem>
                               <SelectItem value="days">Days</SelectItem>
                             </SelectContent>
                           </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />
@@ -817,46 +824,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
             )}
 
             {/* Order Cancelled */}
-            <FormField
-              control={form.control}
-              name="related_order_cancelled"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      variant="blue"
-                      className="border border-white"
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>The concerned order is cancelled</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            {/* Order Fulfilled */}
-            <FormField
-              control={form.control}
-              name="related_order_fulfilled"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      variant="blue"
-                      className="border border-white"
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>The concerned order is fulfilled</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
+          
           </div>
 
           <div className="flex justify-end space-x-4">
