@@ -98,8 +98,8 @@ const FullfillmentCreate = () => {
 
         // Order Count - numeric defaults
         order_count_filter_type: "greater",
-        order_count_greater_or_equal: 0,
-        order_count_less_or_equal: 0,
+        order_count_filter_greater_or_equal: 0,
+        order_count_filter_less_or_equal: 0,
         order_count_min: 0,
         order_count_max: 0,
 
@@ -277,7 +277,8 @@ const FullfillmentCreate = () => {
                   </FormLabel>
 
                   <FormControl>
-                    <Select {...field}>
+                    <Select  value={field.value} 
+          onValueChange={field.onChange}> 
                       <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
                         <SelectValue placeholder="Select a Category" />
                       </SelectTrigger>
@@ -317,14 +318,15 @@ const FullfillmentCreate = () => {
                     <div className="h-full overflow-hidden">
                       <FilterForm form={form} />
                     </div>
-                    {form.formState.errors.filter && (
+                  
+                  </DialogContent>
+                </Dialog>
+                {form.formState.errors.filter && (
                       <p className="text-red-500 text-sm">
                         There is an error in the filter fields. Please review
                         your inputs.
                       </p>
                     )}
-                  </DialogContent>
-                </Dialog>
               </div>
             </div>
 
@@ -483,20 +485,22 @@ const FullfillmentCreate = () => {
                   Auto-reply bot for responses. If the user replies within 72
                   hours of getting the message.
                 </p>
+                <FormControl>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
-                  <FormControl>
+                  
                     <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
                       <SelectValue placeholder="Transfer Bot" />
                     </SelectTrigger>
-                  </FormControl>
+                
                   <SelectContent>
                     <SelectItem value="transfer">Transfer Bot</SelectItem>
                     <SelectItem value="welcome-bot">Welcome bot</SelectItem>
                   </SelectContent>
                 </Select>
+                </FormControl>
               </FormItem>
             )}
           />
@@ -700,7 +704,26 @@ const FullfillmentCreate = () => {
             )}
 
             {/* Order Cancelled */}
-            <FormField
+              <FormField
+                          control={form.control}
+                          name="related_order_cancelled"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  variant="blue"
+                                  className="border border-white"
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>The concerned order is cancelled</FormLabel>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+            {/* <FormField
               control={form.control}
               name="related_order_cancelled"
               render={({ field }) => (
@@ -718,7 +741,7 @@ const FullfillmentCreate = () => {
                   </div>
                 </FormItem>
               )}
-            />
+            /> */}
 
             {/* Order Fulfilled */}
           

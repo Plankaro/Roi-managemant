@@ -98,8 +98,9 @@ const FullfillmentUpdate = () => {
 
         // Order Count - numeric defaults
         order_count_filter_type: "greater",
-        order_count_greater_or_equal: 0,
-        order_count_less_or_equal: 0,
+        order_count_filter_greater_or_equal: 0,
+        order_count_filter_less_or_equal
+        : 0,
         order_count_min: 0,
         order_count_max: 0,
 
@@ -276,7 +277,8 @@ const FullfillmentUpdate = () => {
                   </FormLabel>
 
                   <FormControl>
-                    <Select {...field}>
+                  <Select  value={field.value} 
+          onValueChange={field.onChange}> 
                       <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
                         <SelectValue placeholder="Select a Category" />
                       </SelectTrigger>
@@ -482,20 +484,22 @@ const FullfillmentUpdate = () => {
                   Auto-reply bot for responses. If the user replies within 72
                   hours of getting the message.
                 </p>
+                <FormControl>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
-                  <FormControl>
+            
                     <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
                       <SelectValue placeholder="Transfer Bot" />
                     </SelectTrigger>
-                  </FormControl>
+               
                   <SelectContent>
                     <SelectItem value="transfer">Transfer Bot</SelectItem>
                     <SelectItem value="welcome-bot">Welcome bot</SelectItem>
                   </SelectContent>
                 </Select>
+                </FormControl>
               </FormItem>
             )}
           />

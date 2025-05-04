@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { isEmpty } from "lodash"
+import { FilterSchema } from "./fullfillment-create-campaign"
 import { Templateschema } from "../broadcast/form"
 
 export const OrderMethod = z.enum([
@@ -21,268 +21,268 @@ export const DiscountType = z.enum(["PERCENTAGE", "AMOUNT"])
 export const PaymentOptionType = z.enum(["PAID", "UNPAID"])
 export const TriggerType = z.enum(["AFTER_EVENT", "CUSTOM"])
 
-export const FilterSchema = z
-  .object({
-    // Order Tags
-    is_order_tag_filter_enabled: z.boolean().default(false),
-    order_tag_filter_all: z.array(z.string()).default([]),
-    order_tag_filter_any: z.array(z.string()).default([]),
-    order_tag_filter_none: z.array(z.string()).default([]),
+// export const FilterSchema = z
+//   .object({
+//     // Order Tags
+//     is_order_tag_filter_enabled: z.boolean().default(false),
+//     order_tag_filter_all: z.array(z.string()).default([]),
+//     order_tag_filter_any: z.array(z.string()).default([]),
+//     order_tag_filter_none: z.array(z.string()).default([]),
 
-    // Product Tags
-    is_product_tag_filter_enabled: z.boolean().default(false),
-    product_tag_filter_all: z.array(z.string()).default([]),
-    product_tag_filter_any: z.array(z.string()).default([]),
-    product_tag_filter_none: z.array(z.string()).default([]),
+//     // Product Tags
+//     is_product_tag_filter_enabled: z.boolean().default(false),
+//     product_tag_filter_all: z.array(z.string()).default([]),
+//     product_tag_filter_any: z.array(z.string()).default([]),
+//     product_tag_filter_none: z.array(z.string()).default([]),
 
-    // Customer Tags
-    is_customer_tag_filter_enabled: z.boolean().default(false),
-    customer_tag_filter_all: z.array(z.string()).default([]),
-    customer_tag_filter_any: z.array(z.string()).default([]),
-    customer_tag_filter_none: z.array(z.string()).default([]),
+//     // Customer Tags
+//     is_customer_tag_filter_enabled: z.boolean().default(false),
+//     customer_tag_filter_all: z.array(z.string()).default([]),
+//     customer_tag_filter_any: z.array(z.string()).default([]),
+//     customer_tag_filter_none: z.array(z.string()).default([]),
 
-    // Payment Gateways
-    is_payment_gateway_filter_enabled: z.boolean().default(false),
-    payment_gateway_filter_any: z.array(z.string()).default([]),
-    payment_gateway_filter_none: z.array(z.string()).default([]),
+//     // Payment Gateways
+//     is_payment_gateway_filter_enabled: z.boolean().default(false),
+//     payment_gateway_filter_any: z.array(z.string()).default([]),
+//     payment_gateway_filter_none: z.array(z.string()).default([]),
 
-    // Payment Options
-    is_payment_option_filter_enabled: z.boolean().default(false),
-    payment_options_type: PaymentOptionType.optional().nullable(),
+//     // Payment Options
+//     is_payment_option_filter_enabled: z.boolean().default(false),
+//     payment_options_type: PaymentOptionType.optional().nullable(),
 
-    // Unsubscribed Customers
-    is_send_to_unsub_customer_filter_enabled: z.boolean().default(false),
-    send_to_unsub_customer: z.boolean().optional().nullable(),
+//     // Unsubscribed Customers
+//     is_send_to_unsub_customer_filter_enabled: z.boolean().default(false),
+//     send_to_unsub_customer: z.boolean().optional().nullable(),
 
-    // Order Amount
-    is_order_amount_filter_enabled: z.boolean().default(false),
-    order_amount_filter_type: z.enum(["greater", "less", "custom"]).optional().nullable(),
-    order_amount_filter_greater_or_equal: z.number().optional().nullable(),
-    order_amount_filter_less_or_equal: z.number().optional().nullable(),
-    order_amount_min: z.number().optional().nullable(),
-    order_amount_max: z.number().optional().nullable(),
+//     // Order Amount
+//     is_order_amount_filter_enabled: z.boolean().default(false),
+//     order_amount_filter_type: z.enum(["greater", "less", "custom"]).optional().nullable(),
+//     order_amount_filter_greater_or_equal: z.number().optional().nullable(),
+//     order_amount_filter_less_or_equal: z.number().optional().nullable(),
+//     order_amount_min: z.number().optional().nullable(),
+//     order_amount_max: z.number().optional().nullable(),
 
-    // Discount Amount
-    is_discount_amount_filter_enabled: z.boolean().default(false),
-    discount_amount_filter_type: z.enum(["greater", "less", "custom"]).optional().nullable(),
-    discount_amount_filter_greater_or_equal: z.number().optional().nullable(),
-    discount_amount_filter_less_or_equal: z.number().optional().nullable(),
-    discount_amount_min: z.number().optional().nullable(),
-    discount_amount_max: z.number().optional().nullable(),
+//     // Discount Amount
+//     is_discount_amount_filter_enabled: z.boolean().default(false),
+//     discount_amount_filter_type: z.enum(["greater", "less", "custom"]).optional().nullable(),
+//     discount_amount_filter_greater_or_equal: z.number().optional().nullable(),
+//     discount_amount_filter_less_or_equal: z.number().optional().nullable(),
+//     discount_amount_min: z.number().optional().nullable(),
+//     discount_amount_max: z.number().optional().nullable(),
 
-    // Discount Codes
-    is_discount_code_filter_enabled: z.boolean().default(false),
-    discount_code_filter_any: z.array(z.string()).default([]),
-    discount_code_filter_none: z.array(z.string()).default([]),
+//     // Discount Codes
+//     is_discount_code_filter_enabled: z.boolean().default(false),
+//     discount_code_filter_any: z.array(z.string()).default([]),
+//     discount_code_filter_none: z.array(z.string()).default([]),
 
-    // Order Count
-    is_order_count_filter_enabled: z.boolean().default(false),
-    order_count_filter_type: z.enum(["greater", "less", "custom"]).optional().nullable(),
-    order_count_greater_or_equal: z.number().optional().nullable(),
-    order_count_less_or_equal: z.number().optional().nullable(),
-    order_count_min: z.number().optional().nullable(),
-    order_count_max: z.number().optional().nullable(),
+//     // Order Count
+//     is_order_count_filter_enabled: z.boolean().default(false),
+//     order_count_filter_type: z.enum(["greater", "less", "custom"]).optional().nullable(),
+//     order_count_greater_or_equal: z.number().optional().nullable(),
+//     order_count_less_or_equal: z.number().optional().nullable(),
+//     order_count_min: z.number().optional().nullable(),
+//     order_count_max: z.number().optional().nullable(),
 
-    // Order Delivery
-    is_order_delivery_filter_enabled: z.boolean().default(false),
-    order_method: z.string().optional().nullable(),
-  })
-  .superRefine((data, ctx) => {
-    // Order Tags
-    if (
-      data.is_order_tag_filter_enabled &&
-      isEmpty(data.order_tag_filter_all) &&
-      isEmpty(data.order_tag_filter_any) &&
-      isEmpty(data.order_tag_filter_none)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_order_tag_filter_enabled"],
-        message: "At least one order tag filter must be provided ",
-      })
-    }
+//     // Order Delivery
+//     is_order_delivery_filter_enabled: z.boolean().default(false),
+//     order_method: z.string().optional().nullable(),
+//   })
+//   .superRefine((data, ctx) => {
+//     // Order Tags
+//     if (
+//       data.is_order_tag_filter_enabled &&
+//       isEmpty(data.order_tag_filter_all) &&
+//       isEmpty(data.order_tag_filter_any) &&
+//       isEmpty(data.order_tag_filter_none)
+//     ) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_order_tag_filter_enabled"],
+//         message: "At least one order tag filter must be provided ",
+//       })
+//     }
 
-    // Product Tags
-    if (
-      data.is_product_tag_filter_enabled &&
-      isEmpty(data.product_tag_filter_all) &&
-      isEmpty(data.product_tag_filter_any) &&
-      isEmpty(data.product_tag_filter_none)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_product_tag_filter_enabled"],
-        message: "At least one product tag filter must be provided ",
-      })
-    }
+//     // Product Tags
+//     if (
+//       data.is_product_tag_filter_enabled &&
+//       isEmpty(data.product_tag_filter_all) &&
+//       isEmpty(data.product_tag_filter_any) &&
+//       isEmpty(data.product_tag_filter_none)
+//     ) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_product_tag_filter_enabled"],
+//         message: "At least one product tag filter must be provided ",
+//       })
+//     }
 
-    // Customer Tags
-    if (
-      data.is_customer_tag_filter_enabled &&
-      isEmpty(data.customer_tag_filter_all) &&
-      isEmpty(data.customer_tag_filter_any) &&
-      isEmpty(data.customer_tag_filter_none)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_customer_tag_filter_enabled"],
-        message: "At least one customer tag filter must be provided",
-      })
-    }
+//     // Customer Tags
+//     if (
+//       data.is_customer_tag_filter_enabled &&
+//       isEmpty(data.customer_tag_filter_all) &&
+//       isEmpty(data.customer_tag_filter_any) &&
+//       isEmpty(data.customer_tag_filter_none)
+//     ) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_customer_tag_filter_enabled"],
+//         message: "At least one customer tag filter must be provided",
+//       })
+//     }
 
-    // Payment Gateways
-    if (
-      data.is_payment_gateway_filter_enabled &&
-      isEmpty(data.payment_gateway_filter_any) &&
-      isEmpty(data.payment_gateway_filter_none)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_payment_gateway_filter_enabled"],
-        message: "At least one payment gateway filter must be provided ",
-      })
-    }
+//     // Payment Gateways
+//     if (
+//       data.is_payment_gateway_filter_enabled &&
+//       isEmpty(data.payment_gateway_filter_any) &&
+//       isEmpty(data.payment_gateway_filter_none)
+//     ) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_payment_gateway_filter_enabled"],
+//         message: "At least one payment gateway filter must be provided ",
+//       })
+//     }
 
-    // Payment Options: (Optional - only if you require a value when enabled)
-    // Uncomment and adjust if needed:
-    if (data.is_payment_option_filter_enabled && isEmpty(data.payment_options_type)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_payment_option_filter_enabled"],
-        message: "Payment option type must be provided ",
-      })
-    }
+//     // Payment Options: (Optional - only if you require a value when enabled)
+//     // Uncomment and adjust if needed:
+//     if (data.is_payment_option_filter_enabled && isEmpty(data.payment_options_type)) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_payment_option_filter_enabled"],
+//         message: "Payment option type must be provided ",
+//       })
+//     }
 
-    // Unsubscribed Customers: (Optional - only if you require a value when enabled)
-    if (data.is_send_to_unsub_customer_filter_enabled && isEmpty(data.send_to_unsub_customer)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_send_to_unsub_customer_filter_enabled"],
-        message: "Unsubscribed customer value must be provided ",
-      })
-    }
+//     // Unsubscribed Customers: (Optional - only if you require a value when enabled)
+//     if (data.is_send_to_unsub_customer_filter_enabled && isEmpty(data.send_to_unsub_customer)) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_send_to_unsub_customer_filter_enabled"],
+//         message: "Unsubscribed customer value must be provided ",
+//       })
+//     }
 
-    // Order Amount
-    if (data.is_order_amount_filter_enabled) {
-      if (isEmpty(data.order_amount_filter_type)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_amount_filter_enabled"],
-          message: "Order amount filter type must be provided ",
-        })
-      } else if (data.order_amount_filter_type === "greater" && data.order_amount_filter_greater_or_equal === null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_amount_filter_enabled"],
-          message: "Value for 'greater or equal' must be provided.",
-        })
-      } else if (data.order_amount_filter_type === "less" && data.order_amount_filter_less_or_equal === null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_amount_filter_enabled"],
-          message: "Value for 'less or equal' must be provided ",
-        })
-      } else if (
-        data.order_amount_filter_type === "custom" &&
-        (data.order_amount_min === null || data.order_amount_max === null)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_amount_filter_enabled"],
-          message: "Both minimum and maximum values must be provided",
-        })
-      }
-    }
+//     // Order Amount
+//     if (data.is_order_amount_filter_enabled) {
+//       if (isEmpty(data.order_amount_filter_type)) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_amount_filter_enabled"],
+//           message: "Order amount filter type must be provided ",
+//         })
+//       } else if (data.order_amount_filter_type === "greater" && data.order_amount_filter_greater_or_equal === null) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_amount_filter_enabled"],
+//           message: "Value for 'greater or equal' must be provided.",
+//         })
+//       } else if (data.order_amount_filter_type === "less" && data.order_amount_filter_less_or_equal === null) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_amount_filter_enabled"],
+//           message: "Value for 'less or equal' must be provided ",
+//         })
+//       } else if (
+//         data.order_amount_filter_type === "custom" &&
+//         (data.order_amount_min === null || data.order_amount_max === null)
+//       ) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_amount_filter_enabled"],
+//           message: "Both minimum and maximum values must be provided",
+//         })
+//       }
+//     }
 
-    // Discount Amount
-    if (data.is_discount_amount_filter_enabled) {
-      if (isEmpty(data.discount_amount_filter_type)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_discount_amount_filter_enabled"],
-          message: "Discount amount filter type must be provided",
-        })
-      } else if (
-        data.discount_amount_filter_type === "greater" &&
-        data.discount_amount_filter_greater_or_equal === null
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_discount_amount_filter_enabled"],
-          message: "Value for 'greater or equal' must be provided",
-        })
-      } else if (data.discount_amount_filter_type === "less" && data.discount_amount_filter_less_or_equal === null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_discount_amount_filter_enabled"],
-          message: "Value for 'less or equal' must be provided",
-        })
-      } else if (
-        data.discount_amount_filter_type === "custom" &&
-        (data.discount_amount_min === null || data.discount_amount_max === null)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_discount_amount_filter_enabled"],
-          message: "Both minimum and maximum values must be provided ",
-        })
-      }
-    }
+//     // Discount Amount
+//     if (data.is_discount_amount_filter_enabled) {
+//       if (isEmpty(data.discount_amount_filter_type)) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_discount_amount_filter_enabled"],
+//           message: "Discount amount filter type must be provided",
+//         })
+//       } else if (
+//         data.discount_amount_filter_type === "greater" &&
+//         data.discount_amount_filter_greater_or_equal === null
+//       ) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_discount_amount_filter_enabled"],
+//           message: "Value for 'greater or equal' must be provided",
+//         })
+//       } else if (data.discount_amount_filter_type === "less" && data.discount_amount_filter_less_or_equal === null) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_discount_amount_filter_enabled"],
+//           message: "Value for 'less or equal' must be provided",
+//         })
+//       } else if (
+//         data.discount_amount_filter_type === "custom" &&
+//         (data.discount_amount_min === null || data.discount_amount_max === null)
+//       ) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_discount_amount_filter_enabled"],
+//           message: "Both minimum and maximum values must be provided ",
+//         })
+//       }
+//     }
 
-    // Discount Codes
-    if (
-      data.is_discount_code_filter_enabled &&
-      isEmpty(data.discount_code_filter_any) &&
-      isEmpty(data.discount_code_filter_none)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_discount_code_filter_enabled"],
-        message: "At least one discount code filter must be provided",
-      })
-    }
+//     // Discount Codes
+//     if (
+//       data.is_discount_code_filter_enabled &&
+//       isEmpty(data.discount_code_filter_any) &&
+//       isEmpty(data.discount_code_filter_none)
+//     ) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_discount_code_filter_enabled"],
+//         message: "At least one discount code filter must be provided",
+//       })
+//     }
 
-    // Order Count
-    if (data.is_order_count_filter_enabled) {
-      if (isEmpty(data.order_count_filter_type)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_count_filter_enabled"],
-          message: "Order count filter type must be provided ",
-        })
-      } else if (data.order_count_filter_type === "greater" && data.order_count_greater_or_equal === null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_count_filter_enabled"],
-          message: "Value for 'greater or equal' must be provided when filter type is 'greater'.",
-        })
-      } else if (data.order_count_filter_type === "less" && data.order_count_less_or_equal === null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_count_filter_enabled"],
-          message: "Value for 'less or equal' must be provided when filter type is 'less'.",
-        })
-      } else if (
-        data.order_count_filter_type === "custom" &&
-        (data.order_count_min === null || data.order_count_max === null)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["is_order_count_filter_enabled"],
-          message: "Both minimum and maximum values must be provided when filter type is 'custom'.",
-        })
-      }
-    }
+//     // Order Count
+//     if (data.is_order_count_filter_enabled) {
+//       if (isEmpty(data.order_count_filter_type)) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_count_filter_enabled"],
+//           message: "Order count filter type must be provided ",
+//         })
+//       } else if (data.order_count_filter_type === "greater" && data.order_count_greater_or_equal === null) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_count_filter_enabled"],
+//           message: "Value for 'greater or equal' must be provided when filter type is 'greater'.",
+//         })
+//       } else if (data.order_count_filter_type === "less" && data.order_count_less_or_equal === null) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_count_filter_enabled"],
+//           message: "Value for 'less or equal' must be provided when filter type is 'less'.",
+//         })
+//       } else if (
+//         data.order_count_filter_type === "custom" &&
+//         (data.order_count_min === null || data.order_count_max === null)
+//       ) {
+//         ctx.addIssue({
+//           code: z.ZodIssueCode.custom,
+//           path: ["is_order_count_filter_enabled"],
+//           message: "Both minimum and maximum values must be provided when filter type is 'custom'.",
+//         })
+//       }
+//     }
 
-    // Order Delivery
-    if (data.is_order_delivery_filter_enabled && isEmpty(data.order_method)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["is_order_delivery_filter_enabled"],
-        message: "Order delivery status must be provided when order delivery filter is enabled.",
-      })
-    }
-  })
+//     // Order Delivery
+//     if (data.is_order_delivery_filter_enabled && isEmpty(data.order_method)) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["is_order_delivery_filter_enabled"],
+//         message: "Order delivery status must be provided when order delivery filter is enabled.",
+//       })
+//     }
+//   })
 
 const headerSchema = z
   .object({

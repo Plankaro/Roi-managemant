@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
-import { Search, UserPlus } from "lucide-react"
+
+import { Search,} from "lucide-react"
 
 export default function NoProspectFound() {
   return (

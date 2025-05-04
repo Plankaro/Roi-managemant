@@ -11,13 +11,16 @@ import { CreateCampaignButton } from "@/components/page/campaigns/create-campaig
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BsGraphUpArrow } from "react-icons/bs";
-import { useGetCampaignQuery } from "@/store/features/apislice";
+import { useGetCampaignQuery,useChangeCampaignStatusMutation } from "@/store/features/apislice";
 import Link from "next/link";
 import CampaignsNotFound from "@/components/page/campaigns/campaigns-list-not-found";
+import toast from "react-hot-toast";
 
 interface CampaignStats {
   id: string;
@@ -34,10 +37,16 @@ interface CampaignStats {
   codtoCheckout: number;
   codtoCheckoutRecoveredAmount: number;
   status: string;
+  Order:[
+    {
+      amount: string;
+    }
+  ]
 }
 
 export default function CampaignsPage() {
   const { data: Campaigns, isLoading } = useGetCampaignQuery({});
+  
   const [search, setSearch] = useState("");
   console.log(Campaigns);
 
@@ -105,6 +114,8 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
     skippedCount,
     failedCount,
   } = Campaigns;
+  const [changeCampaignStatus] = useChangeCampaignStatusMutation();
+  const  [status, setStatus] = useState(Campaigns.status);
 
   const deliveredPercentage =
     totalMessages > 0 ? Math.round((deliveredCount / totalMessages) * 100) : 0;
@@ -115,8 +126,26 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
   const failedPercentage =
     totalMessages > 0 ? Math.round((failedCount / totalMessages) * 100) : 0;
 
+  const handleStatusChange = async(status: string) => {
+    try {
+      console.log(status);
+      const promise = changeCampaignStatus({ id: Campaigns.id,   body: { status }, }).unwrap();
+      toast.promise(promise, {
+        loading: 'Changing status',
+        success: 'Status changed successfully',
+        error: 'Failed to change status',
+      });
+      const data = await promise;
+      console.log(data);
+      setStatus(status);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   return (
-    <Card className="bg-backgroundColor  border-primary  text-white rounded-xl h-full">
+    <Card className="bg-backgroundColor  border-primary  text-white rounded-xl h-[400px]">
       <CardContent className="p-6 space-y-4">
         {/* Title and Badge */}
         <div className="flex items-center justify-between">
@@ -137,14 +166,14 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
             <p className="text-blue-400 text-sm mb-1">Order Created</p>
             <div className="flex items-center">
               <BsGraphUpArrow className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-lg font-semibold">{totalMessages}</span>
+              <span className="text-lg font-semibold">{Campaigns?.Order?.length??0}</span>
             </div>
           </div>
           <div>
             <p className="text-blue-400 text-sm mb-1">Revenue</p>
             <div className="flex items-center">
               <BsGraphUpArrow className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-lg font-semibold">+25,000</span>
+              <span className="text-lg font-semibold">{Campaigns?.Order?.reduce((total, order) => total + Number(order.amount), 0)??0}</span>
             </div>
           </div>
         </div>
@@ -153,30 +182,36 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
         <div className="flex justify-between items-center">
           <p className="text-blue-400 text-sm">Status:</p>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-8 px-2 text-white hover:text-white flex items-center gap-1 hover:bg-blue-900/20"
-              >
-                {Campaigns.status || "ACTIVE"}
-                <ChevronDown className="h-4 w-4 opacity-70" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-[#1a1a2e] border-gray-700 text-white hover:text-white"
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-8 px-2 text-white hover:text-white flex items-center gap-1 hover:bg-blue-900/20"
             >
-              <DropdownMenuItem className="hover:bg-blue-900/20 cursor-pointer">
+              {status}
+              <ChevronDown className="h-4 w-4 opacity-70" />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent
+            align="end"
+            className="bg-[#1a1a2e] border-gray-700 text-white"
+          >
+            <DropdownMenuRadioGroup
+              value={status}
+              onValueChange={handleStatusChange}
+            >
+              <DropdownMenuRadioItem value="ACTIVE">
                 ACTIVE
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-blue-900/20 cursor-pointer">
-                PAUSED
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-blue-900/20 cursor-pointer">
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="INACTIVE">
+              INACTIVE
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="ARCHIVED">
                 ARCHIVED
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         </div>
 
         {/* Trigger Set */}

@@ -5,28 +5,12 @@ import * as React from "react"
 import { Search } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
+
 import { addToCart,removeItem } from "@/store/features/cartSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useGetProductsQuery } from "@/store/features/apislice"
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface ProductProps {
-  id: string;
-  title: string;
-  images: string[];
-  options: {
-    name: string;
-    values: string[];
-  }[];
-  variants: {
-    id: string;
-    availableForSale: boolean;
-    price: number;
-    title: string;
-  }[];
-  totalInventory: number;
-}
 
 
 export default function ProductInventory() {

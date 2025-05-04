@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -8,6 +9,7 @@ import { RazorpayModal } from "@/components/page/integrations/razorpay-intgratio
 import { MetaPixelModal } from "@/components/page/integrations/meta-pixel-modal"
 import { Input } from "@/components/ui/input"
 import { useGetIntegrationsQuery,useDeleteGoogleAnalyticsMutation,useDeletemetapixelMutation,useDeleteRazorPayMutation } from "@/store/features/apislice"
+import IntegrationSkeleton from "@/components/page/integrations/integration-skeleton"
 
 
 // Integration data
@@ -28,7 +30,7 @@ export type IntegrationStatus = {
 export default function DataIntegration() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeModal, setActiveModal] = useState<string | null>(null)
-  const { data } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus };
+  const { data,isLoading } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus,isLoading?:boolean };
   const [ deleteGoogleAnalytics ] = useDeleteGoogleAnalyticsMutation()
   const [ deletemetapixel ] = useDeletemetapixelMutation()
   const [ deleterazorpay ] = useDeleteRazorPayMutation()
@@ -77,7 +79,7 @@ export default function DataIntegration() {
   )
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className=" mx-auto px-4 py-8 h-[calc(100vh-100px)] no-scrollbar overflow-y-auto ">
       <h1 className="text-2xl font-bold text-white mb-6">Data Integration</h1>
 
       {/* Search bar */}
@@ -95,16 +97,21 @@ export default function DataIntegration() {
       </div>
 
       {/* Integration cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredIntegrations.map((integration) => (
-          <IntegrationCard
-            key={integration.id}
-            integration={integration}
-            onConnect={() => setActiveModal(integration.id)}
-            isConnected={integration.isconnected}
-            disconnect={integration.onDisconnect}
-          />
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+        {isLoading ? (
+          <IntegrationSkeleton />
+        ) : (
+          filteredIntegrations.map((integration:any) => (
+            <IntegrationCard
+              key={integration.id}
+              integration={integration}
+              onConnect={() => setActiveModal(integration.id)}
+              isConnected={integration.isconnected}
+              disconnect={integration.onDisconnect}
+            />
+          ))
+        )
+        }
 
         {filteredIntegrations.length === 0 && (
           <div className="col-span-full text-center py-10 text-white">No integrations found matching your search.</div>

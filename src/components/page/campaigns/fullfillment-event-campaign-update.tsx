@@ -103,8 +103,8 @@ const FullfillmentEventCreate = ({id}: {id: string}) => {
 
         // Order Count - numeric defaults
         order_count_filter_type: "greater",
-        order_count_greater_or_equal: 0,
-        order_count_less_or_equal: 0,
+        order_count_filter_greater_or_equal: 0,
+        order_count_filter_less_or_equal: 0,
         order_count_min: 0,
         order_count_max: 0,
 
@@ -151,48 +151,90 @@ const FullfillmentEventCreate = ({id}: {id: string}) => {
           name: campaignData.name,
           reply_action: campaignData.reply_action,
           filter: {
-            is_order_tag_filter_enabled: campaignData.filters.is_order_tag_filter_enabled,
-            is_product_tag_filter_enabled: campaignData.filters.is_product_tag_filter_enabled,
-            is_customer_tag_filter_enabled: campaignData.filters.is_customer_tag_filter_enabled,
-            is_discount_code_filter_enabled: campaignData.filters.is_discount_code_filter_enabled,
-            is_payment_gateway_filter_enabled: campaignData.filters.is_payment_gateway_filter_enabled,
-            is_payment_option_filter_enabled: campaignData.filters.is_payment_option_filter_enabled,
-            is_send_to_unsub_customer_filter_enabled: campaignData.filters.is_send_to_unsub_customer_filter_enabled,
-            is_order_amount_filter_enabled: campaignData.filters.is_order_amount_filter_enabled,
-            is_discount_amount_filter_enabled: campaignData.filters.is_discount_amount_filter_enabled,
-            is_order_delivery_filter_enabled: campaignData.filters.is_order_delivery_filter_enabled,
-            is_order_count_filter_enabled: campaignData.filters.is_order_count_filter_enabled,
-  
+            // 1. Tag filters
+            is_order_tag_filter_enabled:
+              campaignData.filters.is_order_tag_filter_enabled,
             order_tag_filter_all: campaignData.filters.order_tag_filter_all,
             order_tag_filter_any: campaignData.filters.order_tag_filter_any,
             order_tag_filter_none: campaignData.filters.order_tag_filter_none,
+  
+            is_product_tag_filter_enabled:
+              campaignData.filters.is_product_tag_filter_enabled,
             product_tag_filter_all: campaignData.filters.product_tag_filter_all,
             product_tag_filter_any: campaignData.filters.product_tag_filter_any,
             product_tag_filter_none: campaignData.filters.product_tag_filter_none,
+  
+            is_customer_tag_filter_enabled:
+              campaignData.filters.is_customer_tag_filter_enabled,
             customer_tag_filter_all: campaignData.filters.customer_tag_filter_all,
             customer_tag_filter_any: campaignData.filters.customer_tag_filter_any,
-            customer_tag_filter_none: campaignData.filters.customer_tag_filter_none,
-            discount_code_filter_any: campaignData.filters.discount_code_filter_any,
-            discount_code_filter_none: campaignData.filters.discount_code_filter_none,
-            payment_gateway_filter_any: campaignData.filters.payment_gateway_filter_any,
-            payment_gateway_filter_none: campaignData.filters.payment_gateway_filter_none,
+            customer_tag_filter_none:
+              campaignData.filters.customer_tag_filter_none,
   
+            // 2. Discount-code filters
+            is_discount_code_filter_enabled:
+              campaignData.filters.is_discount_code_filter_enabled,
+            discount_code_filter_any:
+              campaignData.filters.discount_code_filter_any,
+            discount_code_filter_none:
+              campaignData.filters.discount_code_filter_none,
+  
+            // 3. Payment gateway & option filters
+            is_payment_gateway_filter_enabled:
+              campaignData.filters.is_payment_gateway_filter_enabled,
+            payment_gateway_filter_any:
+              campaignData.filters.payment_gateway_filter_any,
+            payment_gateway_filter_none:
+              campaignData.filters.payment_gateway_filter_none,
+  
+            is_payment_option_filter_enabled:
+              campaignData.filters.is_payment_option_filter_enabled,
             payment_options_type: campaignData.filters.payment_options_type,
+  
+            // 4. Unsubscribed-customer filter
+            is_send_to_unsub_customer_filter_enabled:
+              campaignData.filters.is_send_to_unsub_customer_filter_enabled,
             send_to_unsub_customer: campaignData.filters.send_to_unsub_customer,
-            order_amount_filter_greater_or_equal: campaignData.filters.order_amount_filter_greater_or_equal,
-            order_amount_filter_less_or_equal: campaignData.filters.order_amount_filter_less_or_equal,
+  
+            // 5. Order-amount filters
+            is_order_amount_filter_enabled:
+              campaignData.filters.is_order_amount_filter_enabled,
+            order_amount_filter_type: campaignData.filters.order_amount_type,
+            order_amount_filter_greater_or_equal:
+              campaignData.filters.order_amount_filter_greater_or_equal,
+            order_amount_filter_less_or_equal:
+              campaignData.filters.order_amount_filter_less_or_equal,
             order_amount_min: campaignData.filters.order_amount_min,
             order_amount_max: campaignData.filters.order_amount_max,
-            discount_amount_filter_greater_or_equal: campaignData.filters.discount_amount_filter_greater_or_equal,
-            discount_amount_filter_less_or_equal: campaignData.filters.discount_amount_filter_less_or_equal,
+  
+            // 6. Discount-amount filters
+            is_discount_amount_filter_enabled:
+              campaignData.filters.is_discount_amount_filter_enabled,
+            discount_amount_filter_type:
+              campaignData.filters.discount_amount_type,
+            discount_amount_filter_greater_or_equal:
+              campaignData.filters.discount_amount_filter_greater_or_equal,
+            discount_amount_filter_less_or_equal:
+              campaignData.filters.discount_amount_filter_less_or_equal,
             discount_amount_min: campaignData.filters.discount_amount_min,
             discount_amount_max: campaignData.filters.discount_amount_max,
-            order_count_greater_or_equal: campaignData.filters.order_count_greater_or_equal || 0,
-            order_count_less_or_equal: campaignData.filters.order_count_less_or_equal || 0,
-            order_count_min: campaignData.filters.order_count_min || 0,
-            order_count_max: campaignData.filters.order_count_max || 0,
+  
+            // 7. Order-count filters
+            is_order_count_filter_enabled:
+              campaignData.filters.is_order_count_filter_enabled,
+            order_count_filter_type: campaignData.filters.order_count_type,
+            order_count_filter_greater_or_equal:
+              campaignData.filters.order_count_filter_greater_or_equal ?? null,
+            order_count_filter_less_or_equal:
+              campaignData.filters.order_count_filter_less_or_equal ?? null,
+            order_count_min: campaignData.filters.order_count_min ?? null,
+            order_count_max: campaignData.filters.order_count_max ?? null,
+  
+            // 8. Delivery filter
+            is_order_delivery_filter_enabled:
+              campaignData.filters.is_order_delivery_filter_enabled,
             order_method: campaignData.filters.order_method,
-          },
+          } ,
           type: campaignData.type,
           trigger_type: campaignData.trigger_type,
           trigger_time: campaignData.trigger_time,

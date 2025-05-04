@@ -351,6 +351,13 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    changeCampaignStatus: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `campaign/status/${id}`,
+        method: "PATCH",
+        body,
+      }),
+    }),
     getCampaign: builder.query({
       query: () => ({
         url: "/campaign",
@@ -665,5 +672,6 @@ export const {
   useUninstallShopifyMutation,
   useInstallShopifyMutation,
   useGetSpecificCampaignQuery,
-  useUpdateCampaignMutation
+  useUpdateCampaignMutation,
+  useChangeCampaignStatusMutation
 } = apiSlice;

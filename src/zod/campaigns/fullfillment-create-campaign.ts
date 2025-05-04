@@ -80,8 +80,8 @@ export const FilterSchema = z
     // Order Count
     is_order_count_filter_enabled: z.boolean().default(false),
     order_count_filter_type: z.enum(["greater", "less", "custom"]).optional().nullable(),
-    order_count_greater_or_equal: z.number().optional().nullable(),
-    order_count_less_or_equal: z.number().optional().nullable(),
+    order_count_filter_greater_or_equal: z.number().optional().nullable(),
+    order_count_filter_less_or_equal: z.number().optional().nullable(),
     order_count_min: z.number().optional().nullable(),
     order_count_max: z.number().optional().nullable(),
 
@@ -252,13 +252,13 @@ export const FilterSchema = z
           path: ["is_order_count_filter_enabled"],
           message: "Order count filter type must be provided ",
         })
-      } else if (data.order_count_filter_type === "greater" && data.order_count_greater_or_equal === null) {
+      } else if (data.order_count_filter_type === "greater" && data.order_count_filter_greater_or_equal === null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["is_order_count_filter_enabled"],
           message: "Value for 'greater or equal' must be provided when filter type is 'greater'.",
         })
-      } else if (data.order_count_filter_type === "less" && data.order_count_less_or_equal === null) {
+      } else if (data.order_count_filter_type === "less" && data.order_count_filter_less_or_equal === null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["is_order_count_filter_enabled"],

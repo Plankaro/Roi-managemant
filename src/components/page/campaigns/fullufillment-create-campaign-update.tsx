@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CampaignSchema } from "@/zod/campaigns/fullfillment-create-campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {   z } from "zod";
+import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -32,22 +32,28 @@ import {
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import NumericInput from "@/components/ui/numericInput";
-import {  useGetAllTemplatesQuery, useGetSpecificCampaignQuery, useUpdateCampaignMutation } from "@/store/features/apislice";
+import {
+  useGetAllTemplatesQuery,
+  useGetSpecificCampaignQuery,
+  useUpdateCampaignMutation,
+} from "@/store/features/apislice";
 import CampaignSkeleton from "./campaign skeletion";
 import CampaignNotAvailable from "./not-available";
 
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
-
-const FullfillmentCreate = ({id}: {id: string}) => {
+const FullfillmentCreate = ({ id }: { id: string }) => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
-     const { data: templates, isLoading:isTemplateLoading } = useGetAllTemplatesQuery({});
+  const { data: templates, isLoading: isTemplateLoading } =
+    useGetAllTemplatesQuery({});
 
-  
-    const { data: campaignData, isLoading:isCampaignloading ,isSuccess} = useGetSpecificCampaignQuery(id);
-    const  [updateCampaign] = useUpdateCampaignMutation();
-
+  const {
+    data: campaignData,
+    isLoading: isCampaignloading,
+    isSuccess,
+  } = useGetSpecificCampaignQuery(id);
+  const [updateCampaign] = useUpdateCampaignMutation();
 
   const form = useForm<CampaignFormValues>({
     resolver: zodResolver(CampaignSchema),
@@ -103,8 +109,8 @@ const FullfillmentCreate = ({id}: {id: string}) => {
 
         // Order Count - numeric defaults
         order_count_filter_type: "greater",
-        order_count_greater_or_equal: 0,
-        order_count_less_or_equal: 0,
+        order_count_filter_greater_or_equal: 0,
+        order_count_filter_less_or_equal: 0,
         order_count_min: 0,
         order_count_max: 0,
 
@@ -140,84 +146,125 @@ const FullfillmentCreate = ({id}: {id: string}) => {
   });
 
   useEffect(() => {
-      if (campaignData && templates) {
-        const matched = templates.find(
-          (t:any) =>
-            t.name === campaignData.template_name
-        );
-        console.log(matched);
-        
-        form.reset({
-          name: campaignData.name,
-          reply_action: campaignData.reply_action,
-          filter: {
-            is_order_tag_filter_enabled: campaignData.filters.is_order_tag_filter_enabled,
-            is_product_tag_filter_enabled: campaignData.filters.is_product_tag_filter_enabled,
-            is_customer_tag_filter_enabled: campaignData.filters.is_customer_tag_filter_enabled,
-            is_discount_code_filter_enabled: campaignData.filters.is_discount_code_filter_enabled,
-            is_payment_gateway_filter_enabled: campaignData.filters.is_payment_gateway_filter_enabled,
-            is_payment_option_filter_enabled: campaignData.filters.is_payment_option_filter_enabled,
-            is_send_to_unsub_customer_filter_enabled: campaignData.filters.is_send_to_unsub_customer_filter_enabled,
-            is_order_amount_filter_enabled: campaignData.filters.is_order_amount_filter_enabled,
-            is_discount_amount_filter_enabled: campaignData.filters.is_discount_amount_filter_enabled,
-            is_order_delivery_filter_enabled: campaignData.filters.is_order_delivery_filter_enabled,
-            is_order_count_filter_enabled: campaignData.filters.is_order_count_filter_enabled,
+    if (campaignData && templates) {
+      const matched = templates.find(
+        (t: any) => t.name === campaignData.template_name
+      );
   
-            order_tag_filter_all: campaignData.filters.order_tag_filter_all,
-            order_tag_filter_any: campaignData.filters.order_tag_filter_any,
-            order_tag_filter_none: campaignData.filters.order_tag_filter_none,
-            product_tag_filter_all: campaignData.filters.product_tag_filter_all,
-            product_tag_filter_any: campaignData.filters.product_tag_filter_any,
-            product_tag_filter_none: campaignData.filters.product_tag_filter_none,
-            customer_tag_filter_all: campaignData.filters.customer_tag_filter_all,
-            customer_tag_filter_any: campaignData.filters.customer_tag_filter_any,
-            customer_tag_filter_none: campaignData.filters.customer_tag_filter_none,
-            discount_code_filter_any: campaignData.filters.discount_code_filter_any,
-            discount_code_filter_none: campaignData.filters.discount_code_filter_none,
-            payment_gateway_filter_any: campaignData.filters.payment_gateway_filter_any,
-            payment_gateway_filter_none: campaignData.filters.payment_gateway_filter_none,
-  
-            payment_options_type: campaignData.filters.payment_options_type,
-            send_to_unsub_customer: campaignData.filters.send_to_unsub_customer,
-            order_amount_filter_greater_or_equal: campaignData.filters.order_amount_filter_greater_or_equal,
-            order_amount_filter_less_or_equal: campaignData.filters.order_amount_filter_less_or_equal,
-            order_amount_min: campaignData.filters.order_amount_min,
-            order_amount_max: campaignData.filters.order_amount_max,
-            discount_amount_filter_greater_or_equal: campaignData.filters.discount_amount_filter_greater_or_equal,
-            discount_amount_filter_less_or_equal: campaignData.filters.discount_amount_filter_less_or_equal,
-            discount_amount_min: campaignData.filters.discount_amount_min,
-            discount_amount_max: campaignData.filters.discount_amount_max,
-            order_count_greater_or_equal: campaignData.filters.order_count_greater_or_equal || 0,
-            order_count_less_or_equal: campaignData.filters.order_count_less_or_equal || 0,
-            order_count_min: campaignData.filters.order_count_min || 0,
-            order_count_max: campaignData.filters.order_count_max || 0,
-            order_method: campaignData.filters.order_method,
-          },
-          type: campaignData.type,
-          trigger_type: campaignData.trigger_type,
-          trigger_time: campaignData.trigger_time,
-         
-        
-       
-          filter_condition_match: campaignData.filter_condition_match,
-          new_checkout_abandonment_filter: campaignData.new_checkout_abandonment_filter,
-          new_checkout_abandonment_type: campaignData.new_checkout_abandonment_type,
-          new_checkout_abandonment_time: campaignData.new_checkout_abandonment_time,
-          new_order_creation_filter: campaignData.new_order_creation_filter,
-          new_order_creation_type: campaignData.new_order_creation_type,
-          new_order_creation_time: campaignData.new_order_creation_time,
-          
-          related_order_cancelled: campaignData.related_order_cancelled,
-          templateForm: campaignData.components,
-          template:matched?matched:null,
-  
-        
-        });
-      }
-    }, [campaignData,templates]);
+
+      form.reset({
+        name: campaignData.name,
+
+        reply_action: campaignData.reply_action,
+        filter: {
+          // 1. Tag filters
+          is_order_tag_filter_enabled:
+            campaignData.filters.is_order_tag_filter_enabled,
+          order_tag_filter_all: campaignData.filters.order_tag_filter_all,
+          order_tag_filter_any: campaignData.filters.order_tag_filter_any,
+          order_tag_filter_none: campaignData.filters.order_tag_filter_none,
+
+          is_product_tag_filter_enabled:
+            campaignData.filters.is_product_tag_filter_enabled,
+          product_tag_filter_all: campaignData.filters.product_tag_filter_all,
+          product_tag_filter_any: campaignData.filters.product_tag_filter_any,
+          product_tag_filter_none: campaignData.filters.product_tag_filter_none,
+
+          is_customer_tag_filter_enabled:
+            campaignData.filters.is_customer_tag_filter_enabled,
+          customer_tag_filter_all: campaignData.filters.customer_tag_filter_all,
+          customer_tag_filter_any: campaignData.filters.customer_tag_filter_any,
+          customer_tag_filter_none:
+            campaignData.filters.customer_tag_filter_none,
+
+          // 2. Discount-code filters
+          is_discount_code_filter_enabled:
+            campaignData.filters.is_discount_code_filter_enabled,
+          discount_code_filter_any:
+            campaignData.filters.discount_code_filter_any,
+          discount_code_filter_none:
+            campaignData.filters.discount_code_filter_none,
+
+          // 3. Payment gateway & option filters
+          is_payment_gateway_filter_enabled:
+            campaignData.filters.is_payment_gateway_filter_enabled,
+          payment_gateway_filter_any:
+            campaignData.filters.payment_gateway_filter_any,
+          payment_gateway_filter_none:
+            campaignData.filters.payment_gateway_filter_none,
+
+          is_payment_option_filter_enabled:
+            campaignData.filters.is_payment_option_filter_enabled,
+          payment_options_type: campaignData.filters.payment_options_type,
+
+          // 4. Unsubscribed-customer filter
+          is_send_to_unsub_customer_filter_enabled:
+            campaignData.filters.is_send_to_unsub_customer_filter_enabled,
+          send_to_unsub_customer: campaignData.filters.send_to_unsub_customer,
+
+          // 5. Order-amount filters
+          is_order_amount_filter_enabled:
+            campaignData.filters.is_order_amount_filter_enabled,
+          order_amount_filter_type: campaignData.filters.order_amount_type,
+          order_amount_filter_greater_or_equal:
+            campaignData.filters.order_amount_filter_greater_or_equal,
+          order_amount_filter_less_or_equal:
+            campaignData.filters.order_amount_filter_less_or_equal,
+          order_amount_min: campaignData.filters.order_amount_min,
+          order_amount_max: campaignData.filters.order_amount_max,
+
+          // 6. Discount-amount filters
+          is_discount_amount_filter_enabled:
+            campaignData.filters.is_discount_amount_filter_enabled,
+          discount_amount_filter_type:
+            campaignData.filters.discount_amount_type,
+          discount_amount_filter_greater_or_equal:
+            campaignData.filters.discount_amount_filter_greater_or_equal,
+          discount_amount_filter_less_or_equal:
+            campaignData.filters.discount_amount_filter_less_or_equal,
+          discount_amount_min: campaignData.filters.discount_amount_min,
+          discount_amount_max: campaignData.filters.discount_amount_max,
+
+          // 7. Order-count filters
+          is_order_count_filter_enabled:
+            campaignData.filters.is_order_count_filter_enabled,
+          order_count_filter_type: campaignData.filters.order_count_type,
+          order_count_filter_greater_or_equal:
+            campaignData.filters.order_count_filter_greater_or_equal ?? null,
+          order_count_filter_less_or_equal:
+            campaignData.filters.order_count_filter_less_or_equal ?? null,
+          order_count_min: campaignData.filters.order_count_min ?? null,
+          order_count_max: campaignData.filters.order_count_max ?? null,
+
+          // 8. Delivery filter
+          is_order_delivery_filter_enabled:
+            campaignData.filters.is_order_delivery_filter_enabled,
+          order_method: campaignData.filters.order_method,
+        },
+        type: campaignData.type,
+        trigger_type: campaignData.trigger_type,
+        trigger_time: campaignData.trigger_time,
+
+        filter_condition_match: campaignData.filter_condition_match,
+        new_checkout_abandonment_filter:
+          campaignData.new_checkout_abandonment_filter,
+        new_checkout_abandonment_type:
+          campaignData.new_checkout_abandonment_type,
+        new_checkout_abandonment_time:
+          campaignData.new_checkout_abandonment_time,
+        new_order_creation_filter: campaignData.new_order_creation_filter,
+        new_order_creation_type: campaignData.new_order_creation_type,
+        new_order_creation_time: campaignData.new_order_creation_time,
+
+        related_order_cancelled: campaignData.related_order_cancelled,
+        templateForm: campaignData.components,
+        template: matched ? matched : null,
+      });
+    }
+  }, [campaignData, templates]);
+
 
   const onSubmit = async (data: CampaignFormValues) => {
-   
     try {
       const payload = {
         ...data,
@@ -228,16 +275,14 @@ const FullfillmentCreate = ({id}: {id: string}) => {
       };
       delete (payload as any).template;
 
-
-      
-      const promise = updateCampaign({id:id,body:payload}).unwrap();
+      const promise = updateCampaign({ id: id, body: payload }).unwrap();
 
       await toast.promise(promise, {
         loading: "Update campaign...",
         success: "Campaign Updating successfully!",
         error: "Error updating campaign.",
       });
-      console.log(await promise);
+  
 
       // Additional logic after campaign creation can go here
     } catch (error) {
@@ -284,13 +329,13 @@ const FullfillmentCreate = ({id}: {id: string}) => {
       value: "order_date",
     },
     {
-      type:"Tracking id",
-      value:"track_id"
+      type: "Tracking id",
+      value: "track_id",
     },
     {
       type: "Shippment Status",
-      value:"shippment_status"
-    }
+      value: "shippment_status",
+    },
   ];
 
   const urldropdownOptions = [
@@ -304,18 +349,19 @@ const FullfillmentCreate = ({id}: {id: string}) => {
     },
     {
       type: "Track link",
-      value:"track_link"
+      value: "track_link",
     },
     {
       type: "Shop URL",
       value: "shop_url",
     },
   ];
-  if(isCampaignloading || isTemplateLoading){
-    return <CampaignSkeleton/>
+  console.log("id", form.getValues());
+  if (isCampaignloading || isTemplateLoading) {
+    return <CampaignSkeleton />;
   }
-  if(!isSuccess){
-    return <CampaignNotAvailable/>
+  if (!isSuccess) {
+    return <CampaignNotAvailable />;
   }
 
   return (
@@ -351,17 +397,18 @@ const FullfillmentCreate = ({id}: {id: string}) => {
               control={form.control}
               name="type"
               render={({ field, fieldState }) => (
-                <FormItem className="space-y-3 basis-1/2">
-                  <FormLabel className=" md:text-2xl text-lg">
-                    Trigger Type
-                  </FormLabel>
-
+                <FormItem>
+                  <FormLabel>Trigger Type</FormLabel>
                   <FormControl>
-                    <Select {...field}>
-                      <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
-                        <SelectValue placeholder="Select a Category" />
+                    <Select
+                      value={field.value} // controlled prop
+                      onValueChange={field.onChange} // reactive onChange
+                    >
+                      
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-blue-50 ">
+                      <SelectContent>
                         <SelectItem value="promotional">Promotional</SelectItem>
                         <SelectItem value="utility">Utility</SelectItem>
                       </SelectContent>
@@ -397,15 +444,15 @@ const FullfillmentCreate = ({id}: {id: string}) => {
                     <div className="h-full overflow-hidden">
                       <FilterForm form={form} />
                     </div>
-                    {form.formState.errors.filter && (
-                      <p className="text-red-500 text-sm">
-                        There is an error in the filter fields. Please review
-                        your inputs.
-                      </p>
-                    )}
                   </DialogContent>
                 </Dialog>
               </div>
+              {form.formState.errors.filter && (
+                <p className="text-red-500 text-sm">
+                  There is an error in the filter fields. Please review your
+                  inputs.
+                </p>
+              )}
             </div>
 
             <FormField
@@ -488,24 +535,25 @@ const FullfillmentCreate = ({id}: {id: string}) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select option" />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                        Immediate
-                      </SelectItem>
-                      <SelectItem value="CUSTOM">
-                        Custom time after event
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                      <SelectContent>
+                        <SelectItem value="AFTER_CAMPAIGN_CREATED">
+                          Immediate
+                        </SelectItem>
+                        <SelectItem value="CUSTOM">
+                          Custom time after event
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                 </FormItem>
               )}
             />
@@ -531,21 +579,22 @@ const FullfillmentCreate = ({id}: {id: string}) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Unit</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select unit" />
                         </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="minutes">Minutes</SelectItem>
-                        <SelectItem value="hours">Hours</SelectItem>
-                        <SelectItem value="days">Days</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+                        <SelectContent>
+                          <SelectItem value="minutes">Minutes</SelectItem>
+                          <SelectItem value="hours">Hours</SelectItem>
+                          <SelectItem value="days">Days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -563,20 +612,21 @@ const FullfillmentCreate = ({id}: {id: string}) => {
                   Auto-reply bot for responses. If the user replies within 72
                   hours of getting the message.
                 </p>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                  >
                     <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
                       <SelectValue placeholder="Transfer Bot" />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="transfer">Transfer Bot</SelectItem>
-                    <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                  </SelectContent>
-                </Select>
+
+                    <SelectContent>
+                      <SelectItem value="transfer">Transfer Bot</SelectItem>
+                      <SelectItem value="welcome-bot">Welcome bot</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
               </FormItem>
             )}
           />
@@ -618,24 +668,25 @@ const FullfillmentCreate = ({id}: {id: string}) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value ={field.value}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="AFTER_EVENT">
-                            Immediately after event
-                          </SelectItem>
-                          <SelectItem value="CUSTOM">
-                            Custom time after event
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+
+                          <SelectContent>
+                            <SelectItem value="AFTER_EVENT">
+                              Immediately after event
+                            </SelectItem>
+                            <SelectItem value="CUSTOM">
+                              Custom time after event
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -661,21 +712,22 @@ const FullfillmentCreate = ({id}: {id: string}) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
                               </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="minutes">Minutes</SelectItem>
-                              <SelectItem value="hours">Hours</SelectItem>
-                              <SelectItem value="days">Days</SelectItem>
-                            </SelectContent>
-                          </Select>
+
+                              <SelectContent>
+                                <SelectItem value="minutes">Minutes</SelectItem>
+                                <SelectItem value="hours">Hours</SelectItem>
+                                <SelectItem value="days">Days</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />
@@ -713,24 +765,25 @@ const FullfillmentCreate = ({id}: {id: string}) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>When to trigger</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="AFTER_EVENT">
-                            Immediately after event
-                          </SelectItem>
-                          <SelectItem value="CUSTOM">
-                            Custom time after event
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+
+                          <SelectContent>
+                            <SelectItem value="AFTER_EVENT">
+                              Immediately after event
+                            </SelectItem>
+                            <SelectItem value="CUSTOM">
+                              Custom time after event
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -756,21 +809,22 @@ const FullfillmentCreate = ({id}: {id: string}) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Unit</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select unit" />
                               </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="minutes">Minutes</SelectItem>
-                              <SelectItem value="hours">Hours</SelectItem>
-                              <SelectItem value="days">Days</SelectItem>
-                            </SelectContent>
-                          </Select>
+
+                              <SelectContent>
+                                <SelectItem value="minutes">Minutes</SelectItem>
+                                <SelectItem value="hours">Hours</SelectItem>
+                                <SelectItem value="days">Days</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
                         </FormItem>
                       )}
                     />
@@ -801,7 +855,6 @@ const FullfillmentCreate = ({id}: {id: string}) => {
             />
 
             {/* Order Fulfilled */}
-          
           </div>
 
           <div className="flex justify-end space-x-4">

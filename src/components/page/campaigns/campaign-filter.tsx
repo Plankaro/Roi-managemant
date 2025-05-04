@@ -34,7 +34,7 @@ const FilterSection = ({ title, children, enabled, onToggle, visible = true, id,
   >
     <FormItem className="flex flex-row items-center space-x-3 space-y-0">
       <FormControl>
-        <Checkbox checked={enabled} onCheckedChange={onToggle} />
+        <Checkbox checked={enabled} onCheckedChange={onToggle} variant="blue"/>
       </FormControl>
       <FormLabel className={`text-base font-semibold ${error ? "text-red-500" : ""}`}>{title}</FormLabel>
       {error && <p className="text-xs text-red-500">{error}</p>}
@@ -255,8 +255,8 @@ export default function FilterForm({ form }: FilterFormProps) {
           />
         </div>
       </CardHeader>
-      <CardContent className="p-4 py-10 b-0">
-        <ScrollArea className="space-y-1 h-[60vh] no-scrollbar overflow-y-auto">
+      <CardContent className="p-4 py-4 b-0">
+        <ScrollArea className="space-y-1 h-[calc(100vh-300px)] no-scrollbar overflow-y-auto">
           {/* Order Tags */}
           <FilterSection
             id="order-tags"

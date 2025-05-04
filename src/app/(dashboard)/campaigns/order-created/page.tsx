@@ -95,8 +95,8 @@ const OrderCreated = () => {
 
         // Order Count - numeric defaults
         order_count_filter_type: "greater",
-        order_count_greater_or_equal: 0,
-        order_count_less_or_equal: 0,
+        order_count_filter_greater_or_equal: 0,
+        order_count_filter_less_or_equal: 0,
         order_count_min: 0,
         order_count_max: 0,
 
@@ -255,7 +255,8 @@ const OrderCreated = () => {
                   </FormLabel>
 
                   <FormControl>
-                    <Select {...field}>
+                  <Select  value={field.value} 
+          onValueChange={field.onChange}> 
                       <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
                         <SelectValue placeholder="Select a Category" />
                       </SelectTrigger>
