@@ -37,7 +37,7 @@ interface CampaignStats {
   codtoCheckout: number;
   codtoCheckoutRecoveredAmount: number;
   status: string;
-  Order:[
+  orders:[
     {
       amount: string;
     }
@@ -126,6 +126,16 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
   const failedPercentage =
     totalMessages > 0 ? Math.round((failedCount / totalMessages) * 100) : 0;
 
+    const totalOrderAmount = Campaigns?.orders?.reduce(
+      (sum, order) => sum + parseFloat(order.amount),
+      0
+    ) || 0;
+    
+    // 2. Format with “k” if ≥1000
+    const formattedTotal = totalOrderAmount >= 1_000
+      ? `${(totalOrderAmount / 1_000).toFixed(2)}k`
+      : totalOrderAmount.toFixed(2);
+
   const handleStatusChange = async(status: string) => {
     try {
       console.log(status);
@@ -166,14 +176,14 @@ function CampaignsCard({ Campaigns }: { Campaigns: CampaignStats }) {
             <p className="text-blue-400 text-sm mb-1">Order Created</p>
             <div className="flex items-center">
               <BsGraphUpArrow className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-lg font-semibold">{Campaigns?.Order?.length??0}</span>
+              <span className="text-lg font-semibold">{Campaigns?.orders?.length??0}</span>
             </div>
           </div>
           <div>
             <p className="text-blue-400 text-sm mb-1">Revenue</p>
             <div className="flex items-center">
               <BsGraphUpArrow className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-lg font-semibold">{Campaigns?.Order?.reduce((total, order) => total + Number(order.amount), 0)??0}</span>
+              <span className="text-lg font-semibold">₹ {formattedTotal}</span>
             </div>
           </div>
         </div>

@@ -46,7 +46,7 @@ export default function ShippingChargesModal({ onClose, initialData }: ShippingC
     toast.promise(promise,{
       loading:"updating",
       success:"update successful",
-      error:"failed to update"
+      error:(error:any) => error?.data?.message || "An unexpected error occurred.",
       
     })
     console.log(values)

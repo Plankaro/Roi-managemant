@@ -332,7 +332,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
   const urldropdownOptions = [
     {
       type: "Order Status Link",
-      value: "Order Status Link",
+      value: "order_status_link",
     },
     {
       type: "COD to checkout link",

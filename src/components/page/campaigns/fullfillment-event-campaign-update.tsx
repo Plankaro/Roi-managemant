@@ -338,7 +338,7 @@ const FullfillmentEventCreate = ({id}: {id: string}) => {
   const urldropdownOptions = [
     {
       type: "Order Status Link",
-      value: "Order Status Link",
+      value: "order_status_linkk",
     },
     {
       type: "COD to checkout link",

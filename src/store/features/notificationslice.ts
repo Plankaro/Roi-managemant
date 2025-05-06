@@ -16,11 +16,13 @@ export interface NotificationSchema {
 }
 
 interface NotificationState {
-  notifications: NotificationSchema[]
+  notifications: NotificationSchema[],
+  unread: number
 }
 
 const initialState: NotificationState = {
   notifications: [],
+  unread: 0
 }
 
 const notificationSlice = createSlice({
@@ -30,6 +32,9 @@ const notificationSlice = createSlice({
     addNotification: (state, action: PayloadAction<NotificationSchema[]>) => {
       const merged = _.unionBy(action.payload, state.notifications, 'id')
       state.notifications = merged
+
+      const unread = merged.filter(n => n.status === "DELIVERED").length
+      state.unread = unread
     },
 
     markAsRead: (state, action: PayloadAction<string>) => {
@@ -43,6 +48,7 @@ const notificationSlice = createSlice({
       state.notifications.forEach(n => {
         n.status = "READ"
       })
+      state.unread = 0
     },
     
 

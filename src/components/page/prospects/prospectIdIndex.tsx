@@ -54,7 +54,9 @@ function ProspectId({ id }: { id: string }) {
   const { data, refetch, isLoading, isSuccess } =
     useGetSpecificShopifyContactsQuery(id);
 
-  //console.log(data);
+  console.log(data);
+
+ 
 
   const [createProspect] = useCreateProspectMutation();
 
@@ -115,7 +117,7 @@ function ProspectId({ id }: { id: string }) {
       label: "TOTAL ORDERS",
       value: data?.shopifyData?.numberOfOrders || 0,
     },
-    { icon: MousePointerClick, label: "TOTAL PAGE VISIT", value: "8547" },
+    { icon: MousePointerClick, label: "TOTAL PAGE VISIT", value: data?.clickCount??0    },
     {
       icon: MessageSquare,
       label: "TOTAL MESSAGES",

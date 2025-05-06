@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/components/ui/logo";
-import { Search, Bell, X, Menu } from "lucide-react";
-import React from "react";
+import { Bell, X, Menu } from "lucide-react";
+import React, { useEffect } from "react";
 import { useDispatch,useSelector } from "react-redux";
 import { toggleMenuModal } from "@/store/features/prospect";
 import { RootState } from "@/store/store";
@@ -11,12 +11,29 @@ import { Notification } from "./notification";
 import { useState } from "react";
 import { useGetProfileQuery } from "@/store/features/apislice";
 import { Skeleton } from "@/components/ui/skeleton";
+import { markAllAsRead } from "@/store/features/notificationslice";
+import { useUpdateNotificationMutation } from "@/store/features/apislice";
+
+
 const Header = () => {
   const session:any = useSession();
   console.log(session)
   const {data,isLoading}=useGetProfileQuery({})
   console.log(data)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  
+  const unread = useSelector((state:RootState)=>state.notifications.unread)
+
+  const [updateNotification] = useUpdateNotificationMutation()
+
+  useEffect(()=>{
+    if(isNotificationOpen === true){
+      dispatch(markAllAsRead())
+      updateNotification([])
+    }
+  },[isNotificationOpen])
+
+
 
     const isOpen = useSelector((state:RootState)=>state.Prospect.openMenuModal)
     const dispatch = useDispatch()  
@@ -31,13 +48,14 @@ const Header = () => {
 
       <Logo width={120} height={58} className="md:inline hidden"/>
       <div className="flex items-center  gap-10">
-        <Search className="text-white" />
+       
         <div className="relative inline-block">
         <button
           onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-          className="p-2 text-white rounded-full hover:bg-gray-700 transition-colors duration-200"
+          className="p-2 text-white rounded-full hover:bg-gray-700 transition-colors duration-200 relative"
         >
           <Bell className="h-6 w-6" />
+          <span className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-xs font-medium text-white bg-red-500 rounded-full">{unread}</span>
         </button>
         
         <Notification 

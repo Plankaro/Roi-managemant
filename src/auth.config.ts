@@ -7,9 +7,11 @@ import { signInSchema } from "./zod/auth/auth.schema";
 import { CredentialsSignin, NextAuthConfig } from "next-auth";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { NextResponse } from "next/server";
 
 
-const authRoute = ["/sign-in", "/sign-up", "/verify", "/reset-password", "/get-token"];
+const authRoute = ["/sign-in", "/sign-up"]
+const publicRoute = ["/verify", "/reset-password", "/get-token"];
 
 async function refreshAccessToken(token: any) {
 
@@ -90,18 +92,31 @@ export default {
         }),
     ],
     callbacks: {
-        authorized({ request: { nextUrl }, auth }) {
-            const isLoggedIn = !!auth?.user;
+        authorized({ auth, request: { nextUrl } }) {
             const { pathname } = nextUrl;
-            console.log(pathname);
-            
-            // Allow any route that starts with one of the auth route prefixes.
-            if (authRoute.some((route) => pathname.startsWith(route))) {
+            const isAuthRoute = authRoute.some((route) => pathname.startsWith(route));
+            const isLoggedIn = !!auth?.user;
+            if(publicRoute.some((route) => pathname.startsWith(route))){
+                return true
+            }
+      
+            // 1. Unauthenticated user trying to access an auth page?  ✅ Allow.
+            if (!isLoggedIn && isAuthRoute) {
               return true;
             }
-            
-            // For all other routes, require the user to be logged in.
-            return isLoggedIn || Response.redirect(new URL('/sign-in', nextUrl));
+      
+            // 2. Unauthenticated user trying to access any other page?  ⛔ Redirect to /sign-in.
+            if (!isLoggedIn && !isAuthRoute) {
+              return NextResponse.redirect(new URL("/sign-in", nextUrl));
+            }
+      
+            // 3. Authenticated user trying to hit /sign-in or /sign-up?  ⛔ Redirect to home.
+            if (isLoggedIn && isAuthRoute) {
+              return NextResponse.redirect(new URL("/", nextUrl));
+            }
+      
+            // 4. Authenticated user on any other page?  ✅ Allow.
+            return true;
           },
         jwt: async ({ token, account, user }: any) => {
        

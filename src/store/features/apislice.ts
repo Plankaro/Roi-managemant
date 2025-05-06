@@ -7,6 +7,7 @@ export const apiSlice = createApi({
   baseQuery,
   tagTypes: [
     "Prospect",
+    "templates",
     "shopifyCustomer",
     "getbroadcastbyid",
     "getchatsById",
@@ -187,7 +188,10 @@ export const apiSlice = createApi({
       query: () => ({
         url: "/chats/template",
         method: "GET",
+        
       }),
+      providesTags: ["templates"],
+
     }),
     getSpecifTemplates: builder.query({
       query: (name) => ({
@@ -394,6 +398,7 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["templates"],
     }),
     sendWhatsappMedia: builder.mutation({
       query: (body) => ({
@@ -414,6 +419,7 @@ export const apiSlice = createApi({
         method: "DELETE",
         params: { name }, // sends ?name=template-name
       }),
+      invalidatesTags: ["templates"],
     }),
     findBots: builder.query({
       query: () => ({
@@ -591,6 +597,13 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    updateNotification: builder.mutation({
+      query: () => ({
+        url: "chats/notifications",
+        method: "PATCH",
+      
+      }),
+    })
 
     
   }),
@@ -673,5 +686,6 @@ export const {
   useInstallShopifyMutation,
   useGetSpecificCampaignQuery,
   useUpdateCampaignMutation,
-  useChangeCampaignStatusMutation
+  useChangeCampaignStatusMutation,
+  useUpdateNotificationMutation
 } = apiSlice;

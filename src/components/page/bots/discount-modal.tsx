@@ -56,7 +56,7 @@ export default function DiscountModal({ onClose, initialData }: DiscountModalPro
     toast.promise(promise,{
       loading:"updating",
       success:"update successful",
-      error:"failed to update"
+      error:(error:any) => error?.data?.message || "An unexpected error occurred.",
       
     })
     console.log(values)

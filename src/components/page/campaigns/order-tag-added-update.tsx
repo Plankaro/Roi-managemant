@@ -254,7 +254,7 @@ const OrderCreated = ({ id }: { id: string }) => {
     try {
       const payload = {
         ...data,
-        trigger: "ORDER_CREATED",
+        trigger: "ORDER_TAG_ADDED",
         template_name: data.template?.name ?? "",
         template_language: data.template?.language ?? "",
         template_category: data.template?.category ?? "",
@@ -319,7 +319,7 @@ const OrderCreated = ({ id }: { id: string }) => {
   const urldropdownOptions = [
     {
       type: "Order Status Link",
-      value: "Order Status Link",
+      value: "order_status_link",
     },
     {
       type: "COD to checkout link",

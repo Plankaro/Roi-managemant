@@ -1,37 +1,48 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { Bar, BarChart, XAxis } from "recharts"
+import { Bar, BarChart, XAxis ,  Tooltip,} from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer } from "@/components/ui/chart"
+import { ChartContainer} from "@/components/ui/chart"
 import { useGetChatAnalyticsQuery } from "@/store/features/apislice"
 import { useSelector } from "react-redux"
-import { RootState } from "@/store/store"
+import type { RootState } from "@/store/store"
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-2 shadow-lg rounded-lg border border-gray-200">
+        <p className="font-medium">{`${payload[0].value.toLocaleString()}`}</p>
+      </div>
+    );
+  }
 
+  return null;
+};
 
 export function EngagementComparisonChart() {
-  const {analytics}=useSelector((state: RootState) => state);
-    const {data:analyticsData} = useGetChatAnalyticsQuery({
-      startDate: new Date(analytics.startDate).toISOString(),
+  const { analytics } = useSelector((state: RootState) => state)
+  const { data: analyticsData } = useGetChatAnalyticsQuery({
+    startDate: new Date(analytics.startDate).toISOString(),
     endDate: new Date(analytics.endDate).toISOString(),
-    });
-    const totalAgentMessage =  analyticsData?.messagesByAgents?.reduce(
-      (total: number, agent: any) => total + Number(agent.messageCount),
-      0
-    ) ?? 0
-    const data = [
-      {
-        name: "Agent Engagement",
-        value: totalAgentMessage,
-        fill: "#4285F4",
-      },
-      {
-        name: "Automated Engagement",
-        value: analyticsData?.automatedMessages ?? 0,
-        fill: "#1E3A8A",
-      },
-    ]
+  })
+
+  const totalAgentMessage =
+    analyticsData?.messagesByAgents?.reduce((total: number, agent: any) => total + Number(agent.messageCount), 0) ?? 0
+
+  const data = [
+    {
+      name: "Agent Engagement",
+      value: totalAgentMessage,
+      fill: "#4285F4",
+    },
+    {
+      name: "Automated Engagement",
+      value: analyticsData?.automatedMessages ?? 0,
+      fill: "#1E3A8A",
+    },
+  ]
+
   return (
     <Card className="w-full h-full bg-backgroundColor border-primary border rounded-xl overflow-hidden">
       <CardHeader className="flex items-center justify-between pb-2 px-2 sm:px-4 pt-4">
@@ -42,7 +53,7 @@ export function EngagementComparisonChart() {
       <CardContent className="p-2 sm:p-4">
         <div className="w-full h-[180px] sm:h-[200px] md:h-[220px]">
           <ChartContainer
-            className="h-full w-full "
+            className="h-full w-full"
             config={{
               value: {
                 label: "Value",
@@ -50,44 +61,48 @@ export function EngagementComparisonChart() {
               },
             }}
           >
-            {/* <ResponsiveContainer width="100%" height="100%"> */}
-              <BarChart
-                data={data}
-                layout="vertical"
-                margin={{ 
-                  top: 20,
-                  right: 45,
-                  left: 5,
-                  bottom: 20 
+            <BarChart
+              data={data}
+              layout="vertical"
+              margin={{
+                top: 20,
+                right: 45,
+                left: 5,
+                bottom: 20,
+              }}
+              barSize={25}
+              barCategoryGap={12}
+            >
+              <XAxis type="number" hide />
+              <Bar
+                dataKey="value"
+                barSize={30}
+                radius={[0, 6, 6, 0]}
+                fill="#ffffff"
+                label={{
+                  position: "right",
+                  fill: "white",
+                  fontSize: 11,
+                  formatter: (value: any) => value,
+                  dx: 5,
                 }}
-                barSize={25}
-                barCategoryGap={12}
-              >
-                <XAxis type="number" hide />
-                <Bar
-                  dataKey="value"
-                  barSize={30}
-                  radius={[0, 6, 6, 0]}
-                  fill="#ffffff"
-                  label={{
-                    position: "right",
-                    fill: "white",
-                    fontSize: 11,
-                    formatter: (value: any) => value,
-                    dx: 5,
-                  }}
-                />
-              </BarChart>
-            {/* </ResponsiveContainer> */}
+              />
+               <Tooltip
+                                content={CustomTooltip}
+                                cursor={{ fill: "transparent" }}
+                              />
+            </BarChart>
           </ChartContainer>
         </div>
-        <div className="mt-3 space-y-2">
-          {/* <p className="text-[11px] sm:text-xs md:text-sm text-white/80">
-            Average Automated Engagement increased by 18% from past week
-          </p>
-          <p className="text-[11px] sm:text-xs md:text-sm text-white/80">
-            Average Agent Engagement increased by 12% from past week
-          </p> */}
+        <div className=" space-y-2 mt-20">
+          {data.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.fill }} />
+              <p className="text-[11px] sm:text-xs md:text-sm text-white/80">
+                {item.name}: <span className="font-medium">{item.value}</span>
+              </p>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

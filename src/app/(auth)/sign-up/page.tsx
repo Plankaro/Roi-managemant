@@ -65,8 +65,8 @@ export default function SignUpPage() {
                 
             }}
             loading={loading}
-            authDescription="Start your 30 day free trial. Cancel any time"
-            authTitle="Account Sign In"
+            authDescription="Join ROI MAGNET"
+            authTitle="Account Sign Up"
 
         />
 

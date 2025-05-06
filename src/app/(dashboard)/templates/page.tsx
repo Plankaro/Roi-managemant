@@ -26,13 +26,13 @@ export default function TemplatesGrid() {
 
   const [deleteTemplate] = useDeleteTemplateMutation();
 
-  const { data: templates ,isLoading} = useGetAllTemplatesIncludingPendingQuery({});
+  const { data: templates ,isLoading,refetch} = useGetAllTemplatesIncludingPendingQuery({});
 
   const filteredTemplates = templates?.filter((template: any) =>
     template.name.toLowerCase().includes(query.toLowerCase())
   );
 
-  const handleDelete = (template_name: string) => {
+  const handleDelete = async(template_name: string) => {
     const promise = deleteTemplate(template_name).unwrap();
 
     toast.promise(promise, {
@@ -41,6 +41,8 @@ export default function TemplatesGrid() {
       error: (error: any) =>
         error?.data?.message || "An unexpected error occurred.",
     });
+    await promise
+    refetch()
   };
 
   const openModal = (template: any) => {

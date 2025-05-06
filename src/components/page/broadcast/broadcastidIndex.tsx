@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -9,32 +10,50 @@ import BroadcastDashboard from "./previewComponent"
 import BroadcastAndRetries from "@/components/page/broadcast/Broadcastretries"
 import { useGetBroadcastByIdQuery } from "@/store/features/apislice"
 
-import { BroadcastDetailResult } from "@/zod/broadcast/broadcast"
 
-import { calculateTotalPrice, exportJsonToExcel } from "@/lib/utils"
+
+import { exportJsonToExcel } from "@/lib/utils"
 import Link from "next/link"
 import BroadcastDetailsSkeleton from "./broadvastIdskeleton"
 import BroadcastNotAvailable from "./not-available"
 
 export default function BroadcastDetails({id}:{id:string}) {
 
-  const { data, refetch, isLoading,isSuccess }: { data?: BroadcastDetailResult; isLoading: boolean,refetch:()=>void,isSuccess:boolean } = useGetBroadcastByIdQuery(id);
-  //console.log(data)
+  const { data, refetch, isLoading,isSuccess }: { data?: any; isLoading: boolean,refetch:()=>void,isSuccess:boolean } = useGetBroadcastByIdQuery(id);
+  console.log(data)
+  const totalOrderAmount = data?.order?.reduce(
+    (sum:any, order:any) => sum + parseFloat(order.amount),
+    0
+  ) || 0;
   
-  let totalOrderPrice = 0;
 
-  if (Array.isArray(data?.Order) && data.Order.length > 0) {
-    totalOrderPrice = calculateTotalPrice(data.Order);
-  }
+  const totalclicks = data?.link?.reduce(
+    (sum:any, link:any) => sum + parseFloat(link?.no_of_click),
+    0
+  ) || 0;
+
+  // 2. Format with “k” if ≥1000
+  // const formattedTotal = totalOrderAmount >= 1_000
+  //   ? `${(totalOrderAmount / 1_000).toFixed(2)}k`
+  //   : totalOrderAmount.toFixed(2);
+  
+
+
+ 
   //console.log(totalOrderPrice);
-  const roi = data?.price ? (totalOrderPrice / Number(data.price)).toFixed(3) : "0.000";
+  const price = Number(data?.price);
+const roi = price > 0 ? (totalOrderAmount / price).toFixed(3) : "0.000";
 
+const clicks = data?.link?.reduce(
+  (sum: any, link: any) => sum + parseFloat(link?.no_of_click),
+  0
+) || 0;
 
 
 
 const gridComponents = [
   <MessageStatus key="message-status" selectedBroadcast={data} />,
-  <ProfitChart key="profit-chart" expense={Number(data?.price)} revenue={totalOrderPrice}/>,
+  <ProfitChart key="profit-chart" expense={price} revenue={totalOrderAmount}/>,
   <Funnel key="funnel" selectedBroadcast={data}/>,
   <BroadcastDashboard  key="preview-component" selectedBroadcast={data}/>,
   <BroadcastAndRetries key="broadcast-retries" selectedBroadcast={data} BroadCastrefetch={refetch}/>
@@ -42,12 +61,12 @@ const gridComponents = [
 ];
 
 const metrics = [
-  { label: "Orders", value: data?.Order?.length },
+  { label: "Orders", value: data?.order?.length??0 },
   { label: "ROI", value: `${roi}%` },
-  { label: "Link Clicks", value: "12" },
-  { label: "Button Clicks", value: "12" },
-  { label: "Conversions", value: data?.unique_order_created },
-  { label: "Replies", value: data?.reply_count },
+  { label: "Link Clicks", value: totalclicks??0 },
+  { label: "Button Clicks", value: clicks??0 },
+  { label: "Conversions", value: data?.conversion??0  },
+  { label: "Replies", value: data?.reply_count??0 },
 ]
 
 

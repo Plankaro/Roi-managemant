@@ -34,7 +34,7 @@ const FilterSection = ({ title, children, enabled, onToggle, visible = true, id,
   >
     <FormItem className="flex flex-row items-center space-x-3 space-y-0">
       <FormControl>
-        <Checkbox checked={enabled} onCheckedChange={onToggle} variant="blue"/>
+        <Checkbox checked={enabled} onCheckedChange={onToggle} variant="blue" />
       </FormControl>
       <FormLabel className={`text-base font-semibold ${error ? "text-red-500" : ""}`}>{title}</FormLabel>
       {error && <p className="text-xs text-red-500">{error}</p>}
@@ -59,13 +59,20 @@ const TagInput = ({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && inputValue.trim()) {
-   
-      e.preventDefault()
-      if(tags.length >= 3) return
+      e.preventDefault() // This prevents form submission
+      e.stopPropagation() // This stops event bubbling
+
+      if (tags.length >= 3) {
+        // Provide visual feedback that max tags reached
+        return
+      }
+
       if (!tags.includes(inputValue.trim())) {
         form.setValue(fieldName, [...tags, inputValue.trim()])
+        setInputValue("")
+      } else {
+        setInputValue("") // Clear input even if duplicate
       }
-      setInputValue("")
     }
   }
 
@@ -82,11 +89,13 @@ const TagInput = ({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={tags.length >= 3 ? "Maximum tags reached" : placeholder}
           disabled={tags.length >= 3}
-          
           className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
         />
+        <p className="text-xs text-gray-500 mt-1">
+          {tags.length}/3 tags added {tags.length >= 3 ? "(maximum reached)" : "(press Enter to add)"}
+        </p>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {tags.map((tag: string) => (
@@ -480,4 +489,3 @@ export default function FilterForm({ form }: FilterFormProps) {
     </Card>
   )
 }
-

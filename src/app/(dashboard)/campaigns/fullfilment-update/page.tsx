@@ -215,7 +215,7 @@ const FullfillmentUpdate = () => {
   const urldropdownOptions = [
     {
       type: "Order Status Link",
-      value: "Order Status Link",
+      value: "order_status_link",
     },
     {
       type: "COD to checkout link",

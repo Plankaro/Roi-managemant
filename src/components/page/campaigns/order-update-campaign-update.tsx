@@ -257,10 +257,11 @@ const OrderUpdate = ({ id }: { id: string }) => {
         new_order_creation_filter: campaignData.new_order_creation_filter,
         new_order_creation_type: campaignData.new_order_creation_type,
         new_order_creation_time: campaignData.new_order_creation_time,
-        related_order_fulfilled: campaignData.related_order_fullfilled,
+        related_order_fulfilled: campaignData.related_order_fulfilled,
         related_order_cancelled: campaignData.related_order_cancelled,
         templateForm: campaignData.components,
         template: matched ? matched : null,
+        
       });
     }
   }, [campaignData, templates]);
@@ -269,7 +270,7 @@ const OrderUpdate = ({ id }: { id: string }) => {
     try {
       const payload = {
         ...data,
-        trigger: "ORDER_TAG_ADDED",
+        trigger: "ORDER_UPDATED",
         template_name: data.template?.name ?? "",
         template_language: data.template?.language ?? "",
         template_category: data.template?.category ?? "",
@@ -334,7 +335,7 @@ const OrderUpdate = ({ id }: { id: string }) => {
   const urldropdownOptions = [
     {
       type: "Order Status Link",
-      value: "Order Status Link",
+      value: "order_status_link",
     },
     {
       type: "COD to checkout link",

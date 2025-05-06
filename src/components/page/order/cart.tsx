@@ -4,7 +4,7 @@
 "use client"
 import { useState } from "react"
 import { X } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useDispatch, useSelector } from "react-redux"
 import { removeItem, updateQuantity, updateVariant } from "@/store/features/cartSlice"

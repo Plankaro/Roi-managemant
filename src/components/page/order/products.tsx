@@ -10,6 +10,7 @@ import { addToCart,removeItem } from "@/store/features/cartSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useGetProductsQuery } from "@/store/features/apislice"
 import { Skeleton } from "@/components/ui/skeleton"
+import toast from "react-hot-toast"
 
 
 
@@ -32,6 +33,10 @@ export default function ProductInventory() {
 
       dispatch(removeItem(product.id));
     } else {
+      if(product.totalInventory===0){
+        toast.error("Out of stock")
+        return
+      }
      
       dispatch(addToCart(product));
     }

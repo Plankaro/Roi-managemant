@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -46,7 +47,7 @@ export default function BotCard({
     toast.promise(promise,{
       loading:"updating status",
       success:"updated succesfully",
-      error:"updated failed"
+      error:(error:any) => error?.data?.message || "An unexpected error occurred.",
     })
     const data = await promise 
     console.log(data)
