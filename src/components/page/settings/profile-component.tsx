@@ -33,7 +33,7 @@ const profileFormSchema = z.object({
 export function ProfileComponent() {
   const { update } = useSession()
   const [updateProfile] = useUpdateProfileMutation()
-  const { data: profile, isLoading } = useGetProfileQuery()
+  const { data: profile, isLoading } = useGetProfileQuery({})
 
   const [uplodFiles] = useUploadFilesMutation()
   const [profileImage, setProfileImage] = useState<string | null>(null)

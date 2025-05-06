@@ -9,6 +9,7 @@ import Funnel from "@/components/page/broadcast/funnel"
 import BroadcastDashboard from "./previewComponent"
 import BroadcastAndRetries from "@/components/page/broadcast/Broadcastretries"
 import { useGetBroadcastByIdQuery } from "@/store/features/apislice"
+import { Download } from "lucide-react"
 
 
 
@@ -20,7 +21,7 @@ import BroadcastNotAvailable from "./not-available"
 export default function BroadcastDetails({id}:{id:string}) {
 
   const { data, refetch, isLoading,isSuccess }: { data?: any; isLoading: boolean,refetch:()=>void,isSuccess:boolean } = useGetBroadcastByIdQuery(id);
-  console.log(data)
+  
   const totalOrderAmount = data?.order?.reduce(
     (sum:any, order:any) => sum + parseFloat(order.amount),
     0
@@ -71,43 +72,43 @@ const metrics = [
 
 
 
-const handleDownload = async () => {
-    if (data) {
-        // Convert `data` object into an array format for Excel
-        const formattedData = [{
-            "ID": data.id,
-            "Name": data.name,
-            "Type": data.type,
-            "Status": data.status,
-            "Template Name": data.template_name,
-            "Template Language": data.template_language,
-            "Total Contacts": data.total_contact,
-            "Created At": new Date(data.createdAt).toLocaleString(),
-            "Scheduled At": new Date(data?.scheduledDate??"").toLocaleString(),
-            "Scheduled": data.isScheduled,
-            "Price": data.price,
-          
-   
-            "UTM Campaign": data.utm_campaign,
-            "UTM Medium": data.utm_medium,
-            "UTM Source": data.utm_source,
-         
-            "Reply Count": data.reply_count,
-            "Unique Interactions": data.unique_interactions,
-            "Total Messages": data.totalMessages,
-            "Delivered Count": data.deliveredCount,
-            "Read Count": data.readCount,
-            "Failed Count": data.failedCount,
-            "Sent Count": data.sentCount,
-            "Creator Name": data.creator.name
-        }];
 
-        // Create an Excel sheet
-         exportJsonToExcel(formattedData);
-    } else {
-        //console.log("No data available to download.");
-    }
-};
+
+const handleDelete = ()=>{
+  try {
+    const formattedData = [{
+      "ID": data?.id,
+      "Name": data?.name,
+      "Type": data?.type,
+      "Status": data.status,
+      "Template Name": data.template_name,
+      "Template Language": data.template_language,
+      "Total Contacts": data.total_contact,
+      "Created At": new Date(data.createdAt).toLocaleString(),
+      "Scheduled At": new Date(data?.scheduledDate??"").toLocaleString(),
+      "Scheduled": data.isScheduled,
+      "Price": data.price,
+    
+  
+      "UTM Campaign": data.utm_campaign,
+      "UTM Medium": data.utm_medium,
+      "UTM Source": data.utm_source,
+   
+      "Reply Count": data.reply_count,
+      "Unique Interactions": data.unique_interactions,
+      "Total Messages": data.totalMessages,
+      "Delivered Count": data.deliveredCount,
+      "Read Count": data.readCount,
+      "Failed Count": data.failedCount,
+      "Sent Count": data.sentCount,
+      "Creator Name": data.createdBy.name
+  }];
+  console.log(formattedData);
+   exportJsonToExcel(formattedData);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 if(isLoading){
   return <BroadcastDetailsSkeleton/>
@@ -121,14 +122,15 @@ if(!isSuccess){
   return (
     <div className=" bg-transparent  p-1">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl md:text-2xl font-semibold text-white">Broadcast- All Product of the month</h1>
+        <h1 className="text-xl md:text-2xl font-semibold text-white">{data?.name}</h1>
         <div className="flex gap-2">
           <Link href="/broadcast">
           <Button variant="outline" className="border-blue-500 border-2 bg-transparent text-white hover:border-blue-500/10 md:block hidden">
             Exit
           </Button>
           </Link>
-          <Button className="bg-blue-500 text-white hover:bg-blue-600 md:block hidden" onClick={handleDownload}>Download Report</Button>
+          <Button className="bg-blue-500 text-white hover:bg-blue-600 md:block hidden" onClick={handleDelete}>Download Report</Button>
+          <Button className="bg-blue-500 text-white hover:bg-blue-600 rounded-full md:hidden flex items-center justify-center" size={"icon"} onClick={handleDelete}><Download/></Button>
         </div>
       </div>
 

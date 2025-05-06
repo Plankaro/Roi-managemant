@@ -173,7 +173,6 @@ export default function Dashboard() {
 
 function AgentCard({
   data,
-  handleDelete,
   openPermissionModal,
   openDeleteModal,
 }: { data: any; handleDelete: any; openPermissionModal: any; openDeleteModal: any }) {
@@ -232,7 +231,6 @@ function AgentCard({
 
 function AgentListItem({
   data,
-  handleDelete,
   openPermissionModal,
   openDeleteModal,
 }: { data: any; handleDelete: any; openPermissionModal: any; openDeleteModal: any }) {

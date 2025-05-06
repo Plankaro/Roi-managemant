@@ -12,7 +12,7 @@ export default function BroadcastDashboard({ selectedBroadcast }: { selectedBroa
       ? selectedBroadcast?.scheduledDate
       : selectedBroadcast?.createdAt || Date.now()
   );
-  //console.log(selectedBroadcast);
+  console.log(selectedBroadcast);
 
 
   const formattedCreatedDate = format(createdDate, "P, p")
@@ -89,10 +89,10 @@ export default function BroadcastDashboard({ selectedBroadcast }: { selectedBroa
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-muted-foreground min-w-[200px] md:text-base sm:text-sm text-xs">
+      <span className="text-muted-foreground min-w-[200px] sm:text-sm text-xs">
         {label}
       </span>
-      <span className="md:text-base sm:text-sm text-xs flex-1 break-words">: {value}</span>
+      <span className=" sm:text-sm text-xs flex-1 break-words">: {value}</span>
     </div>
   );
 }

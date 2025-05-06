@@ -15,6 +15,9 @@ import { useGetProspectQuery } from "@/store/features/apislice";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
+import { FaImage, FaVideo, FaFileAlt } from 'react-icons/fa'; // Ensure you have react-icons installed
+
+
 import {
   clearSelectedProspects,
   selectProspect,
@@ -26,6 +29,25 @@ import { addProspect } from "@/store/features/prospect";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { getStatusIcon } from "@/components/page/chats/getchatstatus";
+const renderChatPreview = (chat:any) => {
+  const bodyText = chat?.body_text;
+  const headerType = chat?.header_type;
+
+  if (bodyText) {
+    return <span>{bodyText}</span>;
+  }
+
+  switch (headerType) {
+    case 'image':
+      return <FaImage className="text-blue-500" />;
+    case 'video':
+      return <FaVideo className="text-red-500" />;
+    case 'document':
+      return <FaFileAlt className="text-green-500" />;
+    default:
+      return <span>Send your first message</span>;
+  }
+};
 
 export function ChatListSkeleton() {
   return (
@@ -193,8 +215,7 @@ const ChatLists = () => {
                                   : "text-gray-400"
                               }`}
                             >
-                              {contact.chats?.[0]?.body_text ??
-                                "Send your first message"}
+                             {renderChatPreview(contact.chats?.[0])}
                             </span>
                           </div>
 

@@ -1,12 +1,11 @@
 "use client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ShoppingBag, MessageCircle, User } from "lucide-react"
+import { User } from "lucide-react"
 import { ProfileComponent } from "@/components/page/settings/profile-component"
 import { PasswordComponent } from "@/components/page/settings/password-component"
 import { ShopifyComponent } from "@/components/page/settings/shopify-component"
 import { WhatsappComponent } from "@/components/page/settings/whatsapp-component"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import Image from "next/image"
 
 export default function SettingsPage() {

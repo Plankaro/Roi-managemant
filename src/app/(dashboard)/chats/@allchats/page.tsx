@@ -49,7 +49,7 @@ import {
   addProspect,
   clearlastChat,
   clearSelectedProspects,
-  markLastChatAsRead
+  markLastChatAsRead,
 } from "@/store/features/prospect";
 import { getLastOnlineStatus } from "@/lib/last_online";
 
@@ -91,14 +91,12 @@ const AllChats = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
   const { data: flashResponse } = useGetFlashResponseQuery({});
-  const session:any = useSession();
+  const session: any = useSession();
   const user = session?.data?.user?.user;
 
   const { selectedProspect } = useSelector(
     (state: RootState) => state.Prospect
   );
-
-
 
   const [message, setMessage] = useState("");
   const [showFlashPopup, setShowFlashPopup] = useState(false);
@@ -176,6 +174,7 @@ const AllChats = () => {
     formData.append("file", file);
 
     try {
+      console.log(formData);
       const uploadPromise = uploadFiles(formData).unwrap();
       toast.promise(uploadPromise, {
         loading: "Uploading...",
@@ -185,13 +184,16 @@ const AllChats = () => {
       });
       const data = await uploadPromise;
       const link = data[0].link;
-
-      // Use the locally determined type rather than relying on state
-      const sendMediaPromise = sendMedia({
-        recipientNo: selectedProspect?.phoneNo.slice(1),
+      const payload = {
+        recipientNo: selectedProspect?.phoneNo,
+        prospectId: selectedProspect?.id,
         mediaUrl: link,
         type: determinedType,
-      }).unwrap();
+      };
+      console.log(payload);
+      // Use the locally determined type rather than relying on state
+      const sendMediaPromise = sendMedia(payload).unwrap();
+     
 
       toast.promise(sendMediaPromise, {
         loading: "Sending...",
@@ -199,6 +201,7 @@ const AllChats = () => {
         error: (error: any) =>
           error?.data?.message || "An unexpected error occurred.",
       });
+      console.log(await sendMediaPromise);
 
       //console.log(await sendMediaPromise);
       // dispatch(setChats([await sendMediaPromise]));
@@ -206,7 +209,6 @@ const AllChats = () => {
       //console.log(error);
     }
   };
-
 
   useEffect(() => {
     if (message.startsWith("/")) {
@@ -217,12 +219,11 @@ const AllChats = () => {
   }, [message]);
 
   useEffect(() => {
-    if(show===true){
+    if (show === true) {
       setShow(false);
     }
-   
   }, [selectedProspect]);
-  console.log(show)
+  console.log(show);
 
   const handleSelectResponse = (response: any) => {
     //console.log("response",response)
@@ -305,7 +306,10 @@ const AllChats = () => {
         toast.error("Invalid field value");
         return;
       }
-      const promise = updateProspect({ id: selectedProspect?.id, body }).unwrap();
+      const promise = updateProspect({
+        id: selectedProspect?.id,
+        body,
+      }).unwrap();
       toast.promise(promise, {
         loading: "Updating...",
         success: "Details updated successfully!",
@@ -408,11 +412,9 @@ const AllChats = () => {
                   <AssignmentDropdown />
                 </div>
               </div>
-            </div>b  
-
-            {/* Messages */}
-            <Messages  />
-
+            </div>
+            b{/* Messages */}
+            <Messages />
             {/* Input */}
             {selectedProspect?.assignedToId === user?.id ? (
               selectedProspect?.is_blocked ? (
@@ -638,9 +640,7 @@ const AllChats = () => {
                       <SelectContent>
                         <SelectItem value="LEAD">Lead</SelectItem>
                         <SelectItem value="LOST">Lost</SelectItem>
-                        <SelectItem value="NEGOTIATION">
-                          Negotiation
-                        </SelectItem>
+                        <SelectItem value="NEGOTIATION">Negotiation</SelectItem>
                         <SelectItem value="OTHER">Other</SelectItem>
                       </SelectContent>
                     </Select>

@@ -31,7 +31,7 @@ export function exportJsonToExcel(data:any, sheetName = "Sheet1", fileName = "ou
   XLSX.utils.book_append_sheet(wb, ws, sheetName); // Add sheet to workbook
   XLSX.writeFile(wb, fileName); // Save the Excel file
 
-  //console.log(`Excel file '${fileName}' has been created successfully.`);
+  console.log(`Excel file '${fileName}' has been created successfully.`);
 }
 
 export function exportSelectedFieldsToExcel(

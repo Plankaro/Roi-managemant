@@ -42,7 +42,7 @@ import CampaignSkeleton from "./campaign skeletion";
 import CampaignNotAvailable from "./not-available";
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
-const OrderCreated = ({ id }: { id: string }) => {
+const OrderTagAdded = ({ id }: { id: string }) => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
 
@@ -873,4 +873,4 @@ const OrderCreated = ({ id }: { id: string }) => {
   );
 };
 
-export default OrderCreated;
+export default OrderTagAdded;
