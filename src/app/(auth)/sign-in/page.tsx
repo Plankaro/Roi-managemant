@@ -3,20 +3,25 @@
 import AuthForm from "@/components/page/auth/auth-form";
 import { SignInFormValues, signInSchema } from "@/zod/auth/auth.schema";
 import { handleCredentialsSignin } from "./action";
-import { useSession } from "next-auth/react";// Importing signIn from auth
+
 import toast from "react-hot-toast";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-    const {update} = useSession()
+
+    const res = useRouter();
     async function onSubmit(values: SignInFormValues) {
         try {
             const result = await handleCredentialsSignin(values);
             if(result?.message=="Invalid credentials or unverified account"){
-                toast.error("Invalid credentials or unverified account");
+                toast.error(result.message);
                 return;
+            }else{
+                toast.success("Sign-in successful");
+                res.push("/chats");
             }
             console.log(result);
-            update();
+         
         } catch (error) {
             console.log(error);
         }

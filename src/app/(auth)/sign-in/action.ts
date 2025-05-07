@@ -13,7 +13,8 @@ export async function handleCredentialsSignin({
 }) {
   try {
     //console.log({ email, password });
-    await signIn("credentials", { email, password, redirectTo: "/chats" });
+    await signIn("credentials", { email, password });
+    return 
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
