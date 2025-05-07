@@ -2,10 +2,9 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Credentials from "next-auth/providers/credentials";
-import Github from "next-auth/providers/github";
+
 import { signInSchema } from "./zod/auth/auth.schema";
 import { CredentialsSignin, NextAuthConfig } from "next-auth";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { NextResponse } from "next/server";
 
@@ -14,38 +13,41 @@ const authRoute = ["/sign-in", "/sign-up"]
 const publicRoute = ["/verify", "/reset-password", "/get-token"];
 
 async function refreshAccessToken(token: any) {
-
     try {
-      
-
-        const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${token.refresh_token}`,
-                },
-            }
-        );
-//console.log(response);
-        const tokens = response.data;
-
-    ////console.log(response.data)
-
-        return {
-            ...token,
-            access_token: tokens.access_token,
-            refresh_token: tokens.refresh_token// Fall back to old refresh token
-        };
-    } catch (error) {
-        ////console.log(error);
-
-        return {
-            ...token,
-            error: "RefreshAccessTokenError",
-        };
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.refresh_token}`,
+          },
+          // no body needed (empty object), but if your API expects JSON:
+          body: JSON.stringify({}),
+        }
+      );
+  
+      // Throw on HTTP errors so we catch them below
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to refresh access token");
+      }
+  
+      const tokens = await res.json();
+      return {
+        ...token,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token, // fall back to old refresh token if needed
+      };
+    } catch (err: any) {
+      console.error("Refresh token error:", err);
+      return {
+        ...token,
+        error: "RefreshAccessTokenError",
+      };
     }
-}
+  }
+  
 
 export default {
     providers: [
@@ -67,25 +69,37 @@ export default {
                         throw new CredentialsSignin({ cause: "Required fields missing" });
                     }
               
-                    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-                        email,
-                        password,
-                    });
-                
-
-                    const data = {
-                        access_token: response.data.userTokens.access_token,
-                        refresh_token: response.data.userTokens.refresh_token,
-                        user: response.data.user,
-                    };
-                   
+                    const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+                        {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            email,
+                            password,
+                          }),
+                        }
+                      );
+                      
+                      if (!response.ok) {
+                        // throw or handle non-2xx HTTP errors
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || "Login failed");
+                      }
+                      
+                      const responseData = await response.json();
+                      
+                      const data = {
+                        access_token: responseData.userTokens.access_token,
+                        refresh_token: responseData.userTokens.refresh_token,
+                        user: responseData.user,
+                      };
 
                     return data;
                 } catch (error) {
-                    if (axios.isAxiosError(error) && error.response?.status === 403) {
-                        //console.log("An error occurred")
-                        throw new CredentialsSignin({ message: "Email not verified" });
-                      }
+                   
                    throw new CredentialsSignin({"cause": "Invalid credentials"});
                 }
             },
