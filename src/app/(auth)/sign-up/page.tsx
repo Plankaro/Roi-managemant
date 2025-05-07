@@ -27,6 +27,7 @@ export default function SignUpPage() {
           
           
           const { data } = promise;
+          console.log(data);
     
           if (data.email) {
            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/token-link`,{email:data.email});
