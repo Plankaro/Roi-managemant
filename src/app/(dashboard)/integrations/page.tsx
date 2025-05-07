@@ -155,6 +155,7 @@ export default function DataIntegration() {
           </div>
         )}
       </div>
+      
 
       {/* Modals */}
       <GoogleAnalyticsModal isOpen={activeModal === "google-analytics"} onClose={() => setActiveModal(null)} />
