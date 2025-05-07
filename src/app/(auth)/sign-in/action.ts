@@ -13,7 +13,7 @@ export async function handleCredentialsSignin({
 }) {
   try {
     //console.log({ email, password });
-    await signIn("credentials", { email, password });
+    await signIn("credentials", { email, password,redirect:false });
     return 
   } catch (error) {
     if (error instanceof AuthError) {
