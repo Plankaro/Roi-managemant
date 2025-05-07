@@ -8,36 +8,49 @@ import { GoogleAnalyticsModal } from "@/components/page/integrations/google-anay
 import { RazorpayModal } from "@/components/page/integrations/razorpay-intgration"
 import { MetaPixelModal } from "@/components/page/integrations/meta-pixel-modal"
 import { Input } from "@/components/ui/input"
-import { useGetIntegrationsQuery,useDeleteGoogleAnalyticsMutation,useDeletemetapixelMutation,useDeleteRazorPayMutation } from "@/store/features/apislice"
+import {
+  useGetIntegrationsQuery,
+  useDeleteGoogleAnalyticsMutation,
+  useDeletemetapixelMutation,
+  useDeleteRazorPayMutation,
+} from "@/store/features/apislice"
 import IntegrationSkeleton from "@/components/page/integrations/integration-skeleton"
-
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 // Integration data
-
 export type IntegrationStatus = {
-  is_google_analytics_connected: boolean;
-  is_meta_pixel: boolean;
-  is_razorpay_connected: boolean;
-  is_whatsapp_connected: boolean;
-  is_shopify_connected: boolean;
-  shopify_domain: string;
-  whatsapp_mobile: string;
-  whatsapp_buisness_id: string;
-  
-};
-
+  is_google_analytics_connected: boolean
+  is_meta_pixel: boolean
+  is_razorpay_connected: boolean
+  is_whatsapp_connected: boolean
+  shopify_domain: string
+  whatsapp_mobile: string
+  whatsapp_buisness_id: string,
+  is_shopify_connected: boolean
+}
 
 export default function DataIntegration() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeModal, setActiveModal] = useState<string | null>(null)
-  const { data,isLoading } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus,isLoading?:boolean };
-  const [ deleteGoogleAnalytics ] = useDeleteGoogleAnalyticsMutation()
-  const [ deletemetapixel ] = useDeletemetapixelMutation()
-  const [ deleterazorpay ] = useDeleteRazorPayMutation()
-  console.log(data);
+  const { data, isLoading } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus; isLoading?: boolean }
+  const [deleteGoogleAnalytics] = useDeleteGoogleAnalyticsMutation()
+  const [deletemetapixel] = useDeletemetapixelMutation()
+  const [deleterazorpay] = useDeleteRazorPayMutation()
 
+  const [copied, setCopied] = useState(false)
+  const whatsappScript = ` <script src="${process.env.NEXT_PUBLIC_API_URL}/static/script.js" defer></script>`
 
-
+  const copyScript = async () => {
+    try {
+      await navigator.clipboard.writeText(whatsappScript)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy script:', err)
+    }
+  }
 
   const integrations = [
     {
@@ -47,31 +60,30 @@ export default function DataIntegration() {
         "Send conversations and lead events to Google Analytics for thorough performance tracking and valuable insights.",
       icon: "./icons/g-analytics.svg",
       color: "bg-amber-500",
-      isconnected:data?.is_google_analytics_connected??false,
-      onDisconnect:deleteGoogleAnalytics
+      isconnected: data?.is_google_analytics_connected ?? false,
+      onDisconnect: deleteGoogleAnalytics,
     },
     {
       id: "razorpay",
       name: "Razorpay",
-      description: "Push conversations and lead event to razor pay for comprehensive performance tracking and insights.",
+      description: "Push conversations and lead event to Razorpay for comprehensive performance tracking and insights.",
       icon: "./icons/razorpay.svg",
       color: "bg-blue-500",
-      isconnected:data?.is_razorpay_connected??false,
-      onDisconnect:deleterazorpay
+      isconnected: data?.is_razorpay_connected ?? false,
+      onDisconnect: deleterazorpay,
     },
     {
       id: "meta-pixel",
       name: "Meta Pixel",
       description:
-        "Incorporate the meta pixel tracking code into your conversational landing pages to gain comprehensive performance analytics.",
+        "Incorporate the Meta Pixel tracking code into your conversational landing pages to gain comprehensive performance analytics.",
       icon: "./icons/meta-pixel.svg",
       color: "bg-blue-400",
-      isconnected:data?.is_meta_pixel??false,
-      onDisconnect:deletemetapixel
+      isconnected: data?.is_meta_pixel ?? false,
+      onDisconnect: deletemetapixel,
     },
   ]
 
-  // Filter integrations based on search query
   const filteredIntegrations = integrations.filter(
     (integration) =>
       integration.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -79,7 +91,7 @@ export default function DataIntegration() {
   )
 
   return (
-    <div className=" mx-auto px-4 py-8 h-[calc(100vh-100px)] no-scrollbar overflow-y-auto ">
+    <div className="mx-auto px-4 py-8 h-[calc(100vh-100px)] no-scrollbar overflow-y-auto">
       <h1 className="text-2xl font-bold text-white mb-6">Data Integration</h1>
 
       {/* Search bar */}
@@ -97,24 +109,50 @@ export default function DataIntegration() {
       </div>
 
       {/* Integration cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {isLoading ? (
           <IntegrationSkeleton />
         ) : (
-          filteredIntegrations.map((integration:any) => (
-            <IntegrationCard
-              key={integration.id}
-              integration={integration}
-              onConnect={() => setActiveModal(integration.id)}
-              isConnected={integration.isconnected}
-              disconnect={integration.onDisconnect}
-            />
-          ))
-        )
-        }
+          <>  {/* fragment to wrap multiple cards */}
+            {filteredIntegrations.map((integration: any) => (
+              <IntegrationCard
+                key={integration.id}
+                integration={integration}
+                onConnect={() => setActiveModal(integration.id)}
+                isConnected={integration.isconnected}
+                disconnect={integration.onDisconnect}
+              />
+            ))}
 
-        {filteredIntegrations.length === 0 && (
-          <div className="col-span-full text-center py-10 text-white">No integrations found matching your search.</div>
+            {/* WhatsApp integration card with copy script */}
+            {"whatsapp".includes(searchQuery.toLowerCase()) || searchQuery === "" ? (
+              <Card className="bg-transparent border-primary text-white overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="flex flex-col items-start gap-4">
+                    <div className="flex items-center gap-4">
+                      <Image src="./icons/whatsapp.svg" alt="whatsapp" width={40} height={40} />
+                      <h3 className="font-medium text-lg">WhatsApp Widget</h3>
+                    </div>
+                    <p className="text-sm text-gray-300 mt-1">
+                      Integrate WhatsApp widget into your Shopify store. Copy the script tag below and paste it into your theme header.
+                    </p>
+                 
+                  </div>
+                </CardContent>
+                <CardFooter className="px-6 py-4 flex justify-end">
+                  <Button onClick={copyScript} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    {copied ? 'Copied!' : 'Copy Script'}
+                  </Button>
+                </CardFooter>
+              </Card>
+            ) : null}
+          </>
+        )}
+
+        {filteredIntegrations.length === 0 && !isLoading && (
+          <div className="col-span-full text-center py-10 text-white">
+            No integrations found matching your search.
+          </div>
         )}
       </div>
 
