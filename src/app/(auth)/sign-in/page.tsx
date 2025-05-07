@@ -20,6 +20,7 @@ export default function Home() {
             }else{
                 toast.success("Sign-in successful");
                 res.push("/chats");
+                console.log("lfix")
             }
             console.log(result);
          
