@@ -13,7 +13,7 @@ export default function Home() {
     async function onSubmit(values: SignInFormValues) {
         try {
             const result = await handleCredentialsSignin(values);
-            if(result?.message=="Invalid credentials or unverified account"){
+            if(result?.message){
                 toast.error(result.message);
                 return;
             }else{
