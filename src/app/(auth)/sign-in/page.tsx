@@ -11,8 +11,9 @@ export default function Home() {
 
     const res = useRouter();
     async function onSubmit(values: SignInFormValues) {
-        try {
+      
             const result = await handleCredentialsSignin(values);
+            console.log(result);
             if(result?.message){
                 toast.error(result.message);
                 return;
@@ -22,9 +23,9 @@ export default function Home() {
             }
             console.log(result);
          
-        } catch (error) {
-            console.log(error);
-        }
+      
+           
+        
     }
 
     return (
