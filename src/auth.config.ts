@@ -92,32 +92,32 @@ export default {
         }),
     ],
     callbacks: {
-        // authorized({ auth, request: { nextUrl } }) {
-        //     const { pathname } = nextUrl;
-        //     const isAuthRoute = authRoute.some((route) => pathname.startsWith(route));
-        //     const isLoggedIn = !!auth?.user;
-        //     if(publicRoute.some((route) => pathname.startsWith(route))){
-        //         return true
-        //     }
+        authorized({ auth, request: { nextUrl } }) {
+            const { pathname } = nextUrl;
+            const isAuthRoute = authRoute.some((route) => pathname.startsWith(route));
+            const isLoggedIn = !!auth?.user;
+            if(publicRoute.some((route) => pathname.startsWith(route))){
+                return true
+            }
       
-        //     // 1. Unauthenticated user trying to access an auth page?  ✅ Allow.
-        //     if (!isLoggedIn && isAuthRoute) {
-        //       return true;
-        //     }
+            // 1. Unauthenticated user trying to access an auth page?  ✅ Allow.
+            if (!isLoggedIn && isAuthRoute) {
+              return true;
+            }
       
-        //     // 2. Unauthenticated user trying to access any other page?  ⛔ Redirect to /sign-in.
-        //     if (!isLoggedIn && !isAuthRoute) {
-        //       return NextResponse.redirect(new URL("/sign-in", nextUrl));
-        //     }
+            // 2. Unauthenticated user trying to access any other page?  ⛔ Redirect to /sign-in.
+            if (!isLoggedIn && !isAuthRoute) {
+              return NextResponse.redirect(new URL("/sign-in", nextUrl));
+            }
       
-        //     // 3. Authenticated user trying to hit /sign-in or /sign-up?  ⛔ Redirect to home.
-        //     if (isLoggedIn && isAuthRoute) {
-        //       return NextResponse.redirect(new URL("/", nextUrl));
-        //     }
+            // 3. Authenticated user trying to hit /sign-in or /sign-up?  ⛔ Redirect to home.
+            if (isLoggedIn && isAuthRoute) {
+              return NextResponse.redirect(new URL("/", nextUrl));
+            }
       
-        //     // 4. Authenticated user on any other page?  ✅ Allow.
-        //     return true;
-        //   },
+            // 4. Authenticated user on any other page?  ✅ Allow.
+            return true;
+          },
         jwt: async ({ token, account, user }: any) => {
        
             if (token.access_token) {
