@@ -32,6 +32,7 @@ const OrderCreated = () => {
     defaultValues: {
       name: "",
       reply_action: "transfer",
+      
       filter: {
         // Boolean flags
         is_order_tag_filter_enabled: false,

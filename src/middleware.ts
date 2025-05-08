@@ -9,13 +9,13 @@ const { auth } = NextAuth(authConfig);
 
 // Export the wrapped middleware
 export default auth(async function middleware(request: NextRequest) {
-  console.log("[Middleware] Incoming request URL:", request.nextUrl.href);
+  // console.log("[Middleware] Incoming request URL:", request.nextUrl.href);
 
   if (request.nextUrl.pathname.startsWith("/api")) {
     const api_url = process.env.NEXT_PUBLIC_API_URL;
     const session = (await auth()) as any;
 
-    console.log("[Middleware] Session object:", session);
+    // console.log("[Middleware] Session object:", session);
 
     // Remove `/api` from the forwarded path
     const forwardedPath = request.nextUrl.pathname.replace("/api", "");
@@ -23,6 +23,10 @@ export default auth(async function middleware(request: NextRequest) {
 
     console.log("[Middleware] Rewriting to:", url.toString());
 
+    console.log(
+      "[Middleware] Adding Authorization header:",
+      session?.access_token
+    )
     // Rewrite the request to the API URL
     return NextResponse.rewrite(url.toString(), {
       headers: {
