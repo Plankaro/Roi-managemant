@@ -113,7 +113,9 @@ export default {
             if(publicRoute.some((route) => pathname.startsWith(route))){
                 return true
             }
-      
+      console.log("isAuthRoute", isAuthRoute);
+      console.log("isLoggedIn", isLoggedIn);
+      console.log("pathname", auth?.user);
             // 1. Unauthenticated user trying to access an auth page?  ✅ Allow.
             if (!isLoggedIn && isAuthRoute) {
               return true;
