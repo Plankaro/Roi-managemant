@@ -1,3 +1,56 @@
+// /* eslint-disable @typescript-eslint/no-explicit-any */
+// import type { NextRequest } from "next/server";
+// import { NextResponse } from "next/server";
+// import authConfig from "./auth.config";
+// import NextAuth from "next-auth";
+
+// // Use `NextAuth` to provide the `auth` function
+// const { auth } = NextAuth(authConfig);
+
+// // Export the wrapped middleware
+// export default auth(async function middleware(request: NextRequest) {
+//   // console.log("[Middleware] Incoming request URL:", request.nextUrl.href);
+
+//   if (request.nextUrl.pathname.startsWith("/api")) {
+//     const api_url = process.env.API_URL;
+//     const session = (await auth()) as any;
+
+//     // console.log("[Middleware] Session object:", session);
+
+//     // Remove `/api` from the forwarded path
+//     const forwardedPath = request.nextUrl.pathname.replace("/api", "");
+//     const url = new URL(api_url + forwardedPath + request.nextUrl.search);
+
+//     console.log("[Middleware] Rewriting to:", url.toString());
+
+//     console.log(
+//       "[Middleware] Adding Authorization header:",
+//       session?.access_token
+//     )
+//     // Rewrite the request to the API URL
+//     return NextResponse.rewrite(url.toString(), {
+//       headers: {
+//         ...request.headers,
+//         Authorization: `Bearer ${session?.access_token ?? ""}`,
+//       },
+//       statusText: "Rewriting to API",
+//     });
+//   }
+
+//   // If not an API route, continue processing as normal
+//   console.log("[Middleware] Non-API route, proceeding normally.");
+//   return NextResponse.next();
+// });
+
+// export const config = {
+//   matcher: [
+//     // Skip Next.js internals and all static files, unless found in search params
+//     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+//     // Always run for API routes
+//     '/(api|trpc)(.*)',
+//   ],
+// };
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -9,36 +62,12 @@ const { auth } = NextAuth(authConfig);
 
 // Export the wrapped middleware
 export default auth(async function middleware(request: NextRequest) {
-  // console.log("[Middleware] Incoming request URL:", request.nextUrl.href);
-
   if (request.nextUrl.pathname.startsWith("/api")) {
-    const api_url = process.env.API_URL;
     const session = (await auth()) as any;
-
-    // console.log("[Middleware] Session object:", session);
-
-    // Remove `/api` from the forwarded path
-    const forwardedPath = request.nextUrl.pathname.replace("/api", "");
-    const url = new URL(api_url + forwardedPath + request.nextUrl.search);
-
-    console.log("[Middleware] Rewriting to:", url.toString());
-
-    console.log(
-      "[Middleware] Adding Authorization header:",
-      session?.access_token
-    )
-    // Rewrite the request to the API URL
-    return NextResponse.rewrite(url.toString(), {
-      headers: {
-        ...request.headers,
-        Authorization: `Bearer ${session?.access_token ?? ""}`,
-      },
-      statusText: "Rewriting to API",
-    });
+    const headers = new Headers(request.headers);
+    headers.set("Authorization", `Bearer ${session?.access_token ?? ""}`);
+    return NextResponse.next({ headers });
   }
-
-  // If not an API route, continue processing as normal
-  console.log("[Middleware] Non-API route, proceeding normally.");
   return NextResponse.next();
 });
 

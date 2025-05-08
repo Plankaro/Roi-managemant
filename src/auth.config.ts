@@ -68,6 +68,8 @@ export default {
                         //console.error("Invalid credentials:", parsedCredentials.error.errors);
                         throw new CredentialsSignin({ cause: "Required fields missing" });
                     }
+                    console.log(process.env);
+                    const url = `${process.env.API_URL}/auth/login`;
               
                     const response = await fetch(
                         `${process.env.API_URL}/auth/login`,
@@ -86,6 +88,7 @@ export default {
                       if (!response.ok) {
                         // throw or handle non-2xx HTTP errors
                         const errorData = await response.json();
+                        console.log(errorData);
                         throw new Error(errorData.message || "Login failed");
                       }
                       
@@ -99,6 +102,7 @@ export default {
 
                     return data;
                 } catch (error) {
+                  console.log(error);
                    
                    throw new CredentialsSignin({"cause": "Invalid credentials"});
                 }
