@@ -12,7 +12,7 @@ export default auth(async function middleware(request: NextRequest) {
   // console.log("[Middleware] Incoming request URL:", request.nextUrl.href);
 
   if (request.nextUrl.pathname.startsWith("/api")) {
-    const api_url = process.env.NEXT_PUBLIC_API_URL;
+    const api_url = process.env.API_URL;
     const session = (await auth()) as any;
 
     // console.log("[Middleware] Session object:", session);
