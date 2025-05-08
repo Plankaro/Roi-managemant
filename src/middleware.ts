@@ -9,28 +9,32 @@ const { auth } = NextAuth(authConfig);
 
 // Export the wrapped middleware
 export default auth(async function middleware(request: NextRequest) {
+  console.log("[Middleware] Incoming request URL:", request.nextUrl.href);
+
   if (request.nextUrl.pathname.startsWith("/api")) {
     const api_url = process.env.NEXT_PUBLIC_API_URL;
-    const session = await auth() as any
+    const session = (await auth()) as any;
 
+    console.log("[Middleware] Session object:", session);
 
     // Remove `/api` from the forwarded path
     const forwardedPath = request.nextUrl.pathname.replace("/api", "");
     const url = new URL(api_url + forwardedPath + request.nextUrl.search);
 
-   
+    console.log("[Middleware] Rewriting to:", url.toString());
 
     // Rewrite the request to the API URL
     return NextResponse.rewrite(url.toString(), {
       headers: {
         ...request.headers,
-        Authorization: `Bearer ${session?.access_token??""}`, 
+        Authorization: `Bearer ${session?.access_token ?? ""}`,
       },
       statusText: "Rewriting to API",
     });
   }
 
   // If not an API route, continue processing as normal
+  console.log("[Middleware] Non-API route, proceeding normally.");
   return NextResponse.next();
 });
 
@@ -41,4 +45,4 @@ export const config = {
     // Always run for API routes
     '/(api|trpc)(.*)',
   ],
-}
+};
