@@ -69,10 +69,10 @@ export default {
                         throw new CredentialsSignin({ cause: "Required fields missing" });
                     }
                     console.log(process.env);
-                    const url = `${process.env.API_URL}/auth/login`;
+                    const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
               
                     const response = await fetch(
-                        `${process.env.API_URL}/auth/login`,
+                        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
                         {
                           method: "POST",
                           headers: {

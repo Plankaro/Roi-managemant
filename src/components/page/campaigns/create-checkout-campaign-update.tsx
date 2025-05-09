@@ -29,6 +29,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { NativeSelect } from "@/components/ui/native-select";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import NumericInput from "@/components/ui/numericInput";
@@ -151,11 +152,11 @@ const CheckoutCreated = ({ id }: { id: string }) => {
   });
 
   useEffect(() => {
-    if (campaignData && templates) {
+    if (campaignData && templates && form.getValues("name") === "") {
       const matched = templates.find(
         (t: any) => t.name === campaignData.template_name
       );
-      console.log(matched);
+      console.log("campagindatatype", campaignData.type);
 
       form.reset({
         name: campaignData.name,
@@ -268,8 +269,8 @@ const CheckoutCreated = ({ id }: { id: string }) => {
       });
     }
   }, [campaignData, templates]);
+  console.log("campagindatatype", form.watch("type"));
 
-  console.log(form.getValues());
   const onSubmit = async (data: CampaignFormValues) => {
     try {
       const payload = {
@@ -388,26 +389,29 @@ const CheckoutCreated = ({ id }: { id: string }) => {
             <FormField
               control={form.control}
               name="type"
-              render={({ field, fieldState }) => (
-                <FormItem className="space-y-3 basis-1/2">
-                  <FormLabel className=" md:text-2xl text-lg">
-                    Trigger Type
-                  </FormLabel>
+              render={({ field, fieldState }) => {
+                console.log("type", field.value);
+                return (
+                  <FormItem className="space-y-3 basis-1/2">
+                    <FormLabel className=" md:text-2xl text-lg">
+                      Trigger Type
+                    </FormLabel>
 
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
-                        <SelectValue placeholder="Select a Category" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-blue-50 ">
-                        <SelectItem value="promotional">Promotional</SelectItem>
-                        <SelectItem value="utility">Utility</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage>{fieldState.error?.message}</FormMessage>
-                </FormItem>
-              )}
+                    <FormControl>
+                      <NativeSelect
+                        placeholder={`${field.value || "Select Trigger Type"}`}
+                        options={[
+                          { value: "promotional", label: "Promotional" },
+                          { value: "utility", label: "Utility" },
+                        ]}
+                        onChange={field.onChange}
+                      />
+                      {/* <Input {...field}/> */}
+                    </FormControl>
+                    <FormMessage>{fieldState.error?.message}</FormMessage>
+                  </FormItem>
+                );
+              }}
             />
           </div>
 
@@ -529,23 +533,19 @@ const CheckoutCreated = ({ id }: { id: string }) => {
                   <FormItem>
                     <FormLabel>When to trigger</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
+                      <NativeSelect
+                        className="w-full"
+                        options={[
+                          {
+                            value: "AFTER_CAMPAIGN_CREATED",
+                            label: "Immediate",
+                          },
+                          { value: "CUSTOM", label: "Custom time after event" },
+                        ]}
+                        placeholder={`${field.value}` || "Select trigger type"}
                         value={field.value}
-                      >
-                        <SelectTrigger value={field.value}>
-                          <SelectValue placeholder="Select option" />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                            Immediate
-                          </SelectItem>
-                          <SelectItem value="CUSTOM">
-                            Custom time after event
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 );
@@ -672,19 +672,16 @@ const CheckoutCreated = ({ id }: { id: string }) => {
                   hours of getting the message.
                 </p>
                 <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
-                      <SelectValue placeholder="Transfer Bot" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      <SelectItem value="transfer">Transfer Bot</SelectItem>
-                      <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <NativeSelect
+                    className="w-full"
+                    options={[
+                      { value: "transfer", label: "Transfer Bot" },
+                      { value: "welcome-bot", label: "Welcome bot" },
+                    ]}
+                    placeholder={field.value || "Transfer Bot"}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
               </FormItem>
             )}

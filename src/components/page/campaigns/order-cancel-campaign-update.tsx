@@ -14,7 +14,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { CampaignSchema } from "@/zod/campaigns/order-create-campaign";
+import { CampaignSchema } from "@/zod/campaigns/order-cancel-campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ import {
 } from "@/store/features/apislice";
 import CampaignSkeleton from "./campaign skeletion";
 import CampaignNotAvailable from "./not-available";
+import { NativeSelect } from "@/components/ui/native-select";
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
 const OrderCancelled = ({ id }: { id: string }) => {
@@ -129,8 +130,8 @@ const OrderCancelled = ({ id }: { id: string }) => {
       new_order_creation_filter: false,
       new_order_creation_type: "AFTER_EVENT",
       new_order_creation_time: { time: 1, unit: "minutes" },
-      related_order_fulfilled: false,
-      related_order_cancelled: false,
+
+
       // Initialize templateForm with default values
       templateForm: {
         header: {
@@ -235,6 +236,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
             campaignData.filters.order_count_filter_less_or_equal ?? null,
           order_count_min: campaignData.filters.order_count_min ?? null,
           order_count_max: campaignData.filters.order_count_max ?? null,
+          
 
           // 8. Delivery filter
           is_order_delivery_filter_enabled:
@@ -256,7 +258,7 @@ const OrderCancelled = ({ id }: { id: string }) => {
         new_order_creation_type: campaignData.new_order_creation_type,
         new_order_creation_time: campaignData.new_order_creation_time,
 
-        related_order_cancelled: campaignData.related_order_cancelled,
+     
         templateForm: campaignData.components,
         template: matched ? matched : null,
       });
@@ -390,15 +392,14 @@ const OrderCancelled = ({ id }: { id: string }) => {
                   </FormLabel>
 
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
-                        <SelectValue placeholder="Select a Category" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-blue-50 ">
-                        <SelectItem value="promotional">Promotional</SelectItem>
-                        <SelectItem value="utility">Utility</SelectItem>
-                      </SelectContent>
-                    </Select>
+                     <NativeSelect
+                        placeholder={`${field.value || "Select Trigger Type"}`}
+                        options={[
+                          { value: "promotional", label: "Promotional" },
+                          { value: "utility", label: "Utility" },
+                        ]}
+                        onChange={field.onChange}
+                      />
                   </FormControl>
                   <FormMessage>{fieldState.error?.message}</FormMessage>
                 </FormItem>
@@ -521,24 +522,23 @@ const OrderCancelled = ({ id }: { id: string }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select option" />
-                      </SelectTrigger>
+                        <NativeSelect
+                        className="w-full"
+                        options={[
+                          {
+                            value: "AFTER_CAMPAIGN_CREATED",
+                            label: "Immediate",
+                          },
+                          { value: "CUSTOM", label: "Custom time after event" },
+                        ]}
+                        placeholder={`${field.value}` || "Select trigger type"}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                        Immediate
-                      </SelectItem>
-                      <SelectItem value="CUSTOM">
-                        Custom time after event
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                   
                 </FormItem>
               )}
             />
@@ -599,19 +599,16 @@ const OrderCancelled = ({ id }: { id: string }) => {
                   hours of getting the message.
                 </p>
                 <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
-                      <SelectValue placeholder="Transfer Bot" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      <SelectItem value="transfer">Transfer Bot</SelectItem>
-                      <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <NativeSelect
+                    className="w-full"
+                    options={[
+                      { value: "transfer", label: "Transfer Bot" },
+                      { value: "welcome-bot", label: "Welcome bot" },
+                    ]}
+                    placeholder={field.value || "Transfer Bot"}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
               </FormItem>
             )}

@@ -4,7 +4,7 @@ import React from 'react'
 function IntegrationSkeleton() {
   return (
     <>
-        {Array.from({ length: 3 }).map((_, index) => (
+        {Array.from({ length: 4 }).map((_, index) => (
           <div key={index} className="rounded-lg border border-primary p-6 bg-[#0D0D0D4D] flex flex-col">
             <div className="flex items-start gap-4 mb-4">
               <Skeleton className="h-10 w-10 rounded-md bg-gray-700" />

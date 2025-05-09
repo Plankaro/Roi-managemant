@@ -52,7 +52,7 @@ export function WhatsappComponent() {
 
   const [postWhatsapp] = usePostWhatsappMutation()
   const [isCopied, setIsCopied] = useState(false)
-  const webhookUrl = "https://api.yourservice.com/webhooks/whatsapp/12345"
+  const webhookUrl = `${process.env.NEXT_PUBLIC_API_URL}/chats/webhook`
   const webhookRef = useRef<HTMLInputElement>(null)
   
 

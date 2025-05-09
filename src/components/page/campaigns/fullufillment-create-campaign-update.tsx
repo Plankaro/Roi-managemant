@@ -13,6 +13,7 @@ import {
   FormMessage,
   FormLabel,
 } from "@/components/ui/form";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Button } from "@/components/ui/button";
 import { CampaignSchema } from "@/zod/campaigns/fullfillment-create-campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -397,22 +398,17 @@ const FullfillmentCreate = ({ id }: { id: string }) => {
               control={form.control}
               name="type"
               render={({ field, fieldState }) => (
-                <FormItem>
+                <FormItem className="space-y-3 basis-1/2">
                   <FormLabel>Trigger Type</FormLabel>
                   <FormControl>
-                    <Select
-                      value={field.value} // controlled prop
-                      onValueChange={field.onChange} // reactive onChange
-                    >
-                      
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="promotional">Promotional</SelectItem>
-                        <SelectItem value="utility">Utility</SelectItem>
-                      </SelectContent>
-                    </Select>
+                   <NativeSelect
+                        placeholder={`${field.value || "Select Trigger Type"}`}
+                        options={[
+                          { value: "promotional", label: "Promotional" },
+                          { value: "utility", label: "Utility" },
+                        ]}
+                        onChange={field.onChange}
+                      />
                   </FormControl>
                   <FormMessage>{fieldState.error?.message}</FormMessage>
                 </FormItem>
@@ -536,23 +532,19 @@ const FullfillmentCreate = ({ id }: { id: string }) => {
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select option" />
-                      </SelectTrigger>
-
-                      <SelectContent>
-                        <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                          Immediate
-                        </SelectItem>
-                        <SelectItem value="CUSTOM">
-                          Custom time after event
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <NativeSelect
+                        className="w-full"
+                        options={[
+                          {
+                            value: "AFTER_CAMPAIGN_CREATED",
+                            label: "Immediate",
+                          },
+                          { value: "CUSTOM", label: "Custom time after event" },
+                        ]}
+                        placeholder={`${field.value}` || "Select trigger type"}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                   </FormControl>
                 </FormItem>
               )}
@@ -613,19 +605,16 @@ const FullfillmentCreate = ({ id }: { id: string }) => {
                   hours of getting the message.
                 </p>
                 <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
+                   <NativeSelect
+                    className="w-full"
+                    options={[
+                      { value: "transfer", label: "Transfer Bot" },
+                      { value: "welcome-bot", label: "Welcome bot" },
+                    ]}
+                    placeholder={field.value || "Transfer Bot"}
                     value={field.value}
-                  >
-                    <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
-                      <SelectValue placeholder="Transfer Bot" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      <SelectItem value="transfer">Transfer Bot</SelectItem>
-                      <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    onChange={field.onChange}
+                  />
                 </FormControl>
               </FormItem>
             )}

@@ -17,7 +17,8 @@ export const apiSlice = createApi({
     "teams",
     "tags",
     "integrations",
-    "profile"
+    "profile",
+    "campaigns"
   ], // Define tags for invalidation
   endpoints: (builder) => ({
     getToken: builder.mutation({
@@ -267,6 +268,7 @@ export const apiSlice = createApi({
         url: `/broadcast/retry/${id}`,
         method: "GET",
       }),
+      providesTags: ["getbroadcastbyid"],
     }),
     getFlashResponse: builder.query({
       query: () => ({
@@ -347,6 +349,7 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["campaigns"],
     }),
     updateCampaign: builder.mutation({
       query: ({ id, body }) => ({
@@ -354,6 +357,7 @@ export const apiSlice = createApi({
         method: "PATCH",
         body,
       }),
+      invalidatesTags: ["campaigns"],
     }),
     changeCampaignStatus: builder.mutation({
       query: ({ id, body }) => ({
@@ -367,6 +371,7 @@ export const apiSlice = createApi({
         url: "/campaign",
         method: "GET",
       }),
+      providesTags: ["campaigns"],
     }),
     getSpecificCampaign: builder.query({
       query: (id) => ({

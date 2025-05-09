@@ -158,7 +158,7 @@ function TemplateCard({ template, onView, handleDelete }: any) {
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-white font-medium">{template.name}</h3>
+            <h3 className="text-white font-medium line-clamp-1 break-words ">{template.name}</h3>
             <span className="text-xs bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded-full">
               {template.category}
             </span>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -119,13 +120,22 @@ const OrderCreated = () => {
   console.log(form.getValues())
   const onSubmit = async (data: CampaignFormValues) => {
     try {
-      const promise = createCampaign({...data,trigger:"ORDER_TAG_ADDED"})
+      const payload = {
+        ...data,
+        trigger: "ORDER_TAG_ADDED",
+        template_name: data.template?.name ?? "",
+        template_language: data.template?.language ?? "",
+        template_category: data.template?.category ?? "",
+      };
+      delete (payload as any).template;
+      const promise = createCampaign(payload).unwrap()
       await toast.promise(promise, {
         loading: "Creating campaign...",
         success: "Campaign created successfully!",
         error: "Error creating campaign.",
       })
-      console.log(await promise)
+      const response = await promise
+      console.log(response)
       // Additional logic after campaign creation can go here
     } catch (error) {
       // Optionally handle the error further if needed

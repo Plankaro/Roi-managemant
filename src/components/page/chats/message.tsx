@@ -1,32 +1,35 @@
+"use client"
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Image from 'next/image';
-import { IoIosDocument } from 'react-icons/io';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { FaRobot } from "react-icons/fa6";
-import { Avatar, AvatarImage,AvatarFallback } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { RootState } from '@/store/store';
-import { getStatusIcon } from './getchatstatus';
-import { getChatsForProspect } from '../broadcast/getchats';
-import { markLastChatAsRead } from '@/store/features/prospect';
-import { useGetChatsQuery, useMarkMessagesAsReadMutation } from '@/store/features/apislice';
-import { setChats } from '@/store/features/chatSlice';
+import { useEffect, useRef } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import Image from "next/image"
+import { IoIosDocument } from "react-icons/io"
+import { Button } from "@/components/ui/button"
+import { FaRobot } from "react-icons/fa6"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Skeleton } from "@/components/ui/skeleton"
+import type { RootState } from "@/store/store"
+import { getStatusIcon } from "./getchatstatus"
+import { getChatsForProspect } from "../broadcast/getchats"
+import { markLastChatAsRead } from "@/store/features/prospect"
+import { useGetChatsQuery, useMarkMessagesAsReadMutation } from "@/store/features/apislice"
+import { setChats } from "@/store/features/chatSlice"
 
 function MessagesSkeleton() {
   return (
-    <ScrollArea className="flex-1 pt-20 pb-4">
+    <div className="flex-1 pt-20 pb-4 overflow-y-auto no-scrollbar">
       <div className="space-y-4 p-4">
         {[...Array(5)].map((_, i) => {
-          const isMyMessage = i % 2 === 0;
+          const isMyMessage = i % 2 === 0
           return (
             <div key={i} className={`flex flex-col max-w-[85%] ${isMyMessage ? "ml-auto" : "mr-auto"}`}>
               <div className="flex gap-3 items-start">
                 {!isMyMessage && <Skeleton className="h-8 w-8 rounded-full bg-white/10" />}
                 <div className={`flex-1 flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}>
-                  <div className={`p-4 rounded-2xl ${isMyMessage ? "bg-blue-600/30 rounded-tr-none" : "bg-[#ECF0F7]/20 rounded-tl-none"}`}>
+                  <div
+                    className={`p-4 rounded-2xl ${isMyMessage ? "bg-blue-600/30 rounded-tr-none" : "bg-[#ECF0F7]/20 rounded-tl-none"}`}
+                  >
                     {i % 3 === 0 && (
                       <div className="mb-2 -mt-1 -mx-1">
                         <Skeleton className="w-full h-[200px] rounded-lg bg-white/10" />
@@ -44,75 +47,74 @@ function MessagesSkeleton() {
                 <Skeleton className="h-3 w-12 bg-white/10" />
               </div>
             </div>
-          );
+          )
         })}
       </div>
-    </ScrollArea>
-  );
+    </div>
+  )
 }
 
 function Messages() {
+  const [markMessagesAsRead] = useMarkMessagesAsReadMutation()
+  const dispatch = useDispatch()
 
-  const [markMessagesAsRead] = useMarkMessagesAsReadMutation();
-  const dispatch = useDispatch();
-  
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const selectedProspect = useSelector((state: RootState) => state.Prospect.selectedProspect);
-  const selectedChats = useSelector(getChatsForProspect);
- 
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+  const selectedProspect = useSelector((state: RootState) => state.Prospect.selectedProspect)
+  const selectedChats = useSelector(getChatsForProspect)
+
   const { data: chats, isLoading: isChatsLoading } = useGetChatsQuery({
     prospectId: selectedProspect?.id ?? "",
-  });
+  })
 
-  console.log(chats);
-
+  console.log(chats)
 
   useEffect(() => {
     if (chats) {
-      dispatch(setChats(chats));
-
+      dispatch(setChats(chats))
     }
-  },[chats]);
+  }, [chats, dispatch])
+
   // Handle marking messages as read
   useEffect(() => {
-    if (selectedChats && selectedChats.length > 0 && (selectedProspect?.phoneNo !== selectedChats?.[0]?.receiverPhoneNo || selectedProspect?.chats?.[0]?.Status !== "read")) {
-      dispatch(markLastChatAsRead());
-      markMessagesAsRead({ prospectId: selectedProspect?.id ?? "" });
+    if (
+      selectedChats &&
+      selectedChats.length > 0 &&
+      (selectedProspect?.phoneNo !== selectedChats?.[0]?.receiverPhoneNo ||
+        selectedProspect?.chats?.[0]?.Status !== "read")
+    ) {
+      dispatch(markLastChatAsRead())
+      markMessagesAsRead({ prospectId: selectedProspect?.id ?? "" })
     }
-  }, [selectedChats, selectedProspect, dispatch, markMessagesAsRead]);
+  }, [selectedChats, selectedProspect, dispatch, markMessagesAsRead])
 
   // Scroll to bottom whenever messages change or component mounts
   useEffect(() => {
     const scrollToBottom = () => {
       if (scrollContainerRef.current) {
-        const scrollElement = scrollContainerRef.current;
-        scrollElement.scrollTop = scrollElement.scrollHeight;
+        const scrollElement = scrollContainerRef.current
+        scrollElement.scrollTop = scrollElement.scrollHeight
       }
-    };
+    }
 
     // Scroll immediately
-    scrollToBottom();
+    scrollToBottom()
 
     // Also scroll after a short delay to handle dynamic content loading
-    const timeoutId = setTimeout(scrollToBottom, 100);
+    const timeoutId = setTimeout(scrollToBottom, 100)
 
-    return () => clearTimeout(timeoutId);
-  }, [selectedChats]); // Dependency on selectedChats ensures we scroll when messages change
-
+    return () => clearTimeout(timeoutId)
+  }, [selectedChats]) // Dependency on selectedChats ensures we scroll when messages change
 
   return (
     <>
       {isChatsLoading ? (
         <MessagesSkeleton />
       ) : (
-        <ScrollArea className="flex-1 pt-20 pb-4  bg-backgroundColor overscroll-y-auto no-scrollbar">
-          <div 
-            className="space-y-4 p-4 w-full h-full flex-1 " 
-           
-          >
+        <div ref={scrollContainerRef} className="flex-1 pt-20 pb-4 bg-backgroundColor overflow-y-auto no-scrollbar">
+          <div className="space-y-4 p-4 w-full h-full flex-1">
             {selectedChats && selectedChats.length > 0 ? (
               selectedChats.map((chat: any) => {
-                const isMyMessage = chat.receiverPhoneNo === selectedProspect?.phoneNo;
+                const isMyMessage = chat.receiverPhoneNo === selectedProspect?.phoneNo
                 return (
                   <div
                     key={chat.chatId}
@@ -123,13 +125,11 @@ function Messages() {
                       {!isMyMessage && (
                         <Avatar className="h-8 w-8 shrink-0">
                           <AvatarImage
-                            
                             src={selectedProspect?.image ?? ""}
                             alt={selectedProspect?.name ?? ""}
                             className="object-cover"
                           />
                           <AvatarFallback>{selectedProspect?.name?.charAt(0).toUpperCase()}</AvatarFallback>
-
                         </Avatar>
                       )}
                       <div className={`flex-1 flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}>
@@ -181,7 +181,7 @@ function Messages() {
                       })}
                     </span>
                   </div>
-                );
+                )
               })
             ) : (
               <div className="text-center h-full w-full flex-1 justify-center items-center text-white">
@@ -189,10 +189,10 @@ function Messages() {
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
       )}
     </>
-  );
+  )
 }
 
 // Helper function to render message content
@@ -241,18 +241,24 @@ function renderMessageContent(chat: any, isMyMessage: boolean) {
           chat.Buttons.map((button: any, index: any) => {
             if (button.type === "URL") {
               return (
-                <Button key={index} className="bg-primary-100 lg:text-base sm:text-sm text-xs  w-full text-black hover:bg-primary hover:text-white">
+                <Button
+                  key={index}
+                  className="bg-primary-100 lg:text-base sm:text-sm text-xs w-full text-black hover:bg-primary hover:text-white"
+                >
                   <a href={button.value} target="_blank" rel="noopener noreferrer">
                     {button.text}
                   </a>
                 </Button>
-              );
+              )
             } else {
               return (
-                <Button key={index} className="bg-primary-100 lg:text-base sm:text-sm text-xs w-full text-black hover:bg-primary hover:text-white">
+                <Button
+                  key={index}
+                  className="bg-primary-100 lg:text-base sm:text-sm text-xs w-full text-black hover:bg-primary hover:text-white"
+                >
                   {button.text}
                 </Button>
-              );
+              )
             }
           })}
       </div>
@@ -261,26 +267,24 @@ function renderMessageContent(chat: any, isMyMessage: boolean) {
         {chat.Status}
       </div>
     </>
-  );
+  )
 }
-
-
 
 interface Chat {
   sender?: {
-    image?: string;
-    name?: string;
-  };
+    image?: string
+    name?: string
+  }
   // …other chat fields
 }
 
 interface Props {
-  isMyMessage: boolean;
-  chat: Chat;
+  isMyMessage: boolean
+  chat: Chat
 }
 
- function MessageAvatar({ isMyMessage, chat }: Props) {
-  if (!isMyMessage) return null;
+function MessageAvatar({ isMyMessage, chat }: Props) {
+  if (!isMyMessage) return null
 
   return chat.sender ? (
     <Avatar className="h-8 w-8 shrink-0">
@@ -289,17 +293,13 @@ interface Props {
         alt={chat.sender.name ?? "User"}
         className="object-cover"
       />
-      <AvatarFallback>
-        {chat.sender.name
-          ? chat.sender.name.charAt(0).toUpperCase()
-          : "U"}
-      </AvatarFallback>
+      <AvatarFallback>{chat.sender.name ? chat.sender.name.charAt(0).toUpperCase() : "U"}</AvatarFallback>
     </Avatar>
   ) : (
-    <div className='h-8 w-8 rounded-full flex items-center justify-center shrink-0 bg-white'>
-    <FaRobot className="h-6 w-6 text-zinc-400 shrink-0" aria-label="Bot" />
+    <div className="h-8 w-8 rounded-full flex items-center justify-center shrink-0 bg-white">
+      <FaRobot className="h-6 w-6 text-zinc-400 shrink-0" aria-label="Bot" />
     </div>
-  );
+  )
 }
 
-export default Messages;
+export default Messages

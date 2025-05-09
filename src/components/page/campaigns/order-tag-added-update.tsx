@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import TemplateBuilder from "@/components/page/broadcast/templatedialog";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import AddContentForm from "@/components/page/campaigns/add-content-form";
+import { NativeSelect } from "@/components/ui/native-select";
 import toast from "react-hot-toast";
 import {
   Select,
@@ -242,7 +243,7 @@ const OrderTagAdded = ({ id }: { id: string }) => {
         new_order_creation_filter: campaignData.new_order_creation_filter,
         new_order_creation_type: campaignData.new_order_creation_type,
         new_order_creation_time: campaignData.new_order_creation_time,
-
+related_order_fulfilled: campaignData.related_order_fulfilled,
         related_order_cancelled: campaignData.related_order_cancelled,
         templateForm: campaignData.components,
         template: matched ? matched : null,
@@ -377,15 +378,14 @@ const OrderTagAdded = ({ id }: { id: string }) => {
                   </FormLabel>
 
                   <FormControl>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
-                        <SelectValue placeholder="Select a Category" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-blue-50 ">
-                        <SelectItem value="promotional">Promotional</SelectItem>
-                        <SelectItem value="utility">Utility</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <NativeSelect
+                        placeholder={`${field.value || "Select Trigger Type"}`}
+                        options={[
+                          { value: "promotional", label: "Promotional" },
+                          { value: "utility", label: "Utility" },
+                        ]}
+                        onChange={field.onChange}
+                      />
                   </FormControl>
                   <FormMessage>{fieldState.error?.message}</FormMessage>
                 </FormItem>
@@ -509,24 +509,21 @@ const OrderTagAdded = ({ id }: { id: string }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select option" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                        Immediate
-                      </SelectItem>
-                      <SelectItem value="CUSTOM">
-                        Custom time after event
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                <FormControl>
+                     <NativeSelect
+                        className="w-full"
+                        options={[
+                          {
+                            value: "AFTER_CAMPAIGN_CREATED",
+                            label: "Immediate",
+                          },
+                          { value: "CUSTOM", label: "Custom time after event" },
+                        ]}
+                        placeholder={`${field.value}` || "Select trigger type"}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                </FormControl>
                 </FormItem>
               )}
             />
@@ -587,20 +584,16 @@ const OrderTagAdded = ({ id }: { id: string }) => {
                   hours of getting the message.
                 </p>
                 <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                
-                    <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
-                      <SelectValue placeholder="Transfer Bot" />
-                    </SelectTrigger>
-               
-                  <SelectContent>
-                    <SelectItem value="transfer">Transfer Bot</SelectItem>
-                    <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                  </SelectContent>
-                </Select>
+              <NativeSelect
+                    className="w-full"
+                    options={[
+                      { value: "transfer", label: "Transfer Bot" },
+                      { value: "welcome-bot", label: "Welcome bot" },
+                    ]}
+                    placeholder={field.value || "Transfer Bot"}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
               </FormItem>
             )}

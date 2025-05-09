@@ -396,14 +396,16 @@ const OrderUpdate = ({ id }: { id: string }) => {
                       Trigger Type
                     </FormLabel>
 
-                    <FormControl>
+                 
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
                       >
+                           <FormControl>
                         <SelectTrigger className="lg:w-10/12 focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
                           <SelectValue placeholder="Select a Category" />
                         </SelectTrigger>
+                        </FormControl>
                         <SelectContent className="bg-blue-50">
                           <SelectItem value="promotional">
                             Promotional
@@ -411,7 +413,7 @@ const OrderUpdate = ({ id }: { id: string }) => {
                           <SelectItem value="utility">Utility</SelectItem>
                         </SelectContent>
                       </Select>
-                    </FormControl>
+                  
                     <FormMessage>{fieldState.error?.message}</FormMessage>
                   </FormItem>
                 );

@@ -39,10 +39,22 @@ function AddContentForm({
   const [uploadFiles] = useUploadFilesMutation();
    // a ref that survives across renders but doesn’t trigger them
 
+
+
+  
+
    console.log(formData);
    
   useEffect(() => {
-    if (  selectedTemplate && formData.body.length === 0) {
+       console.log("body", (formData.body.length === 0));
+    console.log("buttons", (formData.buttons.length === 0));
+    console.log("header", formData.header.type === "");
+   
+
+
+    if (  selectedTemplate && ( formData?.body?.length === 0 && formData?.buttons.length === 0 && formData?.header?.type === "")) {
+   console.log("update");
+      
 
       const newFormData = {
         header: {
@@ -138,6 +150,7 @@ function AddContentForm({
           }));
         }
       });
+      console.log("newFormDataChanged", newFormData);
 
       setFormData(newFormData);
     }
@@ -709,7 +722,7 @@ function AddContentForm({
                                   <div className="space-y-3">
                                     <Input
                                       id={`button-${buttonIndex}`}
-                                      placeholder={`Enter value for ${button.parameter_name}`}
+                                      placeholder={`Enter value for ${button.type}`}
                                       value={button.value}
                                       onChange={(e) =>
                                         handleInputChange(

@@ -38,11 +38,11 @@ const renderChatPreview = (chat:any) => {
   }
 
   switch (headerType) {
-    case 'image':
+    case 'IMAGE':
       return <FaImage className="text-blue-500" />;
-    case 'video':
+    case 'VIDEO':
       return <FaVideo className="text-red-500" />;
-    case 'document':
+    case 'DOCUMENT':
       return <FaFileAlt className="text-green-500" />;
     default:
       return <span>Send your first message</span>;

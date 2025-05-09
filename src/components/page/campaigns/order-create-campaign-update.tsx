@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import FilterForm from "@/components/page/campaigns/campaign-filter";
 import { useForm } from "react-hook-form";
+import { NativeSelect } from "@/components/ui/native-select";
 import {
   Form,
   FormControl,
@@ -392,15 +393,14 @@ const OrderCreated = ({ id }: { id: string }) => {
                   </FormLabel>
 
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="lg:w-10/12  focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
-                        <SelectValue placeholder="Select a Category" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-blue-50 ">
-                        <SelectItem value="promotional">Promotional</SelectItem>
-                        <SelectItem value="utility">Utility</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <NativeSelect
+                        placeholder={`${field.value || "Select Trigger Type"}`}
+                        options={[
+                          { value: "promotional", label: "Promotional" },
+                          { value: "utility", label: "Utility" },
+                        ]}
+                        onChange={field.onChange}
+                      />
                   </FormControl>
                   <FormMessage>{fieldState.error?.message}</FormMessage>
                 </FormItem>
@@ -525,24 +525,19 @@ const OrderCreated = ({ id }: { id: string }) => {
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
                   <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                  
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select option" />
-                      </SelectTrigger>
-                  
-                    <SelectContent>
-                      <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                        Immediate
-                      </SelectItem>
-                      <SelectItem value="CUSTOM">
-                        Custom time after event
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <NativeSelect
+                        className="w-full"
+                        options={[
+                          {
+                            value: "AFTER_CAMPAIGN_CREATED",
+                            label: "Immediate",
+                          },
+                          { value: "CUSTOM", label: "Custom time after event" },
+                        ]}
+                        placeholder={`${field.value}` || "Select trigger type"}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                   </FormControl>
                 </FormItem>
               )}
@@ -604,20 +599,16 @@ const OrderCreated = ({ id }: { id: string }) => {
                   hours of getting the message.
                 </p>
                 <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                 
-                    <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
-                      <SelectValue placeholder="Transfer Bot" />
-                    </SelectTrigger>
-                
-                  <SelectContent>
-                    <SelectItem value="transfer">Transfer Bot</SelectItem>
-                    <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                  </SelectContent>
-                </Select>
+            <NativeSelect
+                    className="w-full"
+                    options={[
+                      { value: "transfer", label: "Transfer Bot" },
+                      { value: "welcome-bot", label: "Welcome bot" },
+                    ]}
+                    placeholder={field.value || "Transfer Bot"}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
               </FormItem>
             )}
