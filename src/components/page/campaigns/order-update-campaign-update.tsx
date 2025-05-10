@@ -39,6 +39,7 @@ import {
 } from "@/store/features/apislice";
 import CampaignSkeleton from "./campaign skeletion";
 import CampaignNotAvailable from "./not-available";
+import { NativeSelect } from "@/components/ui/native-select";
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
 const OrderUpdate = ({ id }: { id: string }) => {
@@ -397,22 +398,18 @@ const OrderUpdate = ({ id }: { id: string }) => {
                     </FormLabel>
 
                  
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
+                      
                            <FormControl>
-                        <SelectTrigger className="lg:w-10/12 focus:border-blue-500 bg-transparent border-gray-400 text-white rounded-3xl">
-                          <SelectValue placeholder="Select a Category" />
-                        </SelectTrigger>
+                   <NativeSelect
+                                          placeholder={`${field.value || "Select Trigger Type"}`}
+                                          options={[
+                                            { value: "promotional", label: "Promotional" },
+                                            { value: "utility", label: "Utility" },
+                                          ]}
+                                          onChange={field.onChange}
+                                        />
                         </FormControl>
-                        <SelectContent className="bg-blue-50">
-                          <SelectItem value="promotional">
-                            Promotional
-                          </SelectItem>
-                          <SelectItem value="utility">Utility</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        
                   
                     <FormMessage>{fieldState.error?.message}</FormMessage>
                   </FormItem>
@@ -537,23 +534,19 @@ const OrderUpdate = ({ id }: { id: string }) => {
                 <FormItem>
                   <FormLabel>When to trigger</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select option" />
-                      </SelectTrigger>
-
-                      <SelectContent>
-                        <SelectItem value="AFTER_CAMPAIGN_CREATED">
-                          Immediate
-                        </SelectItem>
-                        <SelectItem value="CUSTOM">
-                          Custom time after event
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                     <NativeSelect
+                        className="w-full"
+                        options={[
+                          {
+                            value: "AFTER_CAMPAIGN_CREATED",
+                            label: "Immediate",
+                          },
+                          { value: "CUSTOM", label: "Custom time after event" },
+                        ]}
+                        placeholder={`${field.value}` || "Select trigger type"}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                   </FormControl>
                 </FormItem>
               )}
@@ -614,19 +607,16 @@ const OrderUpdate = ({ id }: { id: string }) => {
                   hours of getting the message.
                 </p>
                 <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="bg-transparent lg:w-1/4 md:w-1/2 text-white">
-                      <SelectValue placeholder="Transfer Bot" />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      <SelectItem value="transfer">Transfer Bot</SelectItem>
-                      <SelectItem value="welcome-bot">Welcome bot</SelectItem>
-                    </SelectContent>
-                  </Select>
+                 <NativeSelect
+                    className="w-full"
+                    options={[
+                      { value: "transfer", label: "Transfer Bot" },
+                      { value: "welcome-bot", label: "Welcome bot" },
+                    ]}
+                    placeholder={field.value || "Transfer Bot"}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -885,7 +875,7 @@ const OrderUpdate = ({ id }: { id: string }) => {
             >
               Exit
             </Button>
-            <Button type="submit" className="bg-blue-500 text-white">
+            <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600">
               Save & Launch
             </Button>
           </div>

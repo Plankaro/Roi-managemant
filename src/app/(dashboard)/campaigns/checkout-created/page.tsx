@@ -803,7 +803,7 @@ const CheckoutCreated = () => {
             >
               Exit
             </Button>
-            <Button type="submit" className="bg-blue-500 text-white">
+            <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600">
               Save & Launch
             </Button>
           </div>

@@ -118,7 +118,7 @@ export default function ConversionsAnalytics() {
       </CardHeader>
       <CardContent>
         <ScrollArea className="w-full relative">
-          <div className="h-[400px] w-[60vw] min-w-[1070px] ">
+          <div className="h-[400px]  min-w-[1070px] ">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 40 }}>
                 <defs>

@@ -40,12 +40,16 @@ import {
   useUpdateCampaignMutation,
 } from "@/store/features/apislice";
 import CampaignSkeleton from "./campaign skeletion";
+import { useGetIntegrationsQuery } from "@/store/features/apislice";
 import CampaignNotAvailable from "./not-available";
+import { IntegrationStatus } from "@/app/(dashboard)/integrations/page";
+
 type CampaignFormValues = z.infer<typeof CampaignSchema>;
 
 const OrderCreated = ({ id }: { id: string }) => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [templateSelectionDialog, setTemplateSelectionDialog] = useState(false);
+    const { data } = useGetIntegrationsQuery({}) as { data?: IntegrationStatus; isLoading?: boolean }
 
 
   const { data: templates, isLoading: isTemplateLoading } =
@@ -331,21 +335,26 @@ const OrderCreated = ({ id }: { id: string }) => {
       value: "order_date",
     },
   ];
+const isRazorpayEnabled = data?.is_razorpay_connected;
 
-  const urldropdownOptions = [
-    {
-      type: "Order Status Link",
-      value: "order_status_link",
-    },
-    {
-      type: "COD to checkout link",
-      value: "cod_to_checkout_link",
-    },
-    {
-      type: "Shop URL",
-      value: "shop_url",
-    },
-  ];
+const urldropdownOptions = [
+  {
+    type: "Order Status Link",
+    value: "order_status_link",
+  },
+  // Conditionally add COD option
+  ...(isRazorpayEnabled
+    ? [{
+        type: "COD to checkout link",
+        value: "cod_to_checkout_link",
+      }]
+    : []),
+  {
+    type: "Shop URL",
+    value: "shop_url",
+  },
+];
+
 
     if(isCampaignloading || isTemplateLoading){
       return <CampaignSkeleton/>
@@ -871,7 +880,7 @@ const OrderCreated = ({ id }: { id: string }) => {
             >
               Exit
             </Button>
-            <Button type="submit" className="bg-blue-500 text-white">
+            <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600">
               Save & Launch
             </Button>
           </div>

@@ -941,7 +941,7 @@ const CheckoutCreated = ({ id }: { id: string }) => {
             >
               Exit
             </Button>
-            <Button type="submit" className="bg-blue-500 text-white">
+            <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
               Update & Launch
             </Button>
           </div>

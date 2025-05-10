@@ -34,10 +34,16 @@ export default function CodToCheckoutAnalytics() {
     })
 
     console.log(data?.totalCodtocheckoutlinkSent)
-  const chartData = [
-    { name: 'Total links sent', value:data?.totalCodtocheckoutlinkSent??0},
-    { name: 'Recovered', value: data?.totalCodtocheckoutlinkDelivered??0    },
-  ];
+const chartData = [
+  {
+    name: 'Total Unrecovered',
+    value: (data?.totalCodtocheckoutlinkSent ?? 0) - (data?.totalCodtocheckoutlinkDelivered ?? 0),
+  },
+  {
+    name: 'Recovered',
+    value: data?.totalCodtocheckoutlinkDelivered ?? 0,
+  },
+];
 
 
 

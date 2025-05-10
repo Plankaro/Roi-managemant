@@ -619,7 +619,7 @@ const OrderCancelled = () => {
             <Button variant="outline" type="button" className="bg-transparent border-primary">
               Exit
             </Button>
-            <Button type="submit" className="bg-blue-500 text-white">
+            <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600">
               Save & Launch
             </Button>
           </div>
